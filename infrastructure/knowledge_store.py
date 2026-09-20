@@ -2,6 +2,26 @@ import json, re, uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Hybrid retrieval uses scikit-learn + numpy for the semantic layer. They are
+# declared in requirements.txt, but a missing install must not take the whole
+# service down — we degrade to the keyword layer and say so once.
+try:
+    import numpy as np
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+    _HAS_SKLEARN = True
+except ImportError:  # pragma: no cover - depends on the runtime environment
+    _HAS_SKLEARN = False
+    _warned_missing_sklearn = False
+
+    def _warn_once():
+        global _warned_missing_sklearn
+        if not _warned_missing_sklearn:
+            _warned_missing_sklearn = True
+            print("[knowledge_store] scikit-learn not installed — retrieval is "
+                  "running on the keyword layer only. "
+                  "Install with: pip install -r requirements.txt")
+
 COLLECTIONS = ("historical_cases", "capabilities", "principles")
 def now(): return datetime.now(timezone.utc).isoformat()
 
@@ -82,8 +102,12 @@ class JsonKnowledgeStore(KnowledgeStore):
 
     def _build_tfidf(self, collection):
         """Lazy-build / rebuild TF-IDF index for one collection.
-        Returns (vec, matrix, records, texts_lower) or None when no approved records."""
-        from sklearn.feature_extraction.text import TfidfVectorizer
+        Returns (vec, matrix, records, texts_lower) or None when no approved records
+        or when scikit-learn is unavailable (keyword-only mode)."""
+        if not _HAS_SKLEARN:
+            _warn_once()
+            self._tfidf_cache[collection] = None
+            return None
         records = [r for r in self._records(collection) if r.get("review_status") == "approved"]
         if not records:
             self._tfidf_cache[collection] = None
@@ -106,9 +130,9 @@ class JsonKnowledgeStore(KnowledgeStore):
           - TF-IDF cosine layer (char_wb n-grams) — semantic tolerance for Chinese and
             English variants of the same concept.
           - Final score: 0.5 * kw + 0.5 * tfidf (tfidf scaled to kw-magnitude).
+        When scikit-learn is missing the TF-IDF layer contributes 0 and the
+        keyword layer carries the ranking on its own.
         """
-        from sklearn.metrics.pairwise import cosine_similarity
-        import numpy as np
         terms = set(re.findall(r"[a-z0-9]+", (query or "").lower()))
         q_lower = (query or "").lower()
         hits = []
@@ -125,7 +149,9 @@ class JsonKnowledgeStore(KnowledgeStore):
             if cached is None and c not in self._tfidf_cache:
                 cached = self._build_tfidf(c)
             if cached is None:
-                tfidf_scores = np.zeros(len(records))
+                # No TF-IDF available (no approved records, or scikit-learn missing).
+                # Plain list rather than np.zeros so this path needs no numpy either.
+                tfidf_scores = [0.0] * len(records)
                 texts_lower = [json.dumps(r, ensure_ascii=False).lower() for r in records]
             else:
                 vec, matrix, cached_records, texts_lower = cached

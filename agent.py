@@ -7,7 +7,7 @@ Usage:
   python3 agent.py message --opportunity-id opp_1 --text '...'
 """
 from __future__ import annotations
-import argparse, json, os, re, uuid
+import argparse, base64, json, os, re, secrets, uuid
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 from datetime import datetime, timezone
@@ -95,6 +95,11 @@ class EvidenceRetriever:
 
 class CorporateEventAgent:
     def __init__(self):
+        # Bootstrap BEFORE loading state: on a fresh checkout this copies the
+        # committed examples/ into data/, and self.db must be populated from the
+        # resulting files. Loading first would leave the first-run API empty
+        # until a restart.
+        self._bootstrap_examples_if_empty()
         self.db = self._load_opportunities()
         self.routes = load(ROUTES, {})   # email -> active opportunity_id
         self.deepseek_key = os.getenv("DEEPSEEK_API_KEY", "")
@@ -104,7 +109,6 @@ class CorporateEventAgent:
         self.knowledge_store = JsonKnowledgeStore(STORE / "knowledge")
         self.knowledge_importer = KnowledgeImporter(self.knowledge_store)
         self.retriever = EvidenceRetriever(self.knowledge_store)
-        self._bootstrap_examples_if_empty()
         self._seed_legacy_knowledge()
 
     # ---------- one-time bootstrap ----------
@@ -709,11 +713,44 @@ gotchas. Do not invent prices or commitments.'''
 
 class Handler(BaseHTTPRequestHandler):
     agent = CorporateEventAgent()
+    # Optional HTTP Basic auth. Set AGENT_AUTH="user:pass" to require credentials on
+    # every route. Leave unset for local development. Always set it when binding to
+    # 0.0.0.0 or exposing the review UIs to a network — there is no other access control.
+    AUTH = os.getenv("AGENT_AUTH", "").strip()
+
+    def _authorized(self):
+        if not Handler.AUTH: return True
+        header = self.headers.get("Authorization", "")
+        if not header.startswith("Basic "): return False
+        try:
+            given = base64.b64decode(header[6:]).decode("utf-8")
+        except Exception:
+            return False
+        # constant-time compare so a wrong password cannot be timed out byte by byte
+        return secrets.compare_digest(given, Handler.AUTH)
+
+    def _require_auth(self):
+        """True when the request may proceed; otherwise answers 401 and returns False."""
+        if self._authorized(): return True
+        self.send_response(401)
+        self.send_header("WWW-Authenticate", 'Basic realm="corporate-event-agent"')
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+        return False
+
     def send_json(self, data, code=200):
         raw=json.dumps(data, ensure_ascii=False).encode(); self.send_response(code); self.send_header("Content-Type","application/json; charset=utf-8"); self.send_header("Content-Length",str(len(raw))); self.end_headers(); self.wfile.write(raw)
     def send_html(self, path):
         raw=Path(path).read_bytes(); self.send_response(200); self.send_header("Content-Type","text/html; charset=utf-8"); self.send_header("Content-Length",str(len(raw))); self.end_headers(); self.wfile.write(raw)
     def do_GET(self):
+        if not self._require_auth(): return
+        try:
+            self._route_get()
+        except Exception as e:
+            # A broken request should answer 500, not drop the connection.
+            self.send_json({"error": str(e)}, 500)
+
+    def _route_get(self):
         from urllib.parse import parse_qs, urlparse
         parsed = urlparse(self.path); q = parse_qs(parsed.query); route = parsed.path
         if route == "/health": return self.send_json({"ok":True,"service":"corporate-event-agent"})
@@ -734,6 +771,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(self.agent.db.get(route.split("/")[-1], {}))
         self.send_json({"error":"not found"},404)
     def do_POST(self):
+        if not self._require_auth(): return
         try:
             body=json.loads(self.rfile.read(int(self.headers.get("Content-Length",0))) or b"{}")
             parts=self.path.strip("/").split("/")
@@ -750,12 +788,20 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     p=argparse.ArgumentParser(); sub=p.add_subparsers(dest="cmd",required=True)
-    s=sub.add_parser("serve"); s.add_argument("--port",type=int,default=8080)
+    s=sub.add_parser("serve")
+    s.add_argument("--port",type=int,default=int(os.getenv("PORT","8080")))
+    s.add_argument("--host",default=os.getenv("HOST","127.0.0.1"),
+                   help="bind address; use 0.0.0.0 inside containers or when exposing to a network")
     m=sub.add_parser("message"); m.add_argument("--text",required=True); m.add_argument("--opportunity-id"); m.add_argument("--from-email"); m.add_argument("--new-opportunity",action="store_true")
     c=sub.add_parser("close"); c.add_argument("--id",required=True); c.add_argument("--outcome",required=True,choices=["won","lost"]); c.add_argument("--note",default="")
     sub.add_parser("demo")
     a=p.parse_args(); agent=CorporateEventAgent()
-    if a.cmd=="serve": print(f"Agent listening on http://localhost:{a.port}"); ThreadingHTTPServer(("127.0.0.1",a.port),Handler).serve_forever()
+    if a.cmd=="serve":
+        print(f"Agent listening on http://{a.host}:{a.port}"
+              + ("  [HTTP Basic auth enabled]" if Handler.AUTH else "  [no auth — local only]"))
+        print("  LLM: " + (f"enabled ({agent.deepseek_model})" if agent.deepseek_key
+                           else "DISABLED — no DEEPSEEK_API_KEY, falling back to regex-only paths"))
+        ThreadingHTTPServer((a.host,a.port),Handler).serve_forever()
     elif a.cmd=="message": print(json.dumps(agent.message(a.text,a.opportunity_id,a.from_email,a.new_opportunity),ensure_ascii=False,indent=2))
     elif a.cmd=="close": print(json.dumps(agent.close(a.id,a.outcome,a.note),ensure_ascii=False,indent=2))
     else:

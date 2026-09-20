@@ -10,19 +10,34 @@ through its OpenAI-compatible API.
 
 ## Quick start
 
+Requires **Python 3.9+**. The only third-party dependencies are scikit-learn and
+numpy (hybrid retrieval); everything else is stdlib.
+
 ```bash
-# 1. Clone and configure
+# 1. Clone and install dependencies
 git clone <repo-url>
 cd <project>
+python3 -m venv .venv && source .venv/bin/activate   # optional but recommended
+pip install -r requirements.txt
+
+# 2. Configure
 cp .env.example .env
 echo "DEEPSEEK_API_KEY=your-key-here" >> .env
 
-# 2. Run the demo (uses a built-in wellness-workshop prompt)
+# 3. Run the demo (uses a built-in wellness-workshop prompt)
 python3 agent.py demo
 
-# 3. Or start the HTTP service
+# 4. Or start the HTTP service
 python3 agent.py serve --port 8080
 ```
+
+Without `DEEPSEEK_API_KEY` the service still starts — extraction falls back to
+regex-only paths and drafting is skipped. The startup banner tells you which
+mode you are in.
+
+If `scikit-learn` is missing, the service also keeps running: retrieval drops to
+the keyword layer only (no TF-IDF cosine), prints a one-line warning, and every
+route stays up. Install `requirements.txt` for full hybrid ranking.
 
 The service exposes a tiny HTTP API and three review UIs:
 
@@ -134,9 +149,8 @@ curl -X POST http://localhost:8080/opportunities/opp_xxxxxxxx/approve \
 curl -X POST http://localhost:8080/opportunities/opp_xxxxxxxx/reflect \
   -H 'content-type: application/json' -d '{"human_output":"...","note":"Adjust tone here only"}'
 
-# Search the knowledge store (tags optional list)
-curl -X POST http://localhost:8080/knowledge/search \
-  -H 'content-type: application/json' -d '{"query":"matcha workshop pricing","tags":["style"]}'
+# Search the knowledge store (GET, query string)
+curl 'http://localhost:8080/knowledge/search?q=matcha+workshop+pricing'
 
 # Import an old email thread as a candidate historical case
 curl -X POST http://localhost:8080/knowledge/import \
@@ -144,13 +158,15 @@ curl -X POST http://localhost:8080/knowledge/import \
   -d '{"source_type":"email_thread","raw":"ACME Corp planned a 90 pax matcha workshop …"}'
 ```
 
-The full list of routes is at the bottom of `agent.py` `Handler.do_POST`.
+With `AGENT_AUTH` set, add `-u user:pass` to every request. The full list of
+routes is at the bottom of `agent.py` — `Handler.do_GET` and `Handler.do_POST`.
 
 ## Project layout
 
 ```
 .
 ├── agent.py                  # main service + CLI
+├── healthcheck.py            # container healthcheck probe (stdlib only)
 ├── infrastructure/           # JsonKnowledgeStore, EvidenceRetriever, services
 │   └── knowledge_store.py
 ├── ingestion/                # KnowledgeImporter (source extraction)
@@ -161,10 +177,68 @@ The full list of routes is at the bottom of `agent.py` `Handler.do_POST`.
 │   ├── seed_knowledge/       # historical_cases + capabilities + principles
 │   └── legacy_knowledge.json # flat legacy seed used by the inline importer
 ├── data/                     # runtime state (gitignored, auto-bootstrapped from examples/)
+├── requirements.txt          # scikit-learn + numpy
+├── Dockerfile                # python:3.12-slim, non-root, healthchecked
+├── docker-compose.yml        # single-service deploy with a persistent data volume
+├── .dockerignore
 ├── .env.example              # copy → .env, fill in DEEPSEEK_API_KEY
 ├── LICENSE                   # MIT
 └── README.md
 ```
+
+## Deployment
+
+Three supported paths. Pick by how much isolation you need.
+
+### A. Local process (fastest)
+
+```bash
+pip install -r requirements.txt
+cp .env.example .env && echo "DEEPSEEK_API_KEY=..." >> .env
+python3 agent.py serve --port 8080        # binds 127.0.0.1 only
+```
+
+Nothing is exposed to the network, so `AGENT_AUTH` is not needed.
+
+### B. Docker Compose (self-hosting, recommended)
+
+```bash
+cp .env.example .env
+# fill in DEEPSEEK_API_KEY, and set AGENT_AUTH="user:pass"
+docker compose up -d --build
+```
+
+State lives in the named volume `agent-data`, so opportunities and approved
+knowledge survive rebuilds. To wipe it and return to the shipped seed:
+`docker compose down -v`.
+
+By default compose publishes the port on **127.0.0.1 only**. To expose it on
+your LAN, set `BIND_ADDR` in `.env`:
+
+```bash
+BIND_ADDR=0.0.0.0
+HOST_PORT=8080
+AGENT_AUTH=admin:change-me     # now mandatory
+```
+
+### C. Platform as a service (Railway / Render / Fly.io)
+
+The container reads `HOST` and `PORT` from the environment, so those platforms
+work without code changes. Two things to configure:
+
+1. **Attach a persistent volume mounted at `/app/data`.** Without it the
+   filesystem resets on every deploy and all opportunities are lost.
+2. **Set `AGENT_AUTH`.** A public URL without auth exposes every customer
+   conversation and the whole knowledge store to anyone who guesses the domain.
+
+Health checks can point at `GET /health` (returns 401 with auth on, which is
+expected — it proves the process is alive).
+
+> **Security note.** The review UIs and JSON APIs have no built-in account
+> system beyond the single shared `AGENT_AUTH` credential, and they are not
+> designed for untrusted multi-user exposure. Treat them as an internal tool:
+> keep them on localhost, a private network, or behind an authenticating
+> reverse proxy.
 
 ## Configuration
 
@@ -176,6 +250,11 @@ fallback):
 | `DEEPSEEK_API_KEY`  | *(required for LLM)*     | Without it the agent falls back to regex-only paths |
 | `DEEPSEEK_MODEL`    | `deepseek-chat`          | Any OpenAI-compatible model name |
 | `DEEPSEEK_BASE_URL` | `https://api.deepseek.com` | Override for self-hosted or proxies |
+| `HOST`              | `127.0.0.1`              | Bind address. Default is local-only; use `0.0.0.0` in containers |
+| `PORT`              | `8080`                   | Bind port; PaaS providers usually inject this |
+| `AGENT_AUTH`        | *(empty = no auth)*      | `user:pass` enables HTTP Basic auth on every route |
+
+`--host` / `--port` flags override the corresponding environment variables.
 
 Never commit `DEEPSEEK_API_KEY`. The supported defaults are
 `deepseek-chat` and `https://api.deepseek.com`.

@@ -1,0 +1,10 @@
+# Runtime dependencies for the corporate event collaboration agent.
+#
+# scikit-learn and numpy power the hybrid retrieval layer
+# (TF-IDF char_wb n-grams + cosine similarity) in
+# infrastructure/knowledge_store.py. Everything else is Python stdlib.
+#
+#   pip install -r requirements.txt
+
+scikit-learn>=1.3,<2.0
+numpy>=1.24

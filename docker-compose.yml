@@ -1,0 +1,36 @@
+# Self-hosted deployment with a persistent data volume.
+#
+#   cp .env.example .env      # then fill in DEEPSEEK_API_KEY and AGENT_AUTH
+#   docker compose up -d --build
+#   open http://localhost:8080/opportunities/review
+#
+# Compose reads .env automatically for the ${...} substitutions below.
+
+services:
+  agent:
+    build: .
+    image: corporate-event-agent:latest
+    container_name: corporate-event-agent
+    restart: unless-stopped
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${HOST_PORT:-8080}:8080"
+    environment:
+      # Required for the LLM path (message interpretation + customer-facing drafting).
+      # Without it the agent still runs, but falls back to regex-only extraction.
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-chat}
+      DEEPSEEK_BASE_URL: ${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+
+      # Strongly recommended: "user:pass" enables HTTP Basic auth on every route.
+      # Leave empty ONLY if the port is bound to 127.0.0.1 (the default above).
+      AGENT_AUTH: ${AGENT_AUTH:-}
+
+      HOST: "0.0.0.0"
+      PORT: "8080"
+    volumes:
+      # Opportunities + knowledge store live here. Named volume keeps them
+      # across `docker compose down` / rebuilds.
+      - agent-data:/app/data
+
+volumes:
+  agent-data:

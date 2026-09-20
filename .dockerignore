@@ -1,0 +1,29 @@
+# Keep the build context small and never ship local state or secrets.
+
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+
+# Runtime state — regenerated from examples/ on first start inside the container
+data/
+
+# Local tooling
+.workbuddy/
+.idea/
+.vscode/
+.DS_Store
+
+# Python noise
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.log
+*.migrated
+
+# Local docs / license are not needed inside the image
+README.md
+LICENSE
+docker-compose.yml
