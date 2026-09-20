@@ -1,0 +1,12 @@
+{
+  "name": "Globex Co",
+  "pax": 300,
+  "service": "drinks",
+  "price": "S$2,550",
+  "notes": "S$600 setup",
+  "id": "seed_case_globex",
+  "review_status": "approved",
+  "origin": "legacy_seed",
+  "collection": "historical_cases",
+  "created_at": "2026-09-14T17:36:32.135295+00:00"
+}

@@ -1,0 +1,284 @@
+{
+  "id": "seed_opp_charlie",
+  "created_at": "2026-09-01T00:00:00+00:00",
+  "updated_at": "2026-09-01T00:00:00+00:00",
+  "mode": "discovery",
+  "customer": {
+    "contact_email": "client@example.invalid"
+  },
+  "requirements": {
+    "event_type": {
+      "value": "year-end celebration",
+      "confidence": "llm",
+      "source": "llm_interpretation",
+      "explicit": false,
+      "updated_at": "2026-09-19T18:33:40.323375+00:00"
+    },
+    "pax": {
+      "value": 40,
+      "confidence": "llm",
+      "source": "llm_interpretation",
+      "explicit": false,
+      "updated_at": "2026-09-19T18:33:40.323392+00:00"
+    },
+    "event_date": {
+      "value": "December",
+      "confidence": "llm",
+      "source": "llm_interpretation",
+      "explicit": false,
+      "updated_at": "2026-09-19T18:33:40.323402+00:00"
+    }
+  },
+  "operational": {},
+  "commercial": {},
+  "commitments": {
+    "company": [],
+    "customer": [],
+    "pending": []
+  },
+  "conversation": [
+    {
+      "id": "msg__opp_charlie_01",
+      "role": "customer",
+      "text": "Hi again! The session went wonderfully. We are now planning a bigger year-end celebration for the whole firm, about 40 people, in December.",
+      "at": "2026-09-01T00:00:00+00:00"
+    },
+    {
+      "role": "agent",
+      "text": "**Subject: Your Year-End Celebration in December**\n\nHi the client,\n\nThank you for the kind words — it was a pleasure hosting your team, and I'm glad the session went so well.\n\nIt's exciting to hear you're planning a year-end celebration for the whole firm. Noting around 40 guests in December, we've hosted similar celebrations for teams of that size, so we're well set up to make it a memorable evening.\n\nTo get started, could you let me know if you have a specific date in December in mind, and what time you'd like the celebration to begin?\n\nOnce I have those details, I'll put together some options for you.\n\nBest regards,\n[Your Name]",
+      "at": "2026-09-01T00:00:00+00:00",
+      "action": "ask_customer"
+    }
+  ],
+  "history": [
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "customer.contact_email",
+      "from": null,
+      "to": "client@example.invalid",
+      "source": "email_header"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "same_event_check",
+      "confidence": "medium",
+      "reason": "Message references the prior successful session but describes a new, larger year-end celebration for the whole firm (~40 people) in December, which is a different purpose and scale from the earlier session."
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "event_type",
+      "from": null,
+      "to": "year-end celebration",
+      "source": "llm_interpretation"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "pax",
+      "from": null,
+      "to": 40,
+      "source": "llm_interpretation"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "event_date",
+      "from": null,
+      "to": "December",
+      "source": "llm_interpretation"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "agent_action",
+      "action": "ask_customer",
+      "changed": true
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "ai_reflection_summary",
+      "buckets": [
+        "commercial",
+        "style"
+      ],
+      "insight_count": 4
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "ai_reflection_summary",
+      "buckets": [
+        "capability",
+        "style"
+      ],
+      "insight_count": 2
+    }
+  ],
+  "decision": null,
+  "interpretations": [
+    {
+      "at": "2026-09-19T18:33:40.323428+00:00",
+      "interpretation": {
+        "customer_updates": {},
+        "requirement_updates": {
+          "event_type": "year-end celebration",
+          "pax": 40,
+          "event_date": "December"
+        },
+        "operational_updates": {},
+        "commercial_updates": {},
+        "commitments": {
+          "company": [],
+          "customer": []
+        },
+        "next_question": "Do you have a specific date in December in mind, and what time would you like the celebration to start?",
+        "same_event": {
+          "confidence": "medium",
+          "reason": "Message references the prior successful session but describes a new, larger year-end celebration for the whole firm (~40 people) in December, which is a different purpose and scale from the earlier session."
+        }
+      },
+      "applied": [
+        "event_type",
+        "pax",
+        "event_date"
+      ]
+    }
+  ],
+  "agent_plan": {
+    "matters_now": [
+      "resolve the highest-value missing requirement"
+    ],
+    "missing_information": [
+      "venue",
+      "service",
+      "event_time",
+      "event_duration_hours"
+    ],
+    "retrieval_needed": [
+      "service_knowledge"
+    ],
+    "next_action": "ask_customer",
+    "reason": "missing material fields: venue, service, event_time, event_duration_hours",
+    "customer_reply_strategy": "Thank the customer, confirm what is already known, and ask only the highest-value question."
+  },
+  "retrieved_evidence": {},
+  "change_impact": {
+    "triggered": true,
+    "changes": [
+      {
+        "at": "2026-09-19T18:33:40.323384+00:00",
+        "type": "state_change",
+        "field": "event_type",
+        "from": null,
+        "to": "year-end celebration",
+        "source": "llm_interpretation"
+      },
+      {
+        "at": "2026-09-19T18:33:40.323396+00:00",
+        "type": "state_change",
+        "field": "pax",
+        "from": null,
+        "to": 40,
+        "source": "llm_interpretation"
+      },
+      {
+        "at": "2026-09-19T18:33:40.323405+00:00",
+        "type": "state_change",
+        "field": "event_date",
+        "from": null,
+        "to": "December",
+        "source": "llm_interpretation"
+      }
+    ],
+    "impacts": [
+      "commercial estimate",
+      "equipment",
+      "quotation validity",
+      "setup schedule",
+      "staff availability",
+      "staffing",
+      "supplier deadlines",
+      "throughput"
+    ],
+    "human_review_required": true,
+    "reason": "existing state or commitment may be affected"
+  },
+  "reflections": [
+    {
+      "at": "2026-09-20T07:53:56.096420+00:00",
+      "human_output": "Hi the client,\n\nThanks for sharing the updated headcount — we'll plan for 10 guests at the Moss Matcha store. The fee is S$120 and includes a 2-hour hands-on lab with two facilitators. Next step: confirm venue access and final dietary requirements.\n\nBest,\nThe Events Team",
+      "note": "Removed exclamation marks. Lead with confirmed details. Pricing excludes GST unless asked.",
+      "buckets": {
+        "style": [
+          "Lead with confirmed details rather than pleasantries or recap of prior conversation.",
+          "Avoid exclamation marks in outbound client communications.",
+          "Keep replies concise and action-oriented, ending with a clear next step."
+        ],
+        "commercial": [
+          "State the fee and what it includes upfront; exclude taxes such as GST unless the client explicitly asks."
+        ],
+        "capability": []
+      },
+      "rationale": "The human edit tightened the reply to lead with confirmed logistics and pricing, dropped exclamation marks, and omitted tax from the quoted fee.",
+      "applied": [
+        "commercial",
+        "style"
+      ]
+    },
+    {
+      "at": "2026-09-20T07:54:15.553622+00:00",
+      "human_output": "Hi the client,\n\nThanks for the wedding reception enquiry. Unfortunately corporate-event workshops are our core offering; for wedding receptions we partner with boutique catering firms and I'd be happy to refer you to one of them.\n\nWarm regards,\nThe Events Team",
+      "note": "We don't host wedding receptions. Refer to partner vendors and decline politely.",
+      "buckets": {
+        "style": [
+          "Verify the recipient's name and event details before sending any reply, as drafts may contain incorrect assumptions."
+        ],
+        "commercial": [],
+        "capability": [
+          "Decline event types outside our core offering and refer the client to partner vendors instead of attempting to accommodate them."
+        ]
+      },
+      "rationale": "The human corrected the recipient name and event type, declining the out-of-scope wedding reception and referring to a partner vendor rather than proceeding with the AI's assumed corporate celebration.",
+      "applied": [
+        "capability",
+        "style"
+      ]
+    }
+  ],
+  "style_lessons": [
+    {
+      "text": "Lead with confirmed details rather than pleasantries or recap of prior conversation.",
+      "at": "2026-09-20T07:53:56.096420+00:00",
+      "source": "ai_reflection"
+    },
+    {
+      "text": "Avoid exclamation marks in outbound client communications.",
+      "at": "2026-09-20T07:53:56.096420+00:00",
+      "source": "ai_reflection"
+    },
+    {
+      "text": "Keep replies concise and action-oriented, ending with a clear next step.",
+      "at": "2026-09-20T07:53:56.096420+00:00",
+      "source": "ai_reflection"
+    },
+    {
+      "text": "Verify the recipient's name and event details before sending any reply, as drafts may contain incorrect assumptions.",
+      "at": "2026-09-20T07:54:15.553622+00:00",
+      "source": "ai_reflection"
+    }
+  ],
+  "commercial_lessons": [
+    {
+      "text": "State the fee and what it includes upfront; exclude taxes such as GST unless the client explicitly asks.",
+      "at": "2026-09-20T07:53:56.096420+00:00",
+      "source": "ai_reflection"
+    }
+  ],
+  "capability_lessons": [
+    {
+      "text": "Decline event types outside our core offering and refer the client to partner vendors instead of attempting to accommodate them.",
+      "at": "2026-09-20T07:54:15.553622+00:00",
+      "source": "ai_reflection"
+    }
+  ]
+}

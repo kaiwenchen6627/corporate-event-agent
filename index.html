@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gatherly — Event Opportunity Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">g</span><span>gatherly</span></div>
+    <div class="workspace-label">WORKSPACE</div>
+    <nav>
+      <a class="nav-item active" href="#"><span>◈</span> Opportunities <b>12</b></a>
+      <a class="nav-item" href="#"><span>✦</span> Knowledge base</a>
+      <a class="nav-item" href="#"><span>↗</span> Reflections</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="sync"><span class="dot"></span><span>Agent online</span><small>v1.4</small></div>
+      <div class="user"><div class="avatar">JW</div><div><strong>Jamie Wong</strong><small>Event operations</small></div><span>⌄</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><div class="eyebrow">OPPORTUNITIES / WELLNESS EVENTS</div><h1>Project Matcha</h1></div>
+      <div class="header-actions"><span class="status-pill"><span class="dot"></span> Awaiting human review</span><button class="icon-btn">⋯</button><button class="primary" id="approveTop">Approve recommendation <span>↗</span></button></div>
+    </header>
+
+    <section class="meta-row"><div class="meta"><span class="meta-icon">◎</span><div><small>CLIENT</small><strong>Common Ground</strong></div></div><div class="meta"><span class="meta-icon">◷</span><div><small>EVENT DATE</small><strong>20 October 2025</strong></div></div><div class="meta"><span class="meta-icon">♧</span><div><small>AGENT MODE</small><strong><span class="mode-dot"></span> Solution</strong></div></div><div class="meta"><span class="meta-icon">↺</span><div><small>LAST UPDATED</small><strong>Today, 10:42 AM</strong></div></div></section>
+
+    <div class="content-grid">
+      <section class="left-col">
+        <div class="section-heading"><div><div class="eyebrow">LIVE EVENT MEMORY</div><h2>Current event state</h2></div><button class="text-btn" id="showHistory">View change history <span>→</span></button></div>
+        <div class="state-card">
+          <div class="state-group"><div class="group-title"><span class="state-icon coral">◉</span><h3>Customer</h3><span class="complete">Complete</span></div><div class="state-fields"><div><small>Company</small><strong>Common Ground</strong></div><div><small>Contact</small><strong>Amelia Tan <em>·</em> Event lead</strong></div><div><small>Type</small><strong>Direct client</strong></div></div></div>
+          <div class="state-group"><div class="group-title"><span class="state-icon blue">✦</span><h3>Requirements</h3><span class="complete">6 / 8 known</span></div><div class="state-fields"><div><small>Event</small><strong>Wellness day</strong></div><div><small>Attendance</small><strong>80 employees <em>·</em> confirmed</strong></div><div><small>Service</small><strong>Matcha workshop</strong></div><div><small>Venue</small><strong>Common Ground, KL</strong></div><div><small>Date & time</small><strong>20 Oct <em>·</em> 10:00 AM</strong></div><div><small>Duration</small><strong>2 hours</strong></div></div><div class="missing"><span>?</span><div><strong>2 open questions</strong><small>Budget and dietary requirements can wait until proposal.</small></div><button class="mini-btn">Review gaps</button></div></div>
+          <div class="state-group"><div class="group-title"><span class="state-icon purple">⌁</span><h3>Operational</h3><span class="warning">Needs review</span></div><div class="state-fields"><div><small>Setup</small><strong>2m × 2m footprint</strong></div><div><small>Throughput</small><strong>40 participants / hour</strong></div><div><small>Venue access</small><strong>Loading bay pending</strong></div><div><small>Equipment</small><strong>Hot water, whisking sets</strong></div></div></div>
+          <div class="state-group"><div class="group-title"><span class="state-icon gold">◌</span><h3>Commercial & commitments</h3><span class="complete">No commitments yet</span></div><div class="state-fields"><div><small>Price reference</small><strong>S$12 / pax workshop</strong></div><div><small>Customer commitment</small><strong>Confirm venue access</strong></div><div><small>Company commitment</small><strong>Share feasible options</strong></div></div></div>
+        </div>
+
+        <div class="section-heading conversation-heading"><div><div class="eyebrow">CUSTOMER COLLABORATION LOOP</div><h2>Conversation</h2></div><button class="text-btn">Open inbox <span>→</span></button></div>
+        <div class="conversation">
+          <div class="message customer"><div class="avatar teal">AT</div><div class="bubble"><div class="message-head"><strong>Amelia Tan</strong><span>Today, 9:12 AM</span></div><p>Hi Jamie, we're planning a wellness day for around 80 employees at our KL office on 20 October. We'd love to explore a matcha workshop.</p></div></div>
+          <div class="agent-note"><span>✦</span><div><strong>Agent update</strong><p>Understood the event, venue, date, pax and requested service. Asked only for timing and workshop format because they materially affect feasibility.</p></div><small>9:14 AM</small></div>
+          <div class="message customer"><div class="avatar teal">AT</div><div class="bubble"><div class="message-head"><strong>Amelia Tan</strong><span>Today, 10:31 AM</span></div><p>10am would be ideal, and we're happy with a 2-hour session. A hands-on format sounds great.</p></div></div>
+          <div class="message agent"><div class="avatar dark">✦</div><div class="bubble"><div class="message-head"><strong>Gatherly Agent <span class="tag">DRAFT</span></strong><span>Today, 10:42 AM</span></div><p>Thanks Amelia — that gives us enough to shape a first proposal. I’ve put together a few workshop formats for Jamie to review. We’ll come back shortly with the best fit for your team.</p></div></div>
+        </div>
+      </section>
+
+      <aside class="right-col">
+        <div class="brief-card"><div class="card-top"><div><div class="eyebrow">AI SITUATION BRIEF</div><h2>What matters now</h2></div><span class="sparkle">✦</span></div><p>Common Ground needs an engaging, low-friction activity for 80 employees. The 2-hour hands-on format is feasible, but the loading bay and hot water access should be confirmed before a final commitment.</p><div class="brief-footer"><span>Confidence <b>87%</b></span><span>Updated just now</span></div></div>
+        <div class="references"><div class="section-heading compact"><div><div class="eyebrow">RETRIEVED EVIDENCE</div><h2>Relevant references</h2></div><button class="icon-btn">↗</button></div><div class="reference-item"><span class="ref-icon coral">↗</span><div><strong>PUMA · 90 pax workshop</strong><small>S$12 / pax · 2-hour presence</small><em>High similarity</em></div><span>›</span></div><div class="reference-item"><span class="ref-icon blue">⌁</span><div><strong>Workshop playbook</strong><small>40 pax / hour · 2m × 2m setup</small><em>Service knowledge</em></div><span>›</span></div><div class="reference-item"><span class="ref-icon purple">◌</span><div><strong>KL venue operations</strong><small>Loading bay + hot water checklist</small><em>Operational knowledge</em></div><span>›</span></div></div>
+        <div class="recommendation"><div class="section-heading compact"><div><div class="eyebrow">AI RECOMMENDATION</div><h2>Solution options</h2></div><span class="review-tag">Human review</span></div><div class="option recommended"><div class="option-head"><span class="option-label">B</span><div><strong>Recommended · Guided matcha lab</strong><small>Hands-on workshop with a shared tasting</small></div><span class="price">S$960</span></div><ul><li>2 facilitators · 2 hours</li><li>80 tasting kits + premium matcha</li><li>Setup, teardown and printed guide</li></ul><button class="select-btn selected" data-option="B">Selected by agent <span>✓</span></button></div><div class="option"><div class="option-head"><span class="option-label">A</span><div><strong>Essential workshop</strong><small>Simple demonstration and tasting</small></div><span class="price">S$720</span></div><button class="select-btn" data-option="A">Select option</button></div><div class="option"><div class="option-head"><span class="option-label">C</span><div><strong>Premium team experience</strong><small>Workshop, bar and branded take-home set</small></div><span class="price">S$1,480</span></div><button class="select-btn" data-option="C">Select option</button></div><div class="assumptions"><strong>Assumptions & risks</strong><span>⌄</span><p>Venue provides a 13A power point and hot water. Final access confirmation needed by 10 Oct.</p></div></div>
+        <div class="decision"><div><div class="eyebrow">HUMAN DECISION</div><h2>Ready to approve?</h2><p>Approve option B to generate a client-facing proposal from the approved scope.</p></div><button class="primary full" id="approve">Approve & generate reply <span>↗</span></button><button class="secondary full" id="edit">Edit scope first</button></div>
+      </aside>
+    </div>
+  </main>
+  <div class="toast" id="toast">Recommendation approved — proposal draft generated.</div>
+  <script src="app.js"></script>
+</body>
+</html>

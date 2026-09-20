@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>机会管理 — Corporate Event Agent</title>
+<style>
+  :root { --bg:#f6f8fa; --card:#ffffff; --line:#d0d7de; --text:#1f2328; --muted:#57606a;
+          --blue:#0969da; --green:#1a7f37; --red:#cf222e; --amber:#9a6700; --purple:#8250df; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,'PingFang SC','Segoe UI',sans-serif; background:var(--bg); color:var(--text);
+         display:flex; height:100vh; overflow:hidden; }
+  aside { width:360px; min-width:360px; border-right:1px solid var(--line); background:var(--card);
+          display:flex; flex-direction:column; }
+  aside header { padding:14px 16px; border-bottom:1px solid var(--line); }
+  aside header h1 { font-size:15px; }
+  aside header .sub { font-size:11px; color:var(--muted); margin-top:3px; }
+  #list { overflow-y:auto; flex:1; }
+  .section-title { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;
+                   letter-spacing:.04em; padding:12px 16px 6px; }
+  .opp { padding:10px 16px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .opp:hover { background:#f3f4f6; }
+  .opp.active { background:#eaefff; border-left:3px solid var(--blue); padding-left:13px; }
+  .opp .row1 { display:flex; align-items:center; gap:8px; }
+  .opp .name { font-weight:600; font-size:13px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .badge { font-size:10px; font-weight:600; padding:2px 7px; border-radius:10px; }
+  .b-discovery { background:#fff8c5; color:var(--amber); }
+  .b-solution { background:#ddf4ff; color:var(--blue); }
+  .b-collaboration { background:#fbefff; color:var(--purple); }
+  .b-won { background:#dafbe1; color:var(--green); }
+  .b-lost { background:#ffebe9; color:var(--red); }
+  .opp .meta { font-size:11px; color:var(--muted); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  main { flex:1; overflow-y:auto; padding:24px 32px; }
+  .empty { color:var(--muted); font-size:13px; padding:40px; text-align:center; }
+  h2 { font-size:17px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .kv-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px; margin:16px 0; }
+  .kv { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .kv .k { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  .kv .v { font-size:13px; margin-top:3px; word-break:break-word; }
+  .kv .src { font-size:10px; color:var(--muted); margin-top:4px; }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin-bottom:18px; }
+  .panel h3 { font-size:13px; margin-bottom:10px; color:var(--muted); }
+  .msg { display:flex; gap:10px; padding:9px 0; border-bottom:1px solid #eaeef2; }
+  .msg:last-child { border-bottom:none; }
+  .msg .who { font-size:10px; font-weight:700; min-width:44px; padding-top:2px; }
+  .who.customer { color:var(--blue); } .who.agent { color:var(--green); }
+  .msg .body { font-size:12.5px; line-height:1.55; white-space:pre-wrap; word-break:break-word; }
+  .msg .at { font-size:10px; color:var(--muted); }
+  .actions { display:flex; gap:10px; flex-wrap:wrap; margin:6px 0 4px; }
+  button { font-size:12px; padding:7px 14px; border-radius:6px; border:1px solid var(--line);
+           background:var(--card); cursor:pointer; font-weight:600; }
+  button:hover { background:#f3f4f6; }
+  button.primary { background:var(--blue); border-color:var(--blue); color:#fff; }
+  button.primary:hover { background:#0860c4; }
+  button.won { background:var(--green); border-color:var(--green); color:#fff; }
+  button.won:hover { background:#116329; }
+  button.lost { background:var(--card); border-color:var(--red); color:var(--red); }
+  button.lost:hover { background:#ffebe9; }
+  select { font-size:12px; padding:6px 8px; border-radius:6px; border:1px solid var(--line); }
+  .hint { font-size:11px; color:var(--muted); }
+  .case-note { background:#fff8c5; border:1px solid #d4a72c; border-radius:8px; padding:10px 14px;
+               font-size:12.5px; margin-top:10px; }
+  .case-note a { color:var(--blue); font-weight:600; }
+  .decision-box { background:#f0fdf4; border:1px solid var(--green); border-radius:8px; padding:10px 14px; font-size:12.5px; margin-top:10px; }
+  .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:none; align-items:center; justify-content:center; z-index:100; }
+  .modal-backdrop.show { display:flex; }
+  .modal { background:var(--card); border-radius:12px; padding:20px; max-width:640px; width:90%; max-height:80vh; overflow:auto; box-shadow:0 12px 40px rgba(0,0,0,0.2); }
+  .modal h3 { margin:0 0 10px; font-size:14px; }
+  .modal label { display:block; font-size:11.5px; color:var(--muted); margin:10px 0 4px; }
+  .modal textarea { width:100%; min-height:90px; font-family:var(--font-mono); font-size:12px; padding:8px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; resize:vertical; }
+  .modal .ai-draft { background:var(--bg); padding:10px; border-radius:6px; max-height:180px; overflow:auto; font-family:var(--font-mono); font-size:11.5px; white-space:pre-wrap; border:1px solid var(--line); }
+  .modal .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:14px; }
+  .flash { position:fixed; bottom:18px; right:18px; background:#1f2328; color:#fff; font-size:12.5px;
+           padding:10px 16px; border-radius:8px; opacity:0; transition:opacity .25s; }
+  .flash.show { opacity:.95; }
+</style>
+</head>
+<body>
+<aside>
+  <header>
+    <h1>机会管理</h1>
+    <div class="sub">结案 → 蒸馏成案例 → <a href="/knowledge/review" target="_blank">知识库审批</a></div>
+  </header>
+  <div id="list"></div>
+</aside>
+<main id="detail"><div class="empty">← 选择一个机会</div></main>
+<div class="flash" id="flash"></div>
+<div class="modal-backdrop" id="reflectModal" onclick="if(event.target===this)closeReflect()">
+  <div class="modal">
+    <h3>提交反馈（AI 自动总结为通用原则）</h3>
+    <label>AI 原稿（只读）</label>
+    <div class="ai-draft" id="reflectAiDraft"></div>
+    <label>人工改后的版本</label>
+    <textarea id="reflectHuman" placeholder="把你想发给客户的版本粘贴在这里……"></textarea>
+    <label>本次反馈的要点（可选）</label>
+    <textarea id="reflectNote" placeholder="这次主要改了语气 / 报价 / 服务范围 / 客户类型……" style="min-height:50px"></textarea>
+    <div class="modal-actions">
+      <button onclick="closeReflect()">取消</button>
+      <button class="primary" onclick="submitReflect()">提交并让 AI 总结</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const MODE_LABEL = {discovery:'洽谈中', solution:'方案期', collaboration:'已批方案', closed:'已完结'};
+let opps = [], current = null;
+
+function flash(msg){ const f=$('#flash'); f.textContent=msg; f.classList.add('show'); setTimeout(()=>f.classList.remove('show'),2600); }
+
+async function api(path, opts){
+  const r = await fetch(path, opts ? {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(opts)} : undefined);
+  if(!r.ok){ const e = await r.json().catch(()=>({})); throw new Error(e.error || r.statusText); }
+  return r.json();
+}
+
+function badgeFor(o){
+  if(o.closed) return `<span class="badge b-${o.closed.outcome}">${o.closed.outcome==='won'?'成交':'丢单'}</span>`;
+  return `<span class="badge b-${esc(o.mode||'discovery')}">${MODE_LABEL[o.mode]||esc(o.mode)}</span>`;
+}
+
+function reqLine(o){
+  const r = o.requirements||{}, g=k=>r[k]&&r[k].value!=null?String(r[k].value):null;
+  return [g('pax')?g('pax')+'人':null, g('event_date'), g('service')||g('event_type')].filter(Boolean).join(' · ') || '（尚无需求信息）';
+}
+
+function renderList(){
+  const active = opps.filter(o=>!o.closed), closed = opps.filter(o=>o.closed);
+  const card = o => `
+    <div class="opp ${current===o.id?'active':''}" data-oid="${esc(o.id)}">
+      <div class="row1"><span class="name">${esc((o.customer||{}).company || (o.customer||{}).contact_email || o.id)}</span>${badgeFor(o)}</div>
+      <div class="meta">${esc(reqLine(o))}</div>
+      <div class="meta">${esc((o.updated_at||'').slice(0,16).replace('T',' '))}</div>
+    </div>`;
+  $('#list').innerHTML = `
+    <div class="section-title">活跃机会（${active.length}）</div>
+    ${active.map(card).join('') || '<div class="empty" style="padding:16px">无</div>'}
+    ${closed.length?`<div class="section-title">已完结（${closed.length}）</div>${closed.map(card).join('')}`:''}`;
+  document.querySelectorAll('.opp').forEach(el=>el.onclick=()=>select(el.dataset.oid));
+}
+
+function kv(label, value, sub){
+  return `<div class="kv"><div class="k">${esc(label)}</div><div class="v">${esc(value)}</div>${sub?`<div class="src">${esc(sub)}</div>`:''}</div>`;
+}
+
+function renderDetail(o){
+  const r = o.requirements || {};
+  const reqCards = Object.entries(r).map(([k,v])=>kv(k, v.value, v.source)).join('') || '<div class="hint">（空）</div>';
+  const cust = o.customer || {};
+  const conv = (o.conversation||[]).map(m=>`
+    <div class="msg">
+      <div class="who ${m.role}">${m.role==='customer'?'客户':'Agent'}</div>
+      <div><div class="body">${esc(m.text)}</div><div class="at">${esc((m.at||'').slice(0,16).replace('T',' '))}${m.action?' · '+esc(m.action):''}</div></div>
+    </div>`).join('') || '<div class="hint">（无对话）</div>';
+
+  const options = (o.solution||{}).options || [];
+  let actionsHtml = '';
+  if(!o.closed){
+    const optSel = options.length
+      ? `<select id="optSel">${options.map(x=>`<option value="${esc(x.id)}" ${x.recommended?'selected':''}>${esc(x.id)} · ${esc(x.name)} · $${x.price}</option>`).join('')}</select>
+         <button class="primary" onclick="approveOpp()">批准方案</button>`
+      : `<span class="hint">信息未齐 / 无方案 —— 仍可直接结案</span>`;
+    actionsHtml = `
+      <div class="actions">${optSel}
+        <button onclick="openReflect()">💡 提交反馈</button>
+        <button class="won" onclick="closeOpp('won')">✓ 成交结案</button>
+        <button class="lost" onclick="closeOpp('lost')">✗ 丢单结案</button>
+      </div>
+      <div class="hint">结案会把本机会蒸馏成待审案例（AI 起草 insights，其余字段来自 state）</div>`;
+  } else {
+    const c = o.closed;
+    actionsHtml = `
+      <div class="decision-box" style="${c.outcome==='lost'?'background:#ffebe9;border-color:var(--red)':''}">
+        <b>${c.outcome==='won'?'成交':'丢单'}</b>${c.note?` — ${esc(c.note)}`:''}
+        ${c.distilled_case_id?`<br>已蒸馏案例：<code>${esc(c.distilled_case_id)}</code>（pending，去 <a href="/knowledge/review" target="_blank">知识库审批</a>）`:''}
+      </div>`;
+  }
+  let decisionHtml = '';
+  if(o.decision){
+    const d = o.decision;
+    decisionHtml = `<div class="decision-box">已批方案：<b>${esc(d.name)}</b> · $${esc(d.price)}<br>范围：${esc((d.scope||[]).join('、'))}</div>`;
+  }
+
+  $('#detail').innerHTML = `
+    <h2>${esc(cust.company || cust.contact_email || o.id)} ${badgeFor(o)}
+      <span class="hint">${esc(o.id)}</span></h2>
+    <div class="hint" style="margin-top:4px">${esc(cust.contact_person||'')}${cust.role?' · '+esc(cust.role):''}${cust.contact_email?' · '+esc(cust.contact_email):''}</div>
+    ${decisionHtml}
+    <div class="panel"><h3>结案操作</h3>${actionsHtml}</div>
+    <div class="panel"><h3>需求</h3><div class="kv-grid">${reqCards}</div></div>
+    <div class="panel"><h3>对话时间线（${(o.conversation||[]).length} 条）</h3>${conv}</div>`;
+}
+
+async function select(oid){
+  current = oid;
+  const o = await api('/opportunities/'+oid);
+  renderDetail(o); renderList();
+}
+
+async function approveOpp(){
+  try{
+    await api(`/opportunities/${current}/approve`, {option_id: $('#optSel').value});
+    flash('方案已批准（mode → collaboration）'); await select(current);
+  }catch(e){ flash('失败：'+e.message); }
+}
+
+async function closeOpp(outcome){
+  const note = outcome==='lost'
+    ? (prompt('丢单原因（将写入 outcome.note，也是一条高价值教训）：')||'').trim()
+    : (prompt('成交备注（可选）：')||'').trim();
+  if(outcome==='lost' && !note){ flash('丢单需要填原因'); return; }
+  if(!confirm(`确认结案（${outcome==='won'?'成交':'丢单'}）？将蒸馏成待审案例。`)) return;
+  try{
+    const r = await api(`/opportunities/${current}/close`, {outcome, note});
+    if(r.already_closed){ flash('该机会已完结过'); return; }
+    flash(`已结案，案例 ${r.case.id} 待审批（insights ${r.case.reusable_insights.length} 条）`);
+    await refresh();
+    await select(current);
+  }catch(e){ flash('失败：'+e.message); }
+}
+
+async function openReflect(){
+  if(!current){ flash('请先选择一个机会'); return; }
+  try{
+    const o = await api('/opportunities/'+current);
+    const proposalBody = (o.proposal||{}).body || '';
+    const lastAgentMsg = [...(o.conversation||[])].reverse().find(m => m.role==='agent');
+    const draft = proposalBody || (lastAgentMsg ? lastAgentMsg.text : '');
+    if(!draft){ flash('本机会尚无 AI 草稿可反馈（需先走完至少一轮回复）'); return; }
+    $('#reflectAiDraft').textContent = draft;
+    $('#reflectHuman').value = draft;
+    $('#reflectNote').value = '';
+    $('#reflectModal').classList.add('show');
+  }catch(e){ flash('读取草稿失败：'+e.message); }
+}
+
+function closeReflect(){ $('#reflectModal').classList.remove('show'); }
+
+async function submitReflect(){
+  const human_output = $('#reflectHuman').value.trim();
+  const note = $('#reflectNote').value.trim();
+  if(!human_output){ flash('请填写人工改后的版本'); return; }
+  const btn = event.target; btn.disabled = true; btn.textContent = 'AI 总结中…';
+  try{
+    const r = await api(`/opportunities/${current}/reflect`, {human_output, note});
+    const counts = r.principles_created;
+    flash(`已总结 ${r.lessons_appended} 条，${counts} 条新原则入知识库（pending 待审）`);
+    closeReflect();
+    await select(current);
+  }catch(e){ flash('失败：'+e.message); }
+  finally{ btn.disabled = false; btn.textContent = '提交并让 AI 总结'; }
+}
+
+async function refresh(){
+  opps = (await api('/opportunities')).sort((a,b)=>(b.updated_at||'').localeCompare(a.updated_at||''));
+  renderList();
+}
+refresh();
+</script>
+</body>
+</html>

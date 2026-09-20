@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "name": "ACME Corp",
+      "pax": 90,
+      "service": "workshop",
+      "price": "S$12/pax",
+      "notes": "2-hour presence"
+    },
+    {
+      "name": "Globex Co",
+      "pax": 300,
+      "service": "drinks",
+      "price": "S$2,550",
+      "notes": "S$600 setup"
+    },
+    {
+      "name": "Initech Pte Ltd",
+      "pax": 500,
+      "service": "drinks",
+      "price": "S$3,000",
+      "notes": "S$500 operations"
+    }
+  ],
+  "principles": [
+    "Ask only high-value discovery questions.",
+    "Human-approved commercial terms are the source of truth."
+  ]
+}

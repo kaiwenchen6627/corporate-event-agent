@@ -1,0 +1,12 @@
+{
+  "name": "Initech Pte Ltd",
+  "pax": 500,
+  "service": "drinks",
+  "price": "S$3,000",
+  "notes": "S$500 operations",
+  "id": "seed_case_initech",
+  "review_status": "approved",
+  "origin": "legacy_seed",
+  "collection": "historical_cases",
+  "created_at": "2026-09-14T17:36:32.135414+00:00"
+}

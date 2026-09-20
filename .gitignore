@@ -1,0 +1,16 @@
+# Runtime state and secrets
+data/
+.env
+__pycache__/
+*.pyc
+*.log
+
+# Local tool caches
+.workbuddy/
+.idea/
+.vscode/
+.DS_Store
+
+# Misc
+*.migrated
+knowledge.json

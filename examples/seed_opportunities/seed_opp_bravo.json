@@ -1,0 +1,3672 @@
+{
+  "id": "seed_opp_bravo",
+  "created_at": "2026-09-01T00:00:00+00:00",
+  "updated_at": "2026-09-01T00:00:00+00:00",
+  "mode": "solution",
+  "customer": {},
+  "requirements": {
+    "pax": {
+      "value": 65,
+      "confidence": "high",
+      "source": "customer_message",
+      "explicit": true,
+      "updated_at": "2026-09-12T13:36:17.707187+00:00"
+    },
+    "event_duration_hours": {
+      "value": 3.0,
+      "confidence": "high",
+      "source": "customer_message",
+      "explicit": true,
+      "updated_at": "2026-09-12T13:36:17.709451+00:00"
+    },
+    "event_type": {
+      "value": "team day",
+      "confidence": "llm",
+      "source": "llm_interpretation",
+      "explicit": false,
+      "updated_at": "2026-09-12T13:36:19.531774+00:00"
+    },
+    "event_date": {
+      "value": "second week of December",
+      "confidence": "llm",
+      "source": "llm_interpretation",
+      "explicit": false,
+      "updated_at": "2026-09-12T13:36:19.531879+00:00"
+    },
+    "event_time": {
+      "value": "weekday afternoon",
+      "confidence": "llm",
+      "source": "llm_interpretation",
+      "explicit": false,
+      "updated_at": "2026-09-12T13:36:19.531902+00:00"
+    },
+    "venue": {
+      "value": "downtown area, reachable by MRT",
+      "confidence": "llm",
+      "source": "llm_interpretation",
+      "explicit": false,
+      "updated_at": "2026-09-12T13:36:19.531953+00:00"
+    },
+    "service": {
+      "value": "VR gaming experience with light catering",
+      "confidence": "llm",
+      "source": "llm_interpretation",
+      "explicit": false,
+      "updated_at": "2026-09-12T13:36:19.531971+00:00"
+    }
+  },
+  "operational": {},
+  "commercial": {},
+  "commitments": {
+    "company": [],
+    "customer": [],
+    "pending": []
+  },
+  "conversation": [
+    {
+      "id": "msg__opp_bravo_01",
+      "role": "customer",
+      "text": "Hi! We are planning our quarterly team day for roughly 65 colleagues and are exploring a VR gaming experience combined with light catering. We are thinking of a weekday afternoon in the second week of December, somewhere reachable by MRT in the downtown area. Could you let us know whether you can host a private group of 65 for about 3 hours, and your estimated per-person pricing?",
+      "at": "2026-09-01T00:00:00+00:00"
+    },
+    {
+      "role": "agent",
+      "text": "Subject: Your VR team day for 65 — we can host it\n\nHi there,\n\nThanks for reaching out about your quarterly team day. A private VR gaming experience with light catering for 65 colleagues sounds like a great fit, and we'd be glad to host you.\n\nHere's what we can confirm based on what you've shared:\n\n- **Group size:** Private booking for 65 guests\n- **Duration:** Approximately 3 hours\n- **Timing:** Weekday afternoon in the second week of December\n- **Location:** Downtown, easily reachable by MRT\n- **Format:** VR gaming experience with light catering\n\nTo put together an accurate proposal and estimated per-person pricing, could you help us with a few details?\n\n1. Your preferred date and start time within that week\n2. Any preferred MRT station or downtown area\n3. Any catering preferences or dietary requirements within the group\n\nOnce we have these, we'll send over a tailored proposal with pricing and a full rundown of the experience.\n\nLooking forward to helping make your team day a memorable one.\n\nBest regards,\nThe Events Team",
+      "at": "2026-09-01T00:00:00+00:00",
+      "action": "request_human_review"
+    }
+  ],
+  "history": [
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "pax",
+      "from": null,
+      "to": 65
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "event_duration_hours",
+      "from": null,
+      "to": 3.0
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "event_type",
+      "from": null,
+      "to": "team day",
+      "source": "llm_interpretation"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "event_date",
+      "from": null,
+      "to": "second week of December",
+      "source": "llm_interpretation"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "event_time",
+      "from": null,
+      "to": "weekday afternoon",
+      "source": "llm_interpretation"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "venue",
+      "from": null,
+      "to": "downtown area, reachable by MRT",
+      "source": "llm_interpretation"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "service",
+      "from": null,
+      "to": "VR gaming experience with light catering",
+      "source": "llm_interpretation"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "agent_action",
+      "action": "request_human_review",
+      "changed": true
+    }
+  ],
+  "decision": null,
+  "interpretations": [
+    {
+      "at": "2026-09-12T13:36:19.531996+00:00",
+      "interpretation": {
+        "customer_updates": {},
+        "requirement_updates": {
+          "event_type": "team day",
+          "pax": 65,
+          "event_date": "second week of December",
+          "event_time": "weekday afternoon",
+          "event_duration_hours": 3,
+          "venue": "downtown area, reachable by MRT",
+          "service": "VR gaming experience with light catering"
+        },
+        "operational_updates": {},
+        "commercial_updates": {},
+        "commitments": {},
+        "next_question": "Could you confirm a specific date and start time in the second week of December, and whether you have a preferred MRT station or downtown area in mind?",
+        "customer_reply": "Thanks for reaching out! To confirm, we're looking at a private VR gaming experience with light catering for roughly 65 colleagues, about 3 hours, on a weekday afternoon in the second week of December, somewhere downtown and reachable by MRT. Could you let us know if you can host a private group of 65 and share your estimated per-person pricing? It would also help to know a specific date and start time you have in mind, plus any preferred MRT station or downtown area."
+      },
+      "applied": [
+        "event_type",
+        "event_date",
+        "event_time",
+        "venue",
+        "service"
+      ]
+    }
+  ],
+  "agent_plan": {
+    "matters_now": [
+      "Customer asks whether we can host a private group of 65 for ~3 hours",
+      "Customer asks for estimated per-person pricing",
+      "Event is a VR gaming experience with light catering",
+      "Timing: weekday afternoon, second week of December",
+      "Venue: downtown area reachable by MRT",
+      "Need to confirm specific date/time and preferred MRT/downtown area"
+    ],
+    "missing_information": [
+      "Specific date within second week of December",
+      "Specific start time",
+      "Preferred MRT station or downtown area",
+      "Catering preferences/restrictions",
+      "Budget range or approval constraints",
+      "Company/contact details for follow-up"
+    ],
+    "retrieval_needed": [
+      "service_knowledge",
+      "operational_knowledge",
+      "historical_cases",
+      "sales_principles"
+    ],
+    "next_action": "search_service_knowledge",
+    "reason": "Customer explicitly asks about capacity for 65 and per-person pricing for a VR gaming + light catering team day. State has sufficient core requirements, but pricing and capacity are not in state and must be grounded in service/operational knowledge and historical cases rather than inferred.",
+    "customer_reply_strategy": "Acknowledge the request and confirm understanding of the event (65 pax, ~3 hours, weekday afternoon, second week of December, downtown/MRT-accessible, VR gaming with light catering). Do not quote prices or commit to capacity until service/operational knowledge and historical cases are retrieved. Ask for the specific date, start time, and preferred MRT/downtown area to proceed with a tailored proposal."
+  },
+  "retrieved_evidence": {
+    "historical_cases": [
+      {
+        "id": "case_candidate_e5dda2ecba",
+        "title": "Imported historical event case",
+        "source_ids": [
+          "source_e3d7ca3cba"
+        ],
+        "tags": [
+          "imported",
+          "historical_event_case"
+        ],
+        "extraction": {
+          "method": "deepseek_two_stage",
+          "created_at": "2026-09-12T13:13:42.547257+00:00",
+          "timeline": [
+            {
+              "message_id": "msg_001",
+              "turn": 1,
+              "speaker": "customer",
+              "timestamp": "2026-07-20",
+              "source_lines": [
+                485,
+                487,
+                489,
+                491,
+                493,
+                495,
+                497,
+                498,
+                499
+              ],
+              "summary": "Client requests a call to align on collaboration direction, proposing tomorrow 3PM.",
+              "decisions": [],
+              "unresolved_items": []
+            },
+            {
+              "message_id": "msg_002",
+              "turn": 2,
+              "speaker": "company",
+              "timestamp": "2026-07-20",
+              "source_lines": [
+                469,
+                471,
+                473,
+                475,
+                477,
+                479,
+                480,
+                481
+              ],
+              "summary": "Moss Matcha confirms 3PM call; Director and contact will join.",
+              "decisions": [],
+              "unresolved_items": []
+            },
+            {
+              "message_id": "msg_003",
+              "turn": 3,
+              "speaker": "customer",
+              "timestamp": "2026-07-20",
+              "source_lines": [
+                455,
+                457,
+                459,
+                461,
+                463,
+                464,
+                465
+              ],
+              "summary": "Client confirms Teams meeting scheduled for tomorrow 3PM.",
+              "decisions": [],
+              "unresolved_items": []
+            },
+            {
+              "message_id": "msg_004",
+              "turn": 4,
+              "speaker": "company",
+              "timestamp": "2026-07-21",
+              "source_lines": [
+                421,
+                423,
+                425,
+                427,
+                429,
+                431,
+                432,
+                434,
+                435,
+                437,
+                439,
+                440,
+                442,
+                443,
+                445,
+                447,
+                449,
+                450,
+                451
+              ],
+              "summary": "Moss Matcha proposes original in-store format: S$28/pax workshop, S$10/pax dessert add-on, stations 8:30-10:00am.",
+              "decisions": [],
+              "unresolved_items": []
+            },
+            {
+              "message_id": "msg_005",
+              "turn": 5,
+              "speaker": "customer",
+              "timestamp": "2026-07-22",
+              "source_lines": [
+                408,
+                410,
+                412,
+                413,
+                414,
+                415,
+                416,
+                417
+              ],
+              "summary": "Client prefers dessert included in quotation and asks to confirm each runner gets a matcha cup.",
+              "decisions": [],
+              "unresolved_items": [
+                "Confirmation that each runner receives a matcha cup of choice"
+              ]
+            },
+            {
+              "message_id": "msg_006",
+              "turn": 6,
+              "speaker": "company",
+              "timestamp": "2026-07-22",
+              "source_lines": [
+                396,
+                398,
+                400,
+                401,
+                402,
+                403,
+                404
+              ],
+              "summary": "Moss Matcha confirms each runner receives one cup of matcha, self-made or staff-prepared.",
+              "decisions": [],
+              "unresolved_items": []
+            },
+            {
+              "message_id": "msg_007",
+              "turn": 7,
+              "speaker": "customer",
+              "timestamp": "2026-08-14",
+              "source_lines": [
+                373,
+                375,
+                377,
+                379,
+                381,
+                383,
+                385,
+                387,
+                389,
+                390,
+                391,
+                392
+              ],
+              "summary": "Major change: event moves to F&B venue at Clarke Quay with no external food/drinks; client requests simple workshop, mini game, possible matcha powder giveaways for ~90 pax over 2 hours.",
+              "decisions": [],
+              "unresolved_items": [
+                "Whether matcha powder giveaways are feasible",
+                "Quotation for revised format"
+              ]
+            },
+            {
+              "message_id": "msg_008",
+              "turn": 8,
+              "speaker": "company",
+              "timestamp": "2026-08-14",
+              "source_lines": [
+                346,
+                348,
+                350,
+                352,
+                354,
+                356,
+                357,
+                358,
+                359,
+                360,
+                361,
+                363,
+                365,
+                367,
+                368,
+                369
+              ],
+              "summary": "Moss Matcha confirms adaptable no-beverage workshop format and requests event details (date, venue, photos, batch flow, sampling rules, giveaway preferences).",
+              "decisions": [],
+              "unresolved_items": [
+                "Event date/timing",
+                "Venue details/photos",
+                "Batch flow",
+                "Sampling permission",
+                "Giveaway quantity/size"
+              ]
+            },
+            {
+              "message_id": "msg_009",
+              "turn": 9,
+              "speaker": "customer",
+              "timestamp": "2026-08-14",
+              "source_lines": [
+                324,
+                326,
+                328,
+                330,
+                331,
+                332,
+                333,
+                334,
+                335,
+                337,
+                339,
+                340,
+                341,
+                342
+              ],
+              "summary": "Client confirms 17 Sept 8-10pm at [VENUE], Clarke Quay; participants in batches; sampling permission to be checked; asks Moss to propose giveaway.",
+              "decisions": [
+                "Event date/time: 17 Sept, 8-10pm",
+                "Venue: [VENUE], Clarke Quay",
+                "Participants join in batches"
+              ],
+              "unresolved_items": [
+                "Sampling permission at venue",
+                "Giveaway proposal"
+              ]
+            },
+            {
+              "message_id": "msg_010",
+              "turn": 10,
+              "speaker": "company",
+              "timestamp": "2026-08-15",
+              "source_lines": [
+                296,
+                298,
+                300,
+                302,
+                304,
+                306,
+                308,
+                310,
+                312,
+                314,
+                316,
+                318,
+                319,
+                320
+              ],
+              "summary": "Moss Matcha confirms revised timing and proposes interactive workshop with cookie door gift and mini game at S$12/pax for ~90 pax.",
+              "decisions": [
+                "Workshop format: interactive with mini game",
+                "Quote: S$12/pax for ~90 pax"
+              ],
+              "unresolved_items": [
+                "Venue sampling permission"
+              ]
+            },
+            {
+              "message_id": "msg_011",
+              "turn": 11,
+              "speaker": "customer",
+              "timestamp": "2026-08-17",
+              "source_lines": [
+                281,
+                283,
+                285,
+                287,
+                289,
+                290,
+                291,
+                292
+              ],
+              "summary": "Client asks whether cookie door gift can be replaced with matcha powder due to venue food restrictions.",
+              "decisions": [],
+              "unresolved_items": [
+                "Replacing cookie with matcha powder giveaway"
+              ]
+            },
+            {
+              "message_id": "msg_012",
+              "turn": 12,
+              "speaker": "company",
+              "timestamp": "2026-08-17",
+              "source_lines": [
+                255,
+                257,
+                259,
+                261,
+                263,
+                264,
+                266,
+                268,
+                270,
+                271,
+                273,
+                275,
+                276,
+                277
+              ],
+              "summary": "Moss Matcha confirms matcha powder can replace cookie and provides retail and 20% bulk pricing.",
+              "decisions": [
+                "Matcha powder allowed as door gift alternative"
+              ],
+              "unresolved_items": []
+            },
+            {
+              "message_id": "msg_013",
+              "turn": 13,
+              "speaker": "customer",
+              "timestamp": "2026-08-18",
+              "source_lines": [
+                238,
+                240,
+                242,
+                244,
+                246,
+                248,
+                249,
+                250,
+                251
+              ],
+              "summary": "Client asks for cheaper options and whether cost is ~$40-50/pax.",
+              "decisions": [],
+              "unresolved_items": [
+                "Cheaper door gift option"
+              ]
+            },
+            {
+              "message_id": "msg_014",
+              "turn": 14,
+              "speaker": "company",
+              "timestamp": "2026-08-19",
+              "source_lines": [
+                217,
+                219,
+                221,
+                223,
+                225,
+                226,
+                228,
+                230,
+                232,
+                233,
+                234
+              ],
+              "summary": "Moss Matcha clarifies discounted powder prices and offers branded sticky notes as budget alternative.",
+              "decisions": [],
+              "unresolved_items": [
+                "Preferred door gift option and quantity"
+              ]
+            },
+            {
+              "message_id": "msg_015",
+              "turn": 15,
+              "speaker": "customer",
+              "timestamp": "2026-08-19",
+              "source_lines": [
+                198,
+                200,
+                202,
+                204,
+                206,
+                208,
+                210,
+                211,
+                212,
+                213
+              ],
+              "summary": "Client confirms understanding of $43.04/pax for Gyokuei no Mori and requests sticky note visuals, cost for 90 pax, and setup space requirements.",
+              "decisions": [],
+              "unresolved_items": [
+                "Sticky note visuals and cost for 90 pax",
+                "Setup space requirements"
+              ]
+            },
+            {
+              "message_id": "msg_016",
+              "turn": 16,
+              "speaker": "company",
+              "timestamp": "2026-08-20",
+              "source_lines": [
+                178,
+                180,
+                182,
+                184,
+                186,
+                188,
+                190,
+                192,
+                193,
+                194
+              ],
+              "summary": "Moss Matcha confirms pricing: Gyokuei no Mori S$43.04/pax; sticky note option S$12/pax with free sticky notes, S$1,080 for 90 pax; setup needs ~2m x 0.9m table and ~4 sqm.",
+              "decisions": [
+                "Sticky note option: S$12/pax, S$1,080 for 90 pax",
+                "Setup: ~2m x 0.9m table, ~4 sqm"
+              ],
+              "unresolved_items": []
+            },
+            {
+              "message_id": "msg_017",
+              "turn": 17,
+              "speaker": "customer",
+              "timestamp": "2026-08-20",
+              "source_lines": [
+                161,
+                163,
+                165,
+                167,
+                169,
+                171,
+                172,
+                173,
+                174
+              ],
+              "summary": "Client proceeds with sticky pads, sends payment portal account creation link, and requests official quotation.",
+              "decisions": [
+                "Proceed with sticky pads"
+              ],
+              "unresolved_items": [
+                "Official quotation"
+              ]
+            },
+            {
+              "message_id": "msg_018",
+              "turn": 18,
+              "speaker": "company",
+              "timestamp": "2026-08-20",
+              "source_lines": [
+                147,
+                149,
+                151,
+                153,
+                155,
+                156,
+                157
+              ],
+              "summary": "Moss Matcha creates account and attaches official quotation with sticky pad option.",
+              "decisions": [],
+              "unresolved_items": []
+            },
+            {
+              "message_id": "msg_019",
+              "turn": 19,
+              "speaker": "customer",
+              "timestamp": "2026-08-31",
+              "source_lines": [
+                132,
+                134,
+                136,
+                138,
+                140,
+                141,
+                142,
+                143
+              ],
+              "summary": "Client asks if company is GST registered and to include GST in quotation if so.",
+              "decisions": [],
+              "unresolved_items": [
+                "GST inclusion in quotation"
+              ]
+            },
+            {
+              "message_id": "msg_020",
+              "turn": 20,
+              "speaker": "company",
+              "timestamp": "2026-08-31",
+              "source_lines": [
+                116,
+                118,
+                120,
+                122,
+                124,
+                126,
+                127,
+                128
+              ],
+              "summary": "Moss Matcha confirms not GST registered, so no GST in quotation.",
+              "decisions": [
+                "No GST applicable"
+              ],
+              "unresolved_items": []
+            },
+            {
+              "message_id": "msg_021",
+              "turn": 21,
+              "speaker": "customer",
+              "timestamp": "2026-09-03",
+              "source_lines": [
+                104,
+                106,
+                108,
+                110,
+                111,
+                112
+              ],
+              "summary": "Client asks how many runners the 4 sqm workshop can engage at a time.",
+              "decisions": [],
+              "unresolved_items": [
+                "Runner capacity per batch"
+              ]
+            },
+            {
+              "message_id": "msg_022",
+              "turn": 22,
+              "speaker": "company",
+              "timestamp": "2026-09-03",
+              "source_lines": [
+                86,
+                88,
+                90,
+                92,
+                94,
+                96,
+                98,
+                99,
+                100
+              ],
+              "summary": "Moss Matcha clarifies 4 sqm is setup only, runners enter surrounding space in batches, and requests floor plan/photos.",
+              "decisions": [],
+              "unresolved_items": [
+                "Floor plan/photos of event space"
+              ]
+            },
+            {
+              "message_id": "msg_023",
+              "turn": 23,
+              "speaker": "customer",
+              "timestamp": "2026-09-03",
+              "source_lines": [
+                73,
+                75,
+                77,
+                79,
+                80,
+                81,
+                82
+              ],
+              "summary": "Client shares floorplan, prefers orange-highlighted station with black as secondary option.",
+              "decisions": [],
+              "unresolved_items": [
+                "Confirmation of station location"
+              ]
+            },
+            {
+              "message_id": "msg_024",
+              "turn": 24,
+              "speaker": "customer",
+              "timestamp": "2026-09-07",
+              "source_lines": [
+                56,
+                58,
+                60,
+                62,
+                64,
+                66,
+                67,
+                68,
+                69
+              ],
+              "summary": "Client asks how many Moss Matcha staff will attend and whether proposed setup is acceptable.",
+              "decisions": [],
+              "unresolved_items": [
+                "Staff count confirmation",
+                "Setup approval"
+              ]
+            },
+            {
+              "message_id": "msg_025",
+              "turn": 25,
+              "speaker": "company",
+              "timestamp": "2026-09-07",
+              "source_lines": [
+                32,
+                34,
+                36,
+                38,
+                40,
+                42,
+                44,
+                46,
+                48,
+                50,
+                51,
+                52
+              ],
+              "summary": "Moss Matcha explains black area suits presentation, orange suits close interaction/tasting; expects 2-3 staff; asks venue permission for hands-on/tasting.",
+              "decisions": [
+                "Moss Matcha staffing: 2-3 on-site"
+              ],
+              "unresolved_items": [
+                "Venue permission for close interaction/tasting",
+                "Final area choice"
+              ]
+            },
+            {
+              "message_id": "msg_026",
+              "turn": 26,
+              "speaker": "customer",
+              "timestamp": "2026-09-08",
+              "source_lines": [
+                17,
+                19,
+                21,
+                23,
+                25,
+                26,
+                27,
+                28
+              ],
+              "summary": "Client selects orange-highlighted area and asks maximum participant capacity.",
+              "decisions": [
+                "Station area: orange-highlighted area"
+              ],
+              "unresolved_items": [
+                "Maximum participant capacity"
+              ]
+            }
+          ]
+        },
+        "content": {
+          "customer": {
+            "name": "Moss Matcha client (event organizer)",
+            "event_context": "Corporate/group matcha workshop event at F&B venue, Clarke Quay",
+            "location": "Singapore"
+          },
+          "initial_requirement": {
+            "format": "In-store matcha workshop",
+            "pricing": "S$28/pax workshop + S$10/pax dessert add-on",
+            "timing": "8:30-10:00am stations",
+            "inclusions": "Each runner receives one matcha cup (self-made or staff-prepared)",
+            "dessert": "Client preferred dessert included in quotation"
+          },
+          "current_requirement": {
+            "event_date_time": "17 Sept 2026, 8-10pm",
+            "venue": "[VENUE], Clarke Quay (F&B venue, no external food/drinks)",
+            "format": "Interactive matcha workshop with mini game, no beverage serving",
+            "participants": "~90 pax in batches",
+            "door_gift": "Sticky pads at S$12/pax",
+            "station_area": "Orange-highlighted area",
+            "setup": "~2m x 0.9m table, ~4 sqm",
+            "staffing": "2-3 Moss Matcha staff on-site"
+          },
+          "requirement_changes": [
+            {
+              "change": "Event relocated to F&B venue at Clarke Quay with no external food/drinks allowed",
+              "impact": "Format changed to no-beverage workshop; cookie door gift replaced",
+              "source_message_ids": [
+                "msg_007"
+              ]
+            },
+            {
+              "change": "Event timing changed to 17 Sept, 8-10pm",
+              "impact": "Original morning in-store timing (8:30-10:00am) no longer applies",
+              "source_message_ids": [
+                "msg_009"
+              ]
+            },
+            {
+              "change": "Door gift changed from cookie to sticky pads",
+              "impact": "Pricing set at S$12/pax, S$1,080 for 90 pax",
+              "source_message_ids": [
+                "msg_017"
+              ]
+            },
+            {
+              "change": "Station area selected as orange-highlighted area",
+              "impact": "Close interaction/tasting format chosen over presentation-only",
+              "source_message_ids": [
+                "msg_026"
+              ]
+            }
+          ],
+          "operational_state": {
+            "setup_space": "~2m x 0.9m table, ~4 sqm setup area; runners in surrounding space",
+            "staffing": "2-3 Moss Matcha staff on-site",
+            "participant_flow": "~90 runners in batches",
+            "station_location": "Orange-highlighted area selected; black secondary",
+            "sampling_interaction": "Venue permission for hands-on whisking/tasting unresolved",
+            "floor_plan": "Floorplan shared by client"
+          },
+          "commercial_state": {
+            "workshop_fee": "S$12 per pax for ~90 pax",
+            "sticky_note_door_gift": "Included as goodwill at S$12/pax; S$1,080 for 90 pax",
+            "matcha_powder_option": "Gyokuei no Mori S$31.04 per 30g tin after 20% bulk discount; total S$43.04/pax with workshop",
+            "gst": "Moss Matcha not GST registered; no GST in quotation",
+            "original_proposal": "S$28/pax workshop + S$10/pax dessert add-on (superseded)",
+            "quotation": "Official quotation issued with sticky pad option"
+          },
+          "commitments": {
+            "company": [
+              {
+                "item": "Provide official quotation with sticky pad option",
+                "source_message_ids": [
+                  "msg_018"
+                ]
+              },
+              {
+                "item": "Create client payment portal account",
+                "source_message_ids": [
+                  "msg_018"
+                ]
+              },
+              {
+                "item": "Staff 2-3 members on-site",
+                "source_message_ids": [
+                  "msg_025"
+                ]
+              },
+              {
+                "item": "Provide sticky notes as goodwill",
+                "source_message_ids": [
+                  "msg_016"
+                ]
+              }
+            ],
+            "customer": [
+              {
+                "item": "Proceed with sticky pads",
+                "source_message_ids": [
+                  "msg_017"
+                ]
+              },
+              {
+                "item": "Create payment portal account link",
+                "source_message_ids": [
+                  "msg_017"
+                ]
+              },
+              {
+                "item": "Check venue sampling permission",
+                "source_message_ids": [
+                  "msg_009"
+                ]
+              }
+            ],
+            "pending": [
+              {
+                "item": "Venue permission for close interaction/tasting",
+                "source_message_ids": [
+                  "msg_025"
+                ]
+              },
+              {
+                "item": "Maximum participant capacity confirmation",
+                "source_message_ids": [
+                  "msg_026"
+                ]
+              },
+              {
+                "item": "Floor plan/photos of event space",
+                "source_message_ids": [
+                  "msg_022"
+                ]
+              }
+            ]
+          },
+          "conversation_timeline": [
+            {
+              "turn": 1,
+              "summary": "Client requests alignment call; proposes tomorrow 3PM",
+              "source_message_ids": [
+                "msg_001"
+              ]
+            },
+            {
+              "turn": 4,
+              "summary": "Moss Matcha proposes original in-store format: S$28/pax workshop, S$10/pax dessert add-on",
+              "source_message_ids": [
+                "msg_004"
+              ]
+            },
+            {
+              "turn": 7,
+              "summary": "Major change: event moves to F&B venue at Clarke Quay, no external food/drinks, ~90 pax over 2 hours",
+              "source_message_ids": [
+                "msg_007"
+              ]
+            },
+            {
+              "turn": 10,
+              "summary": "Moss Matcha proposes interactive workshop with cookie door gift and mini game at S$12/pax for ~90 pax",
+              "source_message_ids": [
+                "msg_010"
+              ]
+            },
+            {
+              "turn": 17,
+              "summary": "Client proceeds with sticky pads, sends payment portal link, requests official quotation",
+              "source_message_ids": [
+                "msg_017"
+              ]
+            }
+          ],
+          "final_solution": {
+            "event": "17 Sept 2026, 8-10pm at [VENUE], Clarke Quay",
+            "format": "Interactive matcha workshop with mini game, no beverage serving",
+            "door_gift": "Sticky pads at S$12/pax, S$1,080 for 90 pax",
+            "station_area": "Orange-highlighted area",
+            "gst": "No GST applicable",
+            "setup": "~2m x 0.9m table, ~4 sqm",
+            "source_message_ids": [
+              "msg_009",
+              "msg_010",
+              "msg_016",
+              "msg_017",
+              "msg_020",
+              "msg_026"
+            ]
+          },
+          "outcome": "succeed",
+          "reusable_insights": [
+            {
+              "insight": "Venue food/drink restrictions can force door gift and format changes; confirm venue rules early",
+              "source_message_ids": [
+                "msg_007",
+                "msg_011"
+              ]
+            },
+            {
+              "insight": "Offering a budget goodwill alternative (e.g., branded sticky notes) can close price-sensitive door gift decisions",
+              "source_message_ids": [
+                "msg_014",
+                "msg_016"
+              ]
+            },
+            {
+              "insight": "Clarifying setup footprint vs. participant circulation space prevents capacity misunderstandings",
+              "source_message_ids": [
+                "msg_022"
+              ]
+            }
+          ]
+        },
+        "review_status": "approved",
+        "collection": "historical_cases",
+        "created_at": "2026-09-12T13:13:42.547337+00:00",
+        "approved_by": "workspace-user",
+        "approved_at": "2026-09-12T13:21:57.356453+00:00"
+      },
+      {
+        "id": "case_candidate_c5b7af4469",
+        "title": "Imported historical event case",
+        "source_ids": [
+          "source_bc77e88788"
+        ],
+        "tags": [
+          "imported",
+          "historical_event_case"
+        ],
+        "extraction": {
+          "method": "deepseek_two_stage",
+          "created_at": "2026-09-12T13:28:58.884874+00:00",
+          "timeline": [
+            {
+              "message_id": "msg_001",
+              "turn": 1,
+              "speaker": "customer",
+              "timestamp": null,
+              "source_lines": [
+                18,
+                19,
+                21,
+                23,
+                25,
+                26,
+                27,
+                29,
+                31
+              ],
+              "summary": "Client Contact A inquires via WhatsApp about a potential matcha activation in the 2nd week of November, asking about branded cups, matcha redemption, and full/partial buyout.",
+              "decisions": [],
+              "unresolved_items": [
+                "Feasibility and costs for branded cups, redemption, and buyout options"
+              ]
+            },
+            {
+              "message_id": "msg_002",
+              "turn": 2,
+              "speaker": "company",
+              "timestamp": "2026-09-03",
+              "source_lines": [
+                39,
+                40,
+                42,
+                44,
+                46,
+                48,
+                49,
+                51,
+                52,
+                54,
+                55,
+                57,
+                59
+              ],
+              "summary": "Moss Contact responds that branded cup sleeves/stickers, QR redemption, and buyout may be possible, requesting more details on buyout use, dates, hours, guests, and branding.",
+              "decisions": [],
+              "unresolved_items": [
+                "Buyout feasibility pending client details on use, date, hours, guests, branding, public access"
+              ]
+            },
+            {
+              "message_id": "msg_003",
+              "turn": 3,
+              "speaker": "customer",
+              "timestamp": null,
+              "source_lines": [
+                68,
+                69,
+                70,
+                72,
+                74,
+                76,
+                78,
+                80,
+                82,
+                84,
+                86,
+                88,
+                90,
+                92,
+                93,
+                95,
+                97,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                107,
+                109,
+                111,
+                113
+              ],
+              "summary": "Client requests pricing for cups, describes a pre-purchase model of 500–1,000 cups across 2–3 variants with 3–6 month post-event redemption, and details a 2–5 November 2026 activation with exclusive seating 9AM–12PM and 2–6PM daily plus extensive branding ideas.",
+              "decisions": [],
+              "unresolved_items": [
+                "Cup pricing, minimum quantity, lead time",
+                "Redemption feasibility, pricing, mechanics, restrictions",
+                "Buyout classification, costs, operational considerations",
+                "Permissibility of branding elements and approval requirements",
+                "Request for venue photos, floor plans, past activation examples"
+              ]
+            },
+            {
+              "message_id": "msg_004",
+              "turn": 4,
+              "speaker": "company",
+              "timestamp": "2026-09-04",
+              "source_lines": [
+                120,
+                121,
+                122,
+                124,
+                126,
+                128,
+                130,
+                132,
+                134,
+                135,
+                136,
+                137,
+                139,
+                141,
+                143,
+                145,
+                146,
+                148,
+                150,
+                152,
+                154,
+                156,
+                158,
+                160,
+                161,
+                163,
+                165,
+                167,
+                169,
+                170,
+                171,
+                173,
+                175,
+                177,
+                179,
+                181,
+                183,
+                185,
+                187,
+                189,
+                191,
+                193,
+                195,
+                197
+              ],
+              "summary": "Moss provides preliminary proposal: cup sleeves $1/pc min 500 with 1-month artwork lead time; QR Code A $10 and QR Code B $13.50 with 3–6 month validity; partial buyout exclusive seating package $12,000 including 1,000 QR Code A; branded banners $5,000; LED branding $2,500; tent cards/décor $1,500; kapaline near overhead signage not possible due to mall restrictions.",
+              "decisions": [
+                "Partial buyout classification for exclusive seating reservation",
+                "Kapaline boards near main overhead signage not permitted"
+              ],
+              "unresolved_items": [
+                "Client's preferred option combination",
+                "Split between QR Code A and QR Code B"
+              ]
+            },
+            {
+              "message_id": "msg_005",
+              "turn": 5,
+              "speaker": "customer",
+              "timestamp": null,
+              "source_lines": [
+                204,
+                205,
+                206,
+                208,
+                210,
+                212,
+                214,
+                216,
+                218,
+                220,
+                222,
+                224,
+                225,
+                226,
+                227,
+                229,
+                231,
+                233,
+                235,
+                237,
+                239,
+                241,
+                242,
+                243,
+                245,
+                247,
+                249
+              ],
+              "summary": "Client considers ~1,000 cup pieces and asks for cost savings; leans toward QR Code A and asks about uniqueness, distribution, tracking, and past examples; requests logo on existing green noren instead of separate banner; asks about kapaline bar overlay, pull-up banners, and free LED inclusion.",
+              "decisions": [],
+              "unresolved_items": [
+                "Cost savings at 1,000 cup quantity",
+                "QR code uniqueness, distribution, tracking, examples",
+                "Logo on existing green noren feasibility",
+                "Kapaline bar overlay feasibility",
+                "Pull-up banners feasibility",
+                "LED display inclusion at no cost"
+              ]
+            },
+            {
+              "message_id": "msg_006",
+              "turn": 6,
+              "speaker": "company",
+              "timestamp": "2026-09-08",
+              "source_lines": [
+                256,
+                257,
+                258,
+                260,
+                262,
+                264,
+                266,
+                268,
+                270,
+                272,
+                274,
+                275,
+                277,
+                279,
+                281,
+                283,
+                284,
+                285,
+                286,
+                288,
+                290,
+                292
+              ],
+              "summary": "Moss offers 20% cup discount to $0.80/pc ($800 for 1,000); explains unique 16-letter voucher codes valid once with two distribution methods and back-end tracking; accepts green noren with client logo within $5,000 fee; quotes kapaline bar overlay $6,000 and two pull-up banners $4,000; offers to waive $2,500 LED fee if all three branding elements proceed.",
+              "decisions": [
+                "Cup price reduced to $0.80/pc for 1,000 pieces",
+                "Green noren with client logo approved within $5,000 branding fee",
+                "LED display fee waived if green noren, kapaline board, and two pull-up banners all proceed"
+              ],
+              "unresolved_items": [
+                "Client's final option selection",
+                "Final quotation"
+              ]
+            },
+            {
+              "message_id": "msg_007",
+              "turn": 7,
+              "speaker": "customer",
+              "timestamp": null,
+              "source_lines": [
+                299,
+                300,
+                301,
+                303,
+                305,
+                307,
+                309,
+                311,
+                313,
+                315,
+                317,
+                319,
+                321,
+                323,
+                325,
+                327,
+                329
+              ],
+              "summary": "Client asks to self-manage kapaline board production/installation during non-peak hours and to use existing pull-up banners; accepts Moss handling green noren; requests a Teams call; asks whether LED branding remains complimentary if kapaline and pull-ups are self-managed.",
+              "decisions": [],
+              "unresolved_items": [
+                "Permission for client to self-manage kapaline board",
+                "Permission to use existing client pull-up banners",
+                "Whether LED branding remains free if kapaline and pull-ups are self-managed",
+                "Scheduling a Teams call",
+                "Final scope and quotation"
+              ]
+            }
+          ]
+        },
+        "content": {
+          "customer": {
+            "segment": "brand/agency client seeking matcha activation",
+            "contact": "Client Contact A",
+            "channel": "WhatsApp"
+          },
+          "initial_requirement": {
+            "activation_type": "matcha activation",
+            "target_period": "2nd week of November",
+            "branded_cups": true,
+            "matcha_redemption": true,
+            "buyout_interest": "full or partial"
+          },
+          "current_requirement": {
+            "activation_dates": "2–5 November 2026",
+            "exclusive_seating_hours": "9AM–12PM and 2–6PM daily",
+            "cup_quantity": "~1,000 pieces across 2–3 variants",
+            "redemption_model": "pre-purchase with 3–6 month post-event redemption",
+            "branding_scope": "green noren logo, kapaline bar overlay, pull-up banners, LED, tent cards/décor",
+            "self_management": "kapaline board and existing pull-up banners",
+            "venue_assets_requested": "photos, floor plans, past activation examples"
+          },
+          "requirement_changes": [
+            {
+              "change": "Cup quantity increased from 500 to ~1,000 pieces",
+              "source_message_ids": [
+                "msg_005"
+              ]
+            },
+            {
+              "change": "Banner branding changed from separate banner to client logo on new green noren",
+              "source_message_ids": [
+                "msg_005"
+              ]
+            },
+            {
+              "change": "Client may self-manage tent cards and light décor subject to approval",
+              "source_message_ids": [
+                "msg_005"
+              ]
+            },
+            {
+              "change": "Client proposes self-managing kapaline board and using existing pull-up banners",
+              "source_message_ids": [
+                "msg_007"
+              ]
+            }
+          ],
+          "operational_state": {
+            "activation_dates": "2–5 November 2026",
+            "exclusive_seating": "9AM–12PM and 2–6PM daily",
+            "buyout_type": "partial buyout for exclusive seating",
+            "kapaline_overhead_signage": "not permitted due to mall restrictions",
+            "approval_required": "all artwork, materials, dimensions, installation methods, placements",
+            "voucher_mechanics": "unique 16-letter single-use codes, two distribution methods, back-end tracking"
+          },
+          "commercial_state": {
+            "cup_price": "$0.80/pc for 1,000 pieces (20% discount from $1)",
+            "qr_code_a": "$10 (excludes Matcha Latte Float)",
+            "qr_code_b": "$13.50 (Matcha Latte Float)",
+            "partial_buyout_package": "$12,000 including 1,000 QR Code A",
+            "branding_fees": "green noren $5,000; kapaline overlay $6,000; two pull-up banners $4,000; LED $2,500 (waivable)",
+            "led_waiver_condition": "waived if green noren, kapaline board, and two pull-up banners all proceed"
+          },
+          "commitments": {
+            "company": [
+              "Provide dedicated QR codes and redemption portal with back-end tracking",
+              "Produce, install, and remove new green noren with client logo within $5,000 fee",
+              "Coordinate installation and removal to minimize disruption",
+              "Review client-managed tent cards and light décor designs and placement"
+            ],
+            "customer": [
+              "Share artwork, dimensions, and installation method for approval before production",
+              "Manage tent cards and light décor on their end if included, subject to approval"
+            ],
+            "pending": [
+              "Client's final option selection and QR Code A/B split",
+              "Confirmation of final scope and pricing",
+              "Teams call scheduling",
+              "Permission for client to self-manage kapaline board",
+              "Permission to use existing client pull-up banners",
+              "Whether LED branding remains complimentary if kapaline and pull-ups are self-managed"
+            ]
+          },
+          "conversation_timeline": [
+            {
+              "turn": 1,
+              "summary": "Client inquires about matcha activation in 2nd week of November, branded cups, redemption, buyout",
+              "source_message_ids": [
+                "msg_001"
+              ]
+            },
+            {
+              "turn": 2,
+              "summary": "Moss confirms feasibility and requests buyout details",
+              "source_message_ids": [
+                "msg_002"
+              ]
+            },
+            {
+              "turn": 3,
+              "summary": "Client details 2–5 Nov 2026 activation, 500–1,000 cups, redemption model, branding ideas",
+              "source_message_ids": [
+                "msg_003"
+              ]
+            },
+            {
+              "turn": 4,
+              "summary": "Moss provides preliminary pricing and notes kapaline overhead signage not permitted",
+              "source_message_ids": [
+                "msg_004"
+              ]
+            },
+            {
+              "turn": 6,
+              "summary": "Moss offers 20% cup discount, green noren approval, kapaline/pull-up quotes, conditional LED waiver",
+              "source_message_ids": [
+                "msg_006"
+              ]
+            }
+          ],
+          "final_solution": {
+            "activation_dates": "2–5 November 2026",
+            "exclusive_seating": "9AM–12PM and 2–6PM daily via partial buyout",
+            "cup_sleeves": "1,000 pieces at $0.80/pc",
+            "redemption": "QR Code A $10 and QR Code B $13.50 with unique 16-letter codes and back-end tracking",
+            "branding": "green noren with client logo within $5,000; kapaline overlay $6,000; two pull-up banners $4,000; LED $2,500 waivable if all three proceed",
+            "pending": "client final selection, self-management permissions, Teams call"
+          },
+          "outcome": null,
+          "reusable_insights": [
+            "Mall restrictions can block overhead signage; verify landlord approval early for branding placements",
+            "Conditional fee waivers (e.g., LED free if all branding elements proceed) can drive bundle uptake",
+            "Client self-management of some branding elements can reduce costs but requires clear approval and scheduling protocols"
+          ]
+        },
+        "review_status": "approved",
+        "collection": "historical_cases",
+        "created_at": "2026-09-12T13:28:58.884987+00:00",
+        "approved_by": "workspace-user",
+        "approved_at": "2026-09-12T13:33:36.289716+00:00"
+      },
+      {
+        "id": "case_candidate_d7093c11c6",
+        "title": "Imported historical event case",
+        "source_ids": [
+          "source_3222d8d24e"
+        ],
+        "tags": [
+          "imported",
+          "historical_event_case"
+        ],
+        "extraction": {
+          "method": "deepseek_two_stage",
+          "created_at": "2026-09-12T08:54:23.329028+00:00",
+          "timeline": [
+            {
+              "message_id": "msg_001",
+              "turn": 1,
+              "speaker": "customer",
+              "timestamp": "2026-08-12",
+              "source_lines": [
+                16,
+                45
+              ],
+              "summary": "Client confirmed a 150-cup live station order for 19 Aug 1:30 PM at [CLIENT VENUE] totalling S$1,745 and requested an official quotation.",
+              "decisions": [
+                "Order confirmed: 150 cups live station, 19 Aug 1:30 PM, ~2–2.5 hours"
+              ],
+              "unresolved_items": [
+                "Whether payment after delivery or via Vendors@Gov is acceptable"
+              ]
+            },
+            {
+              "message_id": "msg_002",
+              "turn": 2,
+              "speaker": "company",
+              "timestamp": "2026-08-13",
+              "source_lines": [
+                49,
+                68
+              ],
+              "summary": "Moss Matcha issued the official quotation and offered post-delivery payment with a signed invoice committing to payment within two weeks, or Vendors@Gov if details provided.",
+              "decisions": [
+                "Company accommodates payment after delivery of services"
+              ],
+              "unresolved_items": [
+                "Which payment arrangement the client will choose"
+              ]
+            },
+            {
+              "message_id": "msg_003",
+              "turn": 3,
+              "speaker": "customer",
+              "timestamp": "2026-08-13",
+              "source_lines": [
+                72,
+                91
+              ],
+              "summary": "Client confirmed proceeding with the order as quoted and chose Vendors@Gov invoicing with government terms of payment within 30 days from invoice, processing only after delivery.",
+              "decisions": [
+                "Client proceeds with order as quoted",
+                "Payment via Vendors@Gov, 30 days from invoice, processing after delivery"
+              ],
+              "unresolved_items": []
+            },
+            {
+              "message_id": "msg_004",
+              "turn": 4,
+              "speaker": "customer",
+              "timestamp": "2026-08-13",
+              "source_lines": [
+                95,
+                110
+              ],
+              "summary": "Client noted Moss Matcha lacks a Vendors@Gov account and requested account creation by end of week, before 18 Aug at the latest, to issue a purchase order.",
+              "decisions": [],
+              "unresolved_items": [
+                "Moss Matcha Vendors@Gov account creation before 18 Aug"
+              ]
+            },
+            {
+              "message_id": "msg_005",
+              "turn": 5,
+              "speaker": "company",
+              "timestamp": "2026-08-13",
+              "source_lines": [
+                114,
+                131
+              ],
+              "summary": "Moss Matcha confirmed its Vendors@Gov account was set up and shared the required details.",
+              "decisions": [
+                "Vendors@Gov account created"
+              ],
+              "unresolved_items": []
+            },
+            {
+              "message_id": "msg_006",
+              "turn": 6,
+              "speaker": "customer",
+              "timestamp": "2026-08-17",
+              "source_lines": [
+                135,
+                150
+              ],
+              "summary": "Client asked whether Moss Matcha needs tables/logistics for 19 Aug and requested an on-site contact person/number.",
+              "decisions": [],
+              "unresolved_items": [
+                "Tables/logistics requirements",
+                "On-site contact person and number"
+              ]
+            },
+            {
+              "message_id": "msg_007",
+              "turn": 7,
+              "speaker": "company",
+              "timestamp": "2026-08-17",
+              "source_lines": [
+                154,
+                175
+              ],
+              "summary": "Moss Matcha requested the white table with wheels, plans 12:30 PM arrival with one hour setup, asked about service lift and drop-off point, offered a site recce today, and named itself on-site project manager.",
+              "decisions": [
+                "Setup: 12:30 PM arrival, one hour setup",
+                "Company brings own trolley"
+              ],
+              "unresolved_items": [
+                "Service lift use and suitable drop-off point",
+                "Whether a site recce will happen today"
+              ]
+            }
+          ]
+        },
+        "content": {
+          "customer": {
+            "type": "government or corporate client",
+            "venue": "[CLIENT VENUE]",
+            "payment_platform": "Vendors@Gov"
+          },
+          "initial_requirement": {
+            "event_type": "live matcha station",
+            "quantity": "150 cups",
+            "date_time": "19 Aug 1:30 PM",
+            "duration": "~2–2.5 hours",
+            "total_price": "S$1,745",
+            "requested_document": "official quotation"
+          },
+          "current_requirement": {
+            "order_status": "confirmed as quoted",
+            "payment_method": "Vendors@Gov",
+            "payment_terms": "30 days from invoice, processing after delivery",
+            "setup_time": "12:30 PM arrival, one hour setup",
+            "logistics": "requires white table with wheels; company brings own trolley",
+            "on_site_contact": "company project manager throughout",
+            "pending_confirmations": [
+              "service lift use",
+              "drop-off point",
+              "site recce today",
+              "tables/logistics provision"
+            ]
+          },
+          "requirement_changes": [],
+          "operational_state": {
+            "setup_arrival": "12:30 PM",
+            "setup_duration": "one hour",
+            "equipment_provided_by_company": "own trolley",
+            "equipment_required_from_client": "white table with wheels",
+            "on_site_management": "company project manager throughout",
+            "pending_logistics": [
+              "service lift use",
+              "drop-off point",
+              "site recce today"
+            ]
+          },
+          "commercial_state": {
+            "total_amount": "S$1,745",
+            "line_items": "Iced Matcha Latte S$7.90×90=S$711; Ichigo Matcha S$9.90×30=S$297; Matcha Fuwafuwa Latte S$7.90×30=S$237; setup fee S$500",
+            "payment_method": "Vendors@Gov",
+            "payment_terms": "30 days from invoice, processing after delivery",
+            "quotation_issued": true,
+            "vendors_gov_account_created": true
+          },
+          "commitments": {
+            "company": [
+              {
+                "commitment": "Issued official quotation",
+                "source_message_ids": [
+                  "msg_002"
+                ]
+              },
+              {
+                "commitment": "Created Vendors@Gov account and shared details",
+                "source_message_ids": [
+                  "msg_005"
+                ]
+              },
+              {
+                "commitment": "Will arrive 12:30 PM for one-hour setup with own trolley",
+                "source_message_ids": [
+                  "msg_007"
+                ]
+              },
+              {
+                "commitment": "Project manager on-site throughout to coordinate setup and service",
+                "source_message_ids": [
+                  "msg_007"
+                ]
+              }
+            ],
+            "customer": [
+              {
+                "commitment": "Proceed with order as quoted",
+                "source_message_ids": [
+                  "msg_003"
+                ]
+              },
+              {
+                "commitment": "Issue purchase order via Vendors@Gov",
+                "source_message_ids": [
+                  "msg_004"
+                ]
+              },
+              {
+                "commitment": "Payment within 30 days from invoice, processing after delivery",
+                "source_message_ids": [
+                  "msg_003"
+                ]
+              }
+            ],
+            "pending": [
+              {
+                "item": "Confirm service lift use and drop-off point",
+                "source_message_ids": [
+                  "msg_007"
+                ]
+              },
+              {
+                "item": "Confirm whether site recce occurs today",
+                "source_message_ids": [
+                  "msg_007"
+                ]
+              },
+              {
+                "item": "Confirm tables/logistics provision",
+                "source_message_ids": [
+                  "msg_006"
+                ]
+              }
+            ]
+          },
+          "conversation_timeline": [
+            {
+              "turn": 1,
+              "speaker": "customer",
+              "summary": "Confirmed 150-cup live station order for 19 Aug 1:30 PM at S$1,745 and requested official quotation.",
+              "source_message_ids": [
+                "msg_001"
+              ]
+            },
+            {
+              "turn": 2,
+              "speaker": "company",
+              "summary": "Issued official quotation and offered post-delivery payment or Vendors@Gov.",
+              "source_message_ids": [
+                "msg_002"
+              ]
+            },
+            {
+              "turn": 3,
+              "speaker": "customer",
+              "summary": "Confirmed proceeding as quoted and chose Vendors@Gov with 30-day payment after delivery.",
+              "source_message_ids": [
+                "msg_003"
+              ]
+            },
+            {
+              "turn": 4,
+              "speaker": "customer",
+              "summary": "Requested Vendors@Gov account creation by end of week, before 18 Aug, to issue purchase order.",
+              "source_message_ids": [
+                "msg_004"
+              ]
+            },
+            {
+              "turn": 5,
+              "speaker": "company",
+              "summary": "Confirmed Vendors@Gov account set up and shared required details.",
+              "source_message_ids": [
+                "msg_005"
+              ]
+            }
+          ],
+          "final_solution": {
+            "order": "150 cups live station, 19 Aug 1:30 PM, ~2–2.5 hours, S$1,745",
+            "payment": "Vendors@Gov, 30 days from invoice, processing after delivery",
+            "setup": "12:30 PM arrival, one hour setup",
+            "logistics": "company brings own trolley; requires white table with wheels",
+            "on_site_contact": "company project manager throughout",
+            "pending": [
+              "service lift use",
+              "drop-off point",
+              "site recce today",
+              "tables/logistics provision"
+            ]
+          },
+          "outcome": null,
+          "reusable_insights": [
+            {
+              "insight": "For government clients using Vendors@Gov, account creation must be completed before purchase order issuance; allow lead time for setup.",
+              "source_message_ids": [
+                "msg_004",
+                "msg_005"
+              ]
+            },
+            {
+              "insight": "Offering flexible payment options (post-delivery invoice or Vendors@Gov) can accommodate client procurement preferences.",
+              "source_message_ids": [
+                "msg_002",
+                "msg_003"
+              ]
+            },
+            {
+              "insight": "Early clarification of venue logistics (tables, lift, drop-off) and on-site contact prevents last-minute issues.",
+              "source_message_ids": [
+                "msg_006",
+                "msg_007"
+              ]
+            }
+          ]
+        },
+        "review_status": "approved",
+        "collection": "historical_cases",
+        "created_at": "2026-09-12T08:54:23.329099+00:00",
+        "approved_by": "workspace-user",
+        "approved_at": "2026-09-12T08:54:54.352111+00:00"
+      },
+      {
+        "name": "ACME Corp",
+        "pax": 90,
+        "service": "workshop",
+        "price": "S$12/pax",
+        "notes": "2-hour presence",
+        "id": "seed_case_acme",
+        "review_status": "approved",
+        "origin": "legacy_seed",
+        "collection": "historical_cases",
+        "created_at": "2026-09-12T12:54:51.199916+00:00"
+      }
+    ],
+    "sales_principles": [
+      {
+        "text": "Human-approved commercial terms are the source of truth.",
+        "id": "seed_principle_human_approved_commercial_terms_are_the_source_of_truth",
+        "review_status": "approved",
+        "origin": "legacy_seed",
+        "collection": "principles",
+        "created_at": "2026-09-12T10:22:21.561876+00:00"
+      },
+      {
+        "text": "Ask only high-value discovery questions.",
+        "id": "seed_principle_ask_only_high_value_discovery_questions",
+        "review_status": "approved",
+        "origin": "legacy_seed",
+        "collection": "principles",
+        "created_at": "2026-09-12T10:22:21.561778+00:00"
+      }
+    ],
+    "capabilities": [
+      {
+        "name": "Hands-on matcha workshop",
+        "tags": [
+          "workshop"
+        ],
+        "notes": "Facilitated preparation, tasting and guided education.",
+        "id": "seed_service_hands_on_matcha_workshop",
+        "review_status": "approved",
+        "origin": "legacy_seed",
+        "collection": "services",
+        "created_at": "2026-09-12T10:22:21.561489+00:00"
+      },
+      {
+        "name": "Workshop throughput",
+        "notes": "Plan for 40 participants per facilitator-hour; allow 2m x 2m footprint.",
+        "id": "seed_ops_workshop_throughput",
+        "review_status": "approved",
+        "origin": "legacy_seed",
+        "collection": "operations",
+        "created_at": "2026-09-12T10:22:21.561591+00:00"
+      },
+      {
+        "name": "Venue checklist",
+        "notes": "Confirm loading access, power and hot water before final commitment.",
+        "id": "seed_ops_venue_checklist",
+        "review_status": "approved",
+        "origin": "legacy_seed",
+        "collection": "operations",
+        "created_at": "2026-09-12T10:22:21.561687+00:00"
+      }
+    ]
+  },
+  "change_impact": {
+    "triggered": true,
+    "changes": [
+      {
+        "at": "2026-09-12T13:36:17.707236+00:00",
+        "type": "state_change",
+        "field": "pax",
+        "from": null,
+        "to": 65
+      },
+      {
+        "at": "2026-09-12T13:36:17.709471+00:00",
+        "type": "state_change",
+        "field": "event_duration_hours",
+        "from": null,
+        "to": 3.0
+      },
+      {
+        "at": "2026-09-12T13:36:19.531850+00:00",
+        "type": "state_change",
+        "field": "event_type",
+        "from": null,
+        "to": "team day",
+        "source": "llm_interpretation"
+      },
+      {
+        "at": "2026-09-12T13:36:19.531890+00:00",
+        "type": "state_change",
+        "field": "event_date",
+        "from": null,
+        "to": "second week of December",
+        "source": "llm_interpretation"
+      },
+      {
+        "at": "2026-09-12T13:36:19.531938+00:00",
+        "type": "state_change",
+        "field": "event_time",
+        "from": null,
+        "to": "weekday afternoon",
+        "source": "llm_interpretation"
+      },
+      {
+        "at": "2026-09-12T13:36:19.531962+00:00",
+        "type": "state_change",
+        "field": "venue",
+        "from": null,
+        "to": "downtown area, reachable by MRT",
+        "source": "llm_interpretation"
+      },
+      {
+        "at": "2026-09-12T13:36:19.531978+00:00",
+        "type": "state_change",
+        "field": "service",
+        "from": null,
+        "to": "VR gaming experience with light catering",
+        "source": "llm_interpretation"
+      }
+    ],
+    "impacts": [
+      "commercial estimate",
+      "equipment",
+      "footprint",
+      "operational feasibility",
+      "quotation validity",
+      "setup schedule",
+      "staff availability",
+      "staffing",
+      "supplier deadlines",
+      "throughput",
+      "venue access"
+    ],
+    "human_review_required": true,
+    "reason": "existing state or commitment may be affected"
+  },
+  "solution": {
+    "summary": "65-person VR gaming experience with light catering at downtown area, reachable by MRT.",
+    "references": {
+      "cases": [
+        {
+          "id": "case_candidate_e5dda2ecba",
+          "title": "Imported historical event case",
+          "source_ids": [
+            "source_e3d7ca3cba"
+          ],
+          "tags": [
+            "imported",
+            "historical_event_case"
+          ],
+          "extraction": {
+            "method": "deepseek_two_stage",
+            "created_at": "2026-09-12T13:13:42.547257+00:00",
+            "timeline": [
+              {
+                "message_id": "msg_001",
+                "turn": 1,
+                "speaker": "customer",
+                "timestamp": "2026-07-20",
+                "source_lines": [
+                  485,
+                  487,
+                  489,
+                  491,
+                  493,
+                  495,
+                  497,
+                  498,
+                  499
+                ],
+                "summary": "Client requests a call to align on collaboration direction, proposing tomorrow 3PM.",
+                "decisions": [],
+                "unresolved_items": []
+              },
+              {
+                "message_id": "msg_002",
+                "turn": 2,
+                "speaker": "company",
+                "timestamp": "2026-07-20",
+                "source_lines": [
+                  469,
+                  471,
+                  473,
+                  475,
+                  477,
+                  479,
+                  480,
+                  481
+                ],
+                "summary": "Moss Matcha confirms 3PM call; Director and contact will join.",
+                "decisions": [],
+                "unresolved_items": []
+              },
+              {
+                "message_id": "msg_003",
+                "turn": 3,
+                "speaker": "customer",
+                "timestamp": "2026-07-20",
+                "source_lines": [
+                  455,
+                  457,
+                  459,
+                  461,
+                  463,
+                  464,
+                  465
+                ],
+                "summary": "Client confirms Teams meeting scheduled for tomorrow 3PM.",
+                "decisions": [],
+                "unresolved_items": []
+              },
+              {
+                "message_id": "msg_004",
+                "turn": 4,
+                "speaker": "company",
+                "timestamp": "2026-07-21",
+                "source_lines": [
+                  421,
+                  423,
+                  425,
+                  427,
+                  429,
+                  431,
+                  432,
+                  434,
+                  435,
+                  437,
+                  439,
+                  440,
+                  442,
+                  443,
+                  445,
+                  447,
+                  449,
+                  450,
+                  451
+                ],
+                "summary": "Moss Matcha proposes original in-store format: S$28/pax workshop, S$10/pax dessert add-on, stations 8:30-10:00am.",
+                "decisions": [],
+                "unresolved_items": []
+              },
+              {
+                "message_id": "msg_005",
+                "turn": 5,
+                "speaker": "customer",
+                "timestamp": "2026-07-22",
+                "source_lines": [
+                  408,
+                  410,
+                  412,
+                  413,
+                  414,
+                  415,
+                  416,
+                  417
+                ],
+                "summary": "Client prefers dessert included in quotation and asks to confirm each runner gets a matcha cup.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Confirmation that each runner receives a matcha cup of choice"
+                ]
+              },
+              {
+                "message_id": "msg_006",
+                "turn": 6,
+                "speaker": "company",
+                "timestamp": "2026-07-22",
+                "source_lines": [
+                  396,
+                  398,
+                  400,
+                  401,
+                  402,
+                  403,
+                  404
+                ],
+                "summary": "Moss Matcha confirms each runner receives one cup of matcha, self-made or staff-prepared.",
+                "decisions": [],
+                "unresolved_items": []
+              },
+              {
+                "message_id": "msg_007",
+                "turn": 7,
+                "speaker": "customer",
+                "timestamp": "2026-08-14",
+                "source_lines": [
+                  373,
+                  375,
+                  377,
+                  379,
+                  381,
+                  383,
+                  385,
+                  387,
+                  389,
+                  390,
+                  391,
+                  392
+                ],
+                "summary": "Major change: event moves to F&B venue at Clarke Quay with no external food/drinks; client requests simple workshop, mini game, possible matcha powder giveaways for ~90 pax over 2 hours.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Whether matcha powder giveaways are feasible",
+                  "Quotation for revised format"
+                ]
+              },
+              {
+                "message_id": "msg_008",
+                "turn": 8,
+                "speaker": "company",
+                "timestamp": "2026-08-14",
+                "source_lines": [
+                  346,
+                  348,
+                  350,
+                  352,
+                  354,
+                  356,
+                  357,
+                  358,
+                  359,
+                  360,
+                  361,
+                  363,
+                  365,
+                  367,
+                  368,
+                  369
+                ],
+                "summary": "Moss Matcha confirms adaptable no-beverage workshop format and requests event details (date, venue, photos, batch flow, sampling rules, giveaway preferences).",
+                "decisions": [],
+                "unresolved_items": [
+                  "Event date/timing",
+                  "Venue details/photos",
+                  "Batch flow",
+                  "Sampling permission",
+                  "Giveaway quantity/size"
+                ]
+              },
+              {
+                "message_id": "msg_009",
+                "turn": 9,
+                "speaker": "customer",
+                "timestamp": "2026-08-14",
+                "source_lines": [
+                  324,
+                  326,
+                  328,
+                  330,
+                  331,
+                  332,
+                  333,
+                  334,
+                  335,
+                  337,
+                  339,
+                  340,
+                  341,
+                  342
+                ],
+                "summary": "Client confirms 17 Sept 8-10pm at [VENUE], Clarke Quay; participants in batches; sampling permission to be checked; asks Moss to propose giveaway.",
+                "decisions": [
+                  "Event date/time: 17 Sept, 8-10pm",
+                  "Venue: [VENUE], Clarke Quay",
+                  "Participants join in batches"
+                ],
+                "unresolved_items": [
+                  "Sampling permission at venue",
+                  "Giveaway proposal"
+                ]
+              },
+              {
+                "message_id": "msg_010",
+                "turn": 10,
+                "speaker": "company",
+                "timestamp": "2026-08-15",
+                "source_lines": [
+                  296,
+                  298,
+                  300,
+                  302,
+                  304,
+                  306,
+                  308,
+                  310,
+                  312,
+                  314,
+                  316,
+                  318,
+                  319,
+                  320
+                ],
+                "summary": "Moss Matcha confirms revised timing and proposes interactive workshop with cookie door gift and mini game at S$12/pax for ~90 pax.",
+                "decisions": [
+                  "Workshop format: interactive with mini game",
+                  "Quote: S$12/pax for ~90 pax"
+                ],
+                "unresolved_items": [
+                  "Venue sampling permission"
+                ]
+              },
+              {
+                "message_id": "msg_011",
+                "turn": 11,
+                "speaker": "customer",
+                "timestamp": "2026-08-17",
+                "source_lines": [
+                  281,
+                  283,
+                  285,
+                  287,
+                  289,
+                  290,
+                  291,
+                  292
+                ],
+                "summary": "Client asks whether cookie door gift can be replaced with matcha powder due to venue food restrictions.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Replacing cookie with matcha powder giveaway"
+                ]
+              },
+              {
+                "message_id": "msg_012",
+                "turn": 12,
+                "speaker": "company",
+                "timestamp": "2026-08-17",
+                "source_lines": [
+                  255,
+                  257,
+                  259,
+                  261,
+                  263,
+                  264,
+                  266,
+                  268,
+                  270,
+                  271,
+                  273,
+                  275,
+                  276,
+                  277
+                ],
+                "summary": "Moss Matcha confirms matcha powder can replace cookie and provides retail and 20% bulk pricing.",
+                "decisions": [
+                  "Matcha powder allowed as door gift alternative"
+                ],
+                "unresolved_items": []
+              },
+              {
+                "message_id": "msg_013",
+                "turn": 13,
+                "speaker": "customer",
+                "timestamp": "2026-08-18",
+                "source_lines": [
+                  238,
+                  240,
+                  242,
+                  244,
+                  246,
+                  248,
+                  249,
+                  250,
+                  251
+                ],
+                "summary": "Client asks for cheaper options and whether cost is ~$40-50/pax.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Cheaper door gift option"
+                ]
+              },
+              {
+                "message_id": "msg_014",
+                "turn": 14,
+                "speaker": "company",
+                "timestamp": "2026-08-19",
+                "source_lines": [
+                  217,
+                  219,
+                  221,
+                  223,
+                  225,
+                  226,
+                  228,
+                  230,
+                  232,
+                  233,
+                  234
+                ],
+                "summary": "Moss Matcha clarifies discounted powder prices and offers branded sticky notes as budget alternative.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Preferred door gift option and quantity"
+                ]
+              },
+              {
+                "message_id": "msg_015",
+                "turn": 15,
+                "speaker": "customer",
+                "timestamp": "2026-08-19",
+                "source_lines": [
+                  198,
+                  200,
+                  202,
+                  204,
+                  206,
+                  208,
+                  210,
+                  211,
+                  212,
+                  213
+                ],
+                "summary": "Client confirms understanding of $43.04/pax for Gyokuei no Mori and requests sticky note visuals, cost for 90 pax, and setup space requirements.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Sticky note visuals and cost for 90 pax",
+                  "Setup space requirements"
+                ]
+              },
+              {
+                "message_id": "msg_016",
+                "turn": 16,
+                "speaker": "company",
+                "timestamp": "2026-08-20",
+                "source_lines": [
+                  178,
+                  180,
+                  182,
+                  184,
+                  186,
+                  188,
+                  190,
+                  192,
+                  193,
+                  194
+                ],
+                "summary": "Moss Matcha confirms pricing: Gyokuei no Mori S$43.04/pax; sticky note option S$12/pax with free sticky notes, S$1,080 for 90 pax; setup needs ~2m x 0.9m table and ~4 sqm.",
+                "decisions": [
+                  "Sticky note option: S$12/pax, S$1,080 for 90 pax",
+                  "Setup: ~2m x 0.9m table, ~4 sqm"
+                ],
+                "unresolved_items": []
+              },
+              {
+                "message_id": "msg_017",
+                "turn": 17,
+                "speaker": "customer",
+                "timestamp": "2026-08-20",
+                "source_lines": [
+                  161,
+                  163,
+                  165,
+                  167,
+                  169,
+                  171,
+                  172,
+                  173,
+                  174
+                ],
+                "summary": "Client proceeds with sticky pads, sends payment portal account creation link, and requests official quotation.",
+                "decisions": [
+                  "Proceed with sticky pads"
+                ],
+                "unresolved_items": [
+                  "Official quotation"
+                ]
+              },
+              {
+                "message_id": "msg_018",
+                "turn": 18,
+                "speaker": "company",
+                "timestamp": "2026-08-20",
+                "source_lines": [
+                  147,
+                  149,
+                  151,
+                  153,
+                  155,
+                  156,
+                  157
+                ],
+                "summary": "Moss Matcha creates account and attaches official quotation with sticky pad option.",
+                "decisions": [],
+                "unresolved_items": []
+              },
+              {
+                "message_id": "msg_019",
+                "turn": 19,
+                "speaker": "customer",
+                "timestamp": "2026-08-31",
+                "source_lines": [
+                  132,
+                  134,
+                  136,
+                  138,
+                  140,
+                  141,
+                  142,
+                  143
+                ],
+                "summary": "Client asks if company is GST registered and to include GST in quotation if so.",
+                "decisions": [],
+                "unresolved_items": [
+                  "GST inclusion in quotation"
+                ]
+              },
+              {
+                "message_id": "msg_020",
+                "turn": 20,
+                "speaker": "company",
+                "timestamp": "2026-08-31",
+                "source_lines": [
+                  116,
+                  118,
+                  120,
+                  122,
+                  124,
+                  126,
+                  127,
+                  128
+                ],
+                "summary": "Moss Matcha confirms not GST registered, so no GST in quotation.",
+                "decisions": [
+                  "No GST applicable"
+                ],
+                "unresolved_items": []
+              },
+              {
+                "message_id": "msg_021",
+                "turn": 21,
+                "speaker": "customer",
+                "timestamp": "2026-09-03",
+                "source_lines": [
+                  104,
+                  106,
+                  108,
+                  110,
+                  111,
+                  112
+                ],
+                "summary": "Client asks how many runners the 4 sqm workshop can engage at a time.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Runner capacity per batch"
+                ]
+              },
+              {
+                "message_id": "msg_022",
+                "turn": 22,
+                "speaker": "company",
+                "timestamp": "2026-09-03",
+                "source_lines": [
+                  86,
+                  88,
+                  90,
+                  92,
+                  94,
+                  96,
+                  98,
+                  99,
+                  100
+                ],
+                "summary": "Moss Matcha clarifies 4 sqm is setup only, runners enter surrounding space in batches, and requests floor plan/photos.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Floor plan/photos of event space"
+                ]
+              },
+              {
+                "message_id": "msg_023",
+                "turn": 23,
+                "speaker": "customer",
+                "timestamp": "2026-09-03",
+                "source_lines": [
+                  73,
+                  75,
+                  77,
+                  79,
+                  80,
+                  81,
+                  82
+                ],
+                "summary": "Client shares floorplan, prefers orange-highlighted station with black as secondary option.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Confirmation of station location"
+                ]
+              },
+              {
+                "message_id": "msg_024",
+                "turn": 24,
+                "speaker": "customer",
+                "timestamp": "2026-09-07",
+                "source_lines": [
+                  56,
+                  58,
+                  60,
+                  62,
+                  64,
+                  66,
+                  67,
+                  68,
+                  69
+                ],
+                "summary": "Client asks how many Moss Matcha staff will attend and whether proposed setup is acceptable.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Staff count confirmation",
+                  "Setup approval"
+                ]
+              },
+              {
+                "message_id": "msg_025",
+                "turn": 25,
+                "speaker": "company",
+                "timestamp": "2026-09-07",
+                "source_lines": [
+                  32,
+                  34,
+                  36,
+                  38,
+                  40,
+                  42,
+                  44,
+                  46,
+                  48,
+                  50,
+                  51,
+                  52
+                ],
+                "summary": "Moss Matcha explains black area suits presentation, orange suits close interaction/tasting; expects 2-3 staff; asks venue permission for hands-on/tasting.",
+                "decisions": [
+                  "Moss Matcha staffing: 2-3 on-site"
+                ],
+                "unresolved_items": [
+                  "Venue permission for close interaction/tasting",
+                  "Final area choice"
+                ]
+              },
+              {
+                "message_id": "msg_026",
+                "turn": 26,
+                "speaker": "customer",
+                "timestamp": "2026-09-08",
+                "source_lines": [
+                  17,
+                  19,
+                  21,
+                  23,
+                  25,
+                  26,
+                  27,
+                  28
+                ],
+                "summary": "Client selects orange-highlighted area and asks maximum participant capacity.",
+                "decisions": [
+                  "Station area: orange-highlighted area"
+                ],
+                "unresolved_items": [
+                  "Maximum participant capacity"
+                ]
+              }
+            ]
+          },
+          "content": {
+            "customer": {
+              "name": "Moss Matcha client (event organizer)",
+              "event_context": "Corporate/group matcha workshop event at F&B venue, Clarke Quay",
+              "location": "Singapore"
+            },
+            "initial_requirement": {
+              "format": "In-store matcha workshop",
+              "pricing": "S$28/pax workshop + S$10/pax dessert add-on",
+              "timing": "8:30-10:00am stations",
+              "inclusions": "Each runner receives one matcha cup (self-made or staff-prepared)",
+              "dessert": "Client preferred dessert included in quotation"
+            },
+            "current_requirement": {
+              "event_date_time": "17 Sept 2026, 8-10pm",
+              "venue": "[VENUE], Clarke Quay (F&B venue, no external food/drinks)",
+              "format": "Interactive matcha workshop with mini game, no beverage serving",
+              "participants": "~90 pax in batches",
+              "door_gift": "Sticky pads at S$12/pax",
+              "station_area": "Orange-highlighted area",
+              "setup": "~2m x 0.9m table, ~4 sqm",
+              "staffing": "2-3 Moss Matcha staff on-site"
+            },
+            "requirement_changes": [
+              {
+                "change": "Event relocated to F&B venue at Clarke Quay with no external food/drinks allowed",
+                "impact": "Format changed to no-beverage workshop; cookie door gift replaced",
+                "source_message_ids": [
+                  "msg_007"
+                ]
+              },
+              {
+                "change": "Event timing changed to 17 Sept, 8-10pm",
+                "impact": "Original morning in-store timing (8:30-10:00am) no longer applies",
+                "source_message_ids": [
+                  "msg_009"
+                ]
+              },
+              {
+                "change": "Door gift changed from cookie to sticky pads",
+                "impact": "Pricing set at S$12/pax, S$1,080 for 90 pax",
+                "source_message_ids": [
+                  "msg_017"
+                ]
+              },
+              {
+                "change": "Station area selected as orange-highlighted area",
+                "impact": "Close interaction/tasting format chosen over presentation-only",
+                "source_message_ids": [
+                  "msg_026"
+                ]
+              }
+            ],
+            "operational_state": {
+              "setup_space": "~2m x 0.9m table, ~4 sqm setup area; runners in surrounding space",
+              "staffing": "2-3 Moss Matcha staff on-site",
+              "participant_flow": "~90 runners in batches",
+              "station_location": "Orange-highlighted area selected; black secondary",
+              "sampling_interaction": "Venue permission for hands-on whisking/tasting unresolved",
+              "floor_plan": "Floorplan shared by client"
+            },
+            "commercial_state": {
+              "workshop_fee": "S$12 per pax for ~90 pax",
+              "sticky_note_door_gift": "Included as goodwill at S$12/pax; S$1,080 for 90 pax",
+              "matcha_powder_option": "Gyokuei no Mori S$31.04 per 30g tin after 20% bulk discount; total S$43.04/pax with workshop",
+              "gst": "Moss Matcha not GST registered; no GST in quotation",
+              "original_proposal": "S$28/pax workshop + S$10/pax dessert add-on (superseded)",
+              "quotation": "Official quotation issued with sticky pad option"
+            },
+            "commitments": {
+              "company": [
+                {
+                  "item": "Provide official quotation with sticky pad option",
+                  "source_message_ids": [
+                    "msg_018"
+                  ]
+                },
+                {
+                  "item": "Create client payment portal account",
+                  "source_message_ids": [
+                    "msg_018"
+                  ]
+                },
+                {
+                  "item": "Staff 2-3 members on-site",
+                  "source_message_ids": [
+                    "msg_025"
+                  ]
+                },
+                {
+                  "item": "Provide sticky notes as goodwill",
+                  "source_message_ids": [
+                    "msg_016"
+                  ]
+                }
+              ],
+              "customer": [
+                {
+                  "item": "Proceed with sticky pads",
+                  "source_message_ids": [
+                    "msg_017"
+                  ]
+                },
+                {
+                  "item": "Create payment portal account link",
+                  "source_message_ids": [
+                    "msg_017"
+                  ]
+                },
+                {
+                  "item": "Check venue sampling permission",
+                  "source_message_ids": [
+                    "msg_009"
+                  ]
+                }
+              ],
+              "pending": [
+                {
+                  "item": "Venue permission for close interaction/tasting",
+                  "source_message_ids": [
+                    "msg_025"
+                  ]
+                },
+                {
+                  "item": "Maximum participant capacity confirmation",
+                  "source_message_ids": [
+                    "msg_026"
+                  ]
+                },
+                {
+                  "item": "Floor plan/photos of event space",
+                  "source_message_ids": [
+                    "msg_022"
+                  ]
+                }
+              ]
+            },
+            "conversation_timeline": [
+              {
+                "turn": 1,
+                "summary": "Client requests alignment call; proposes tomorrow 3PM",
+                "source_message_ids": [
+                  "msg_001"
+                ]
+              },
+              {
+                "turn": 4,
+                "summary": "Moss Matcha proposes original in-store format: S$28/pax workshop, S$10/pax dessert add-on",
+                "source_message_ids": [
+                  "msg_004"
+                ]
+              },
+              {
+                "turn": 7,
+                "summary": "Major change: event moves to F&B venue at Clarke Quay, no external food/drinks, ~90 pax over 2 hours",
+                "source_message_ids": [
+                  "msg_007"
+                ]
+              },
+              {
+                "turn": 10,
+                "summary": "Moss Matcha proposes interactive workshop with cookie door gift and mini game at S$12/pax for ~90 pax",
+                "source_message_ids": [
+                  "msg_010"
+                ]
+              },
+              {
+                "turn": 17,
+                "summary": "Client proceeds with sticky pads, sends payment portal link, requests official quotation",
+                "source_message_ids": [
+                  "msg_017"
+                ]
+              }
+            ],
+            "final_solution": {
+              "event": "17 Sept 2026, 8-10pm at [VENUE], Clarke Quay",
+              "format": "Interactive matcha workshop with mini game, no beverage serving",
+              "door_gift": "Sticky pads at S$12/pax, S$1,080 for 90 pax",
+              "station_area": "Orange-highlighted area",
+              "gst": "No GST applicable",
+              "setup": "~2m x 0.9m table, ~4 sqm",
+              "source_message_ids": [
+                "msg_009",
+                "msg_010",
+                "msg_016",
+                "msg_017",
+                "msg_020",
+                "msg_026"
+              ]
+            },
+            "outcome": "succeed",
+            "reusable_insights": [
+              {
+                "insight": "Venue food/drink restrictions can force door gift and format changes; confirm venue rules early",
+                "source_message_ids": [
+                  "msg_007",
+                  "msg_011"
+                ]
+              },
+              {
+                "insight": "Offering a budget goodwill alternative (e.g., branded sticky notes) can close price-sensitive door gift decisions",
+                "source_message_ids": [
+                  "msg_014",
+                  "msg_016"
+                ]
+              },
+              {
+                "insight": "Clarifying setup footprint vs. participant circulation space prevents capacity misunderstandings",
+                "source_message_ids": [
+                  "msg_022"
+                ]
+              }
+            ]
+          },
+          "review_status": "approved",
+          "collection": "historical_cases",
+          "created_at": "2026-09-12T13:13:42.547337+00:00",
+          "approved_by": "workspace-user",
+          "approved_at": "2026-09-12T13:21:57.356453+00:00"
+        },
+        {
+          "id": "case_candidate_c5b7af4469",
+          "title": "Imported historical event case",
+          "source_ids": [
+            "source_bc77e88788"
+          ],
+          "tags": [
+            "imported",
+            "historical_event_case"
+          ],
+          "extraction": {
+            "method": "deepseek_two_stage",
+            "created_at": "2026-09-12T13:28:58.884874+00:00",
+            "timeline": [
+              {
+                "message_id": "msg_001",
+                "turn": 1,
+                "speaker": "customer",
+                "timestamp": null,
+                "source_lines": [
+                  18,
+                  19,
+                  21,
+                  23,
+                  25,
+                  26,
+                  27,
+                  29,
+                  31
+                ],
+                "summary": "Client Contact A inquires via WhatsApp about a potential matcha activation in the 2nd week of November, asking about branded cups, matcha redemption, and full/partial buyout.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Feasibility and costs for branded cups, redemption, and buyout options"
+                ]
+              },
+              {
+                "message_id": "msg_002",
+                "turn": 2,
+                "speaker": "company",
+                "timestamp": "2026-09-03",
+                "source_lines": [
+                  39,
+                  40,
+                  42,
+                  44,
+                  46,
+                  48,
+                  49,
+                  51,
+                  52,
+                  54,
+                  55,
+                  57,
+                  59
+                ],
+                "summary": "Moss Contact responds that branded cup sleeves/stickers, QR redemption, and buyout may be possible, requesting more details on buyout use, dates, hours, guests, and branding.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Buyout feasibility pending client details on use, date, hours, guests, branding, public access"
+                ]
+              },
+              {
+                "message_id": "msg_003",
+                "turn": 3,
+                "speaker": "customer",
+                "timestamp": null,
+                "source_lines": [
+                  68,
+                  69,
+                  70,
+                  72,
+                  74,
+                  76,
+                  78,
+                  80,
+                  82,
+                  84,
+                  86,
+                  88,
+                  90,
+                  92,
+                  93,
+                  95,
+                  97,
+                  99,
+                  100,
+                  101,
+                  102,
+                  103,
+                  104,
+                  105,
+                  107,
+                  109,
+                  111,
+                  113
+                ],
+                "summary": "Client requests pricing for cups, describes a pre-purchase model of 500–1,000 cups across 2–3 variants with 3–6 month post-event redemption, and details a 2–5 November 2026 activation with exclusive seating 9AM–12PM and 2–6PM daily plus extensive branding ideas.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Cup pricing, minimum quantity, lead time",
+                  "Redemption feasibility, pricing, mechanics, restrictions",
+                  "Buyout classification, costs, operational considerations",
+                  "Permissibility of branding elements and approval requirements",
+                  "Request for venue photos, floor plans, past activation examples"
+                ]
+              },
+              {
+                "message_id": "msg_004",
+                "turn": 4,
+                "speaker": "company",
+                "timestamp": "2026-09-04",
+                "source_lines": [
+                  120,
+                  121,
+                  122,
+                  124,
+                  126,
+                  128,
+                  130,
+                  132,
+                  134,
+                  135,
+                  136,
+                  137,
+                  139,
+                  141,
+                  143,
+                  145,
+                  146,
+                  148,
+                  150,
+                  152,
+                  154,
+                  156,
+                  158,
+                  160,
+                  161,
+                  163,
+                  165,
+                  167,
+                  169,
+                  170,
+                  171,
+                  173,
+                  175,
+                  177,
+                  179,
+                  181,
+                  183,
+                  185,
+                  187,
+                  189,
+                  191,
+                  193,
+                  195,
+                  197
+                ],
+                "summary": "Moss provides preliminary proposal: cup sleeves $1/pc min 500 with 1-month artwork lead time; QR Code A $10 and QR Code B $13.50 with 3–6 month validity; partial buyout exclusive seating package $12,000 including 1,000 QR Code A; branded banners $5,000; LED branding $2,500; tent cards/décor $1,500; kapaline near overhead signage not possible due to mall restrictions.",
+                "decisions": [
+                  "Partial buyout classification for exclusive seating reservation",
+                  "Kapaline boards near main overhead signage not permitted"
+                ],
+                "unresolved_items": [
+                  "Client's preferred option combination",
+                  "Split between QR Code A and QR Code B"
+                ]
+              },
+              {
+                "message_id": "msg_005",
+                "turn": 5,
+                "speaker": "customer",
+                "timestamp": null,
+                "source_lines": [
+                  204,
+                  205,
+                  206,
+                  208,
+                  210,
+                  212,
+                  214,
+                  216,
+                  218,
+                  220,
+                  222,
+                  224,
+                  225,
+                  226,
+                  227,
+                  229,
+                  231,
+                  233,
+                  235,
+                  237,
+                  239,
+                  241,
+                  242,
+                  243,
+                  245,
+                  247,
+                  249
+                ],
+                "summary": "Client considers ~1,000 cup pieces and asks for cost savings; leans toward QR Code A and asks about uniqueness, distribution, tracking, and past examples; requests logo on existing green noren instead of separate banner; asks about kapaline bar overlay, pull-up banners, and free LED inclusion.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Cost savings at 1,000 cup quantity",
+                  "QR code uniqueness, distribution, tracking, examples",
+                  "Logo on existing green noren feasibility",
+                  "Kapaline bar overlay feasibility",
+                  "Pull-up banners feasibility",
+                  "LED display inclusion at no cost"
+                ]
+              },
+              {
+                "message_id": "msg_006",
+                "turn": 6,
+                "speaker": "company",
+                "timestamp": "2026-09-08",
+                "source_lines": [
+                  256,
+                  257,
+                  258,
+                  260,
+                  262,
+                  264,
+                  266,
+                  268,
+                  270,
+                  272,
+                  274,
+                  275,
+                  277,
+                  279,
+                  281,
+                  283,
+                  284,
+                  285,
+                  286,
+                  288,
+                  290,
+                  292
+                ],
+                "summary": "Moss offers 20% cup discount to $0.80/pc ($800 for 1,000); explains unique 16-letter voucher codes valid once with two distribution methods and back-end tracking; accepts green noren with client logo within $5,000 fee; quotes kapaline bar overlay $6,000 and two pull-up banners $4,000; offers to waive $2,500 LED fee if all three branding elements proceed.",
+                "decisions": [
+                  "Cup price reduced to $0.80/pc for 1,000 pieces",
+                  "Green noren with client logo approved within $5,000 branding fee",
+                  "LED display fee waived if green noren, kapaline board, and two pull-up banners all proceed"
+                ],
+                "unresolved_items": [
+                  "Client's final option selection",
+                  "Final quotation"
+                ]
+              },
+              {
+                "message_id": "msg_007",
+                "turn": 7,
+                "speaker": "customer",
+                "timestamp": null,
+                "source_lines": [
+                  299,
+                  300,
+                  301,
+                  303,
+                  305,
+                  307,
+                  309,
+                  311,
+                  313,
+                  315,
+                  317,
+                  319,
+                  321,
+                  323,
+                  325,
+                  327,
+                  329
+                ],
+                "summary": "Client asks to self-manage kapaline board production/installation during non-peak hours and to use existing pull-up banners; accepts Moss handling green noren; requests a Teams call; asks whether LED branding remains complimentary if kapaline and pull-ups are self-managed.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Permission for client to self-manage kapaline board",
+                  "Permission to use existing client pull-up banners",
+                  "Whether LED branding remains free if kapaline and pull-ups are self-managed",
+                  "Scheduling a Teams call",
+                  "Final scope and quotation"
+                ]
+              }
+            ]
+          },
+          "content": {
+            "customer": {
+              "segment": "brand/agency client seeking matcha activation",
+              "contact": "Client Contact A",
+              "channel": "WhatsApp"
+            },
+            "initial_requirement": {
+              "activation_type": "matcha activation",
+              "target_period": "2nd week of November",
+              "branded_cups": true,
+              "matcha_redemption": true,
+              "buyout_interest": "full or partial"
+            },
+            "current_requirement": {
+              "activation_dates": "2–5 November 2026",
+              "exclusive_seating_hours": "9AM–12PM and 2–6PM daily",
+              "cup_quantity": "~1,000 pieces across 2–3 variants",
+              "redemption_model": "pre-purchase with 3–6 month post-event redemption",
+              "branding_scope": "green noren logo, kapaline bar overlay, pull-up banners, LED, tent cards/décor",
+              "self_management": "kapaline board and existing pull-up banners",
+              "venue_assets_requested": "photos, floor plans, past activation examples"
+            },
+            "requirement_changes": [
+              {
+                "change": "Cup quantity increased from 500 to ~1,000 pieces",
+                "source_message_ids": [
+                  "msg_005"
+                ]
+              },
+              {
+                "change": "Banner branding changed from separate banner to client logo on new green noren",
+                "source_message_ids": [
+                  "msg_005"
+                ]
+              },
+              {
+                "change": "Client may self-manage tent cards and light décor subject to approval",
+                "source_message_ids": [
+                  "msg_005"
+                ]
+              },
+              {
+                "change": "Client proposes self-managing kapaline board and using existing pull-up banners",
+                "source_message_ids": [
+                  "msg_007"
+                ]
+              }
+            ],
+            "operational_state": {
+              "activation_dates": "2–5 November 2026",
+              "exclusive_seating": "9AM–12PM and 2–6PM daily",
+              "buyout_type": "partial buyout for exclusive seating",
+              "kapaline_overhead_signage": "not permitted due to mall restrictions",
+              "approval_required": "all artwork, materials, dimensions, installation methods, placements",
+              "voucher_mechanics": "unique 16-letter single-use codes, two distribution methods, back-end tracking"
+            },
+            "commercial_state": {
+              "cup_price": "$0.80/pc for 1,000 pieces (20% discount from $1)",
+              "qr_code_a": "$10 (excludes Matcha Latte Float)",
+              "qr_code_b": "$13.50 (Matcha Latte Float)",
+              "partial_buyout_package": "$12,000 including 1,000 QR Code A",
+              "branding_fees": "green noren $5,000; kapaline overlay $6,000; two pull-up banners $4,000; LED $2,500 (waivable)",
+              "led_waiver_condition": "waived if green noren, kapaline board, and two pull-up banners all proceed"
+            },
+            "commitments": {
+              "company": [
+                "Provide dedicated QR codes and redemption portal with back-end tracking",
+                "Produce, install, and remove new green noren with client logo within $5,000 fee",
+                "Coordinate installation and removal to minimize disruption",
+                "Review client-managed tent cards and light décor designs and placement"
+              ],
+              "customer": [
+                "Share artwork, dimensions, and installation method for approval before production",
+                "Manage tent cards and light décor on their end if included, subject to approval"
+              ],
+              "pending": [
+                "Client's final option selection and QR Code A/B split",
+                "Confirmation of final scope and pricing",
+                "Teams call scheduling",
+                "Permission for client to self-manage kapaline board",
+                "Permission to use existing client pull-up banners",
+                "Whether LED branding remains complimentary if kapaline and pull-ups are self-managed"
+              ]
+            },
+            "conversation_timeline": [
+              {
+                "turn": 1,
+                "summary": "Client inquires about matcha activation in 2nd week of November, branded cups, redemption, buyout",
+                "source_message_ids": [
+                  "msg_001"
+                ]
+              },
+              {
+                "turn": 2,
+                "summary": "Moss confirms feasibility and requests buyout details",
+                "source_message_ids": [
+                  "msg_002"
+                ]
+              },
+              {
+                "turn": 3,
+                "summary": "Client details 2–5 Nov 2026 activation, 500–1,000 cups, redemption model, branding ideas",
+                "source_message_ids": [
+                  "msg_003"
+                ]
+              },
+              {
+                "turn": 4,
+                "summary": "Moss provides preliminary pricing and notes kapaline overhead signage not permitted",
+                "source_message_ids": [
+                  "msg_004"
+                ]
+              },
+              {
+                "turn": 6,
+                "summary": "Moss offers 20% cup discount, green noren approval, kapaline/pull-up quotes, conditional LED waiver",
+                "source_message_ids": [
+                  "msg_006"
+                ]
+              }
+            ],
+            "final_solution": {
+              "activation_dates": "2–5 November 2026",
+              "exclusive_seating": "9AM–12PM and 2–6PM daily via partial buyout",
+              "cup_sleeves": "1,000 pieces at $0.80/pc",
+              "redemption": "QR Code A $10 and QR Code B $13.50 with unique 16-letter codes and back-end tracking",
+              "branding": "green noren with client logo within $5,000; kapaline overlay $6,000; two pull-up banners $4,000; LED $2,500 waivable if all three proceed",
+              "pending": "client final selection, self-management permissions, Teams call"
+            },
+            "outcome": null,
+            "reusable_insights": [
+              "Mall restrictions can block overhead signage; verify landlord approval early for branding placements",
+              "Conditional fee waivers (e.g., LED free if all branding elements proceed) can drive bundle uptake",
+              "Client self-management of some branding elements can reduce costs but requires clear approval and scheduling protocols"
+            ]
+          },
+          "review_status": "approved",
+          "collection": "historical_cases",
+          "created_at": "2026-09-12T13:28:58.884987+00:00",
+          "approved_by": "workspace-user",
+          "approved_at": "2026-09-12T13:33:36.289716+00:00"
+        },
+        {
+          "id": "case_candidate_d7093c11c6",
+          "title": "Imported historical event case",
+          "source_ids": [
+            "source_3222d8d24e"
+          ],
+          "tags": [
+            "imported",
+            "historical_event_case"
+          ],
+          "extraction": {
+            "method": "deepseek_two_stage",
+            "created_at": "2026-09-12T08:54:23.329028+00:00",
+            "timeline": [
+              {
+                "message_id": "msg_001",
+                "turn": 1,
+                "speaker": "customer",
+                "timestamp": "2026-08-12",
+                "source_lines": [
+                  16,
+                  45
+                ],
+                "summary": "Client confirmed a 150-cup live station order for 19 Aug 1:30 PM at [CLIENT VENUE] totalling S$1,745 and requested an official quotation.",
+                "decisions": [
+                  "Order confirmed: 150 cups live station, 19 Aug 1:30 PM, ~2–2.5 hours"
+                ],
+                "unresolved_items": [
+                  "Whether payment after delivery or via Vendors@Gov is acceptable"
+                ]
+              },
+              {
+                "message_id": "msg_002",
+                "turn": 2,
+                "speaker": "company",
+                "timestamp": "2026-08-13",
+                "source_lines": [
+                  49,
+                  68
+                ],
+                "summary": "Moss Matcha issued the official quotation and offered post-delivery payment with a signed invoice committing to payment within two weeks, or Vendors@Gov if details provided.",
+                "decisions": [
+                  "Company accommodates payment after delivery of services"
+                ],
+                "unresolved_items": [
+                  "Which payment arrangement the client will choose"
+                ]
+              },
+              {
+                "message_id": "msg_003",
+                "turn": 3,
+                "speaker": "customer",
+                "timestamp": "2026-08-13",
+                "source_lines": [
+                  72,
+                  91
+                ],
+                "summary": "Client confirmed proceeding with the order as quoted and chose Vendors@Gov invoicing with government terms of payment within 30 days from invoice, processing only after delivery.",
+                "decisions": [
+                  "Client proceeds with order as quoted",
+                  "Payment via Vendors@Gov, 30 days from invoice, processing after delivery"
+                ],
+                "unresolved_items": []
+              },
+              {
+                "message_id": "msg_004",
+                "turn": 4,
+                "speaker": "customer",
+                "timestamp": "2026-08-13",
+                "source_lines": [
+                  95,
+                  110
+                ],
+                "summary": "Client noted Moss Matcha lacks a Vendors@Gov account and requested account creation by end of week, before 18 Aug at the latest, to issue a purchase order.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Moss Matcha Vendors@Gov account creation before 18 Aug"
+                ]
+              },
+              {
+                "message_id": "msg_005",
+                "turn": 5,
+                "speaker": "company",
+                "timestamp": "2026-08-13",
+                "source_lines": [
+                  114,
+                  131
+                ],
+                "summary": "Moss Matcha confirmed its Vendors@Gov account was set up and shared the required details.",
+                "decisions": [
+                  "Vendors@Gov account created"
+                ],
+                "unresolved_items": []
+              },
+              {
+                "message_id": "msg_006",
+                "turn": 6,
+                "speaker": "customer",
+                "timestamp": "2026-08-17",
+                "source_lines": [
+                  135,
+                  150
+                ],
+                "summary": "Client asked whether Moss Matcha needs tables/logistics for 19 Aug and requested an on-site contact person/number.",
+                "decisions": [],
+                "unresolved_items": [
+                  "Tables/logistics requirements",
+                  "On-site contact person and number"
+                ]
+              },
+              {
+                "message_id": "msg_007",
+                "turn": 7,
+                "speaker": "company",
+                "timestamp": "2026-08-17",
+                "source_lines": [
+                  154,
+                  175
+                ],
+                "summary": "Moss Matcha requested the white table with wheels, plans 12:30 PM arrival with one hour setup, asked about service lift and drop-off point, offered a site recce today, and named itself on-site project manager.",
+                "decisions": [
+                  "Setup: 12:30 PM arrival, one hour setup",
+                  "Company brings own trolley"
+                ],
+                "unresolved_items": [
+                  "Service lift use and suitable drop-off point",
+                  "Whether a site recce will happen today"
+                ]
+              }
+            ]
+          },
+          "content": {
+            "customer": {
+              "type": "government or corporate client",
+              "venue": "[CLIENT VENUE]",
+              "payment_platform": "Vendors@Gov"
+            },
+            "initial_requirement": {
+              "event_type": "live matcha station",
+              "quantity": "150 cups",
+              "date_time": "19 Aug 1:30 PM",
+              "duration": "~2–2.5 hours",
+              "total_price": "S$1,745",
+              "requested_document": "official quotation"
+            },
+            "current_requirement": {
+              "order_status": "confirmed as quoted",
+              "payment_method": "Vendors@Gov",
+              "payment_terms": "30 days from invoice, processing after delivery",
+              "setup_time": "12:30 PM arrival, one hour setup",
+              "logistics": "requires white table with wheels; company brings own trolley",
+              "on_site_contact": "company project manager throughout",
+              "pending_confirmations": [
+                "service lift use",
+                "drop-off point",
+                "site recce today",
+                "tables/logistics provision"
+              ]
+            },
+            "requirement_changes": [],
+            "operational_state": {
+              "setup_arrival": "12:30 PM",
+              "setup_duration": "one hour",
+              "equipment_provided_by_company": "own trolley",
+              "equipment_required_from_client": "white table with wheels",
+              "on_site_management": "company project manager throughout",
+              "pending_logistics": [
+                "service lift use",
+                "drop-off point",
+                "site recce today"
+              ]
+            },
+            "commercial_state": {
+              "total_amount": "S$1,745",
+              "line_items": "Iced Matcha Latte S$7.90×90=S$711; Ichigo Matcha S$9.90×30=S$297; Matcha Fuwafuwa Latte S$7.90×30=S$237; setup fee S$500",
+              "payment_method": "Vendors@Gov",
+              "payment_terms": "30 days from invoice, processing after delivery",
+              "quotation_issued": true,
+              "vendors_gov_account_created": true
+            },
+            "commitments": {
+              "company": [
+                {
+                  "commitment": "Issued official quotation",
+                  "source_message_ids": [
+                    "msg_002"
+                  ]
+                },
+                {
+                  "commitment": "Created Vendors@Gov account and shared details",
+                  "source_message_ids": [
+                    "msg_005"
+                  ]
+                },
+                {
+                  "commitment": "Will arrive 12:30 PM for one-hour setup with own trolley",
+                  "source_message_ids": [
+                    "msg_007"
+                  ]
+                },
+                {
+                  "commitment": "Project manager on-site throughout to coordinate setup and service",
+                  "source_message_ids": [
+                    "msg_007"
+                  ]
+                }
+              ],
+              "customer": [
+                {
+                  "commitment": "Proceed with order as quoted",
+                  "source_message_ids": [
+                    "msg_003"
+                  ]
+                },
+                {
+                  "commitment": "Issue purchase order via Vendors@Gov",
+                  "source_message_ids": [
+                    "msg_004"
+                  ]
+                },
+                {
+                  "commitment": "Payment within 30 days from invoice, processing after delivery",
+                  "source_message_ids": [
+                    "msg_003"
+                  ]
+                }
+              ],
+              "pending": [
+                {
+                  "item": "Confirm service lift use and drop-off point",
+                  "source_message_ids": [
+                    "msg_007"
+                  ]
+                },
+                {
+                  "item": "Confirm whether site recce occurs today",
+                  "source_message_ids": [
+                    "msg_007"
+                  ]
+                },
+                {
+                  "item": "Confirm tables/logistics provision",
+                  "source_message_ids": [
+                    "msg_006"
+                  ]
+                }
+              ]
+            },
+            "conversation_timeline": [
+              {
+                "turn": 1,
+                "speaker": "customer",
+                "summary": "Confirmed 150-cup live station order for 19 Aug 1:30 PM at S$1,745 and requested official quotation.",
+                "source_message_ids": [
+                  "msg_001"
+                ]
+              },
+              {
+                "turn": 2,
+                "speaker": "company",
+                "summary": "Issued official quotation and offered post-delivery payment or Vendors@Gov.",
+                "source_message_ids": [
+                  "msg_002"
+                ]
+              },
+              {
+                "turn": 3,
+                "speaker": "customer",
+                "summary": "Confirmed proceeding as quoted and chose Vendors@Gov with 30-day payment after delivery.",
+                "source_message_ids": [
+                  "msg_003"
+                ]
+              },
+              {
+                "turn": 4,
+                "speaker": "customer",
+                "summary": "Requested Vendors@Gov account creation by end of week, before 18 Aug, to issue purchase order.",
+                "source_message_ids": [
+                  "msg_004"
+                ]
+              },
+              {
+                "turn": 5,
+                "speaker": "company",
+                "summary": "Confirmed Vendors@Gov account set up and shared required details.",
+                "source_message_ids": [
+                  "msg_005"
+                ]
+              }
+            ],
+            "final_solution": {
+              "order": "150 cups live station, 19 Aug 1:30 PM, ~2–2.5 hours, S$1,745",
+              "payment": "Vendors@Gov, 30 days from invoice, processing after delivery",
+              "setup": "12:30 PM arrival, one hour setup",
+              "logistics": "company brings own trolley; requires white table with wheels",
+              "on_site_contact": "company project manager throughout",
+              "pending": [
+                "service lift use",
+                "drop-off point",
+                "site recce today",
+                "tables/logistics provision"
+              ]
+            },
+            "outcome": null,
+            "reusable_insights": [
+              {
+                "insight": "For government clients using Vendors@Gov, account creation must be completed before purchase order issuance; allow lead time for setup.",
+                "source_message_ids": [
+                  "msg_004",
+                  "msg_005"
+                ]
+              },
+              {
+                "insight": "Offering flexible payment options (post-delivery invoice or Vendors@Gov) can accommodate client procurement preferences.",
+                "source_message_ids": [
+                  "msg_002",
+                  "msg_003"
+                ]
+              },
+              {
+                "insight": "Early clarification of venue logistics (tables, lift, drop-off) and on-site contact prevents last-minute issues.",
+                "source_message_ids": [
+                  "msg_006",
+                  "msg_007"
+                ]
+              }
+            ]
+          },
+          "review_status": "approved",
+          "collection": "historical_cases",
+          "created_at": "2026-09-12T08:54:23.329099+00:00",
+          "approved_by": "workspace-user",
+          "approved_at": "2026-09-12T08:54:54.352111+00:00"
+        },
+        {
+          "name": "ACME Corp",
+          "pax": 90,
+          "service": "workshop",
+          "price": "S$12/pax",
+          "notes": "2-hour presence",
+          "id": "seed_case_acme",
+          "review_status": "approved",
+          "origin": "legacy_seed",
+          "collection": "historical_cases",
+          "created_at": "2026-09-12T12:54:51.199916+00:00"
+        }
+      ],
+      "service": [
+        {
+          "name": "Hands-on matcha workshop",
+          "tags": [
+            "workshop"
+          ],
+          "notes": "Facilitated preparation, tasting and guided education.",
+          "id": "seed_service_hands_on_matcha_workshop",
+          "review_status": "approved",
+          "origin": "legacy_seed",
+          "collection": "services",
+          "created_at": "2026-09-12T10:22:21.561489+00:00"
+        }
+      ],
+      "operations": [
+        {
+          "name": "Workshop throughput",
+          "notes": "Plan for 40 participants per facilitator-hour; allow 2m x 2m footprint.",
+          "id": "seed_ops_workshop_throughput",
+          "review_status": "approved",
+          "origin": "legacy_seed",
+          "collection": "operations",
+          "created_at": "2026-09-12T10:22:21.561591+00:00"
+        },
+        {
+          "name": "Venue checklist",
+          "notes": "Confirm loading access, power and hot water before final commitment.",
+          "id": "seed_ops_venue_checklist",
+          "review_status": "approved",
+          "origin": "legacy_seed",
+          "collection": "operations",
+          "created_at": "2026-09-12T10:22:21.561687+00:00"
+        }
+      ],
+      "principles": [
+        {
+          "text": "Human-approved commercial terms are the source of truth.",
+          "id": "seed_principle_human_approved_commercial_terms_are_the_source_of_truth",
+          "review_status": "approved",
+          "origin": "legacy_seed",
+          "collection": "principles",
+          "created_at": "2026-09-12T10:22:21.561876+00:00"
+        },
+        {
+          "text": "Ask only high-value discovery questions.",
+          "id": "seed_principle_ask_only_high_value_discovery_questions",
+          "review_status": "approved",
+          "origin": "legacy_seed",
+          "collection": "principles",
+          "created_at": "2026-09-12T10:22:21.561778+00:00"
+        }
+      ]
+    },
+    "options": [
+      {
+        "id": "A",
+        "name": "Essential workshop",
+        "price": 585,
+        "scope": [
+          "1 facilitator",
+          "demonstration and tasting",
+          "basic setup"
+        ]
+      },
+      {
+        "id": "B",
+        "name": "Guided hands-on lab",
+        "price": 780,
+        "recommended": true,
+        "scope": [
+          "2 facilitators",
+          "hands-on tasting kits",
+          "setup and teardown"
+        ]
+      },
+      {
+        "id": "C",
+        "name": "Premium team experience",
+        "price": 1209,
+        "scope": [
+          "2 facilitators",
+          "branded take-home set",
+          "extended tasting bar"
+        ]
+      }
+    ],
+    "risks": [
+      "Confirm venue loading access and hot water/power.",
+      "Final dietary requirements can be collected before proposal."
+    ],
+    "assumptions": [
+      "Two-hour session",
+      "Venue can support a 2m x 2m footprint"
+    ]
+  },
+  "reflections": [],
+  "style_lessons": [],
+  "commercial_lessons": [],
+  "capability_lessons": []
+}

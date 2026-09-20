@@ -1,0 +1,12 @@
+{
+  "name": "ACME Corp",
+  "pax": 90,
+  "service": "workshop",
+  "price": "S$12/pax",
+  "notes": "2-hour presence",
+  "id": "seed_case_acme",
+  "review_status": "approved",
+  "origin": "legacy_seed",
+  "collection": "historical_cases",
+  "created_at": "2026-09-14T17:36:32.134925+00:00"
+}

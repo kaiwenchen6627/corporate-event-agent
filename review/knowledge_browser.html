@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>知识库管理 · Gatherly</title>
+<style>
+:root{
+  --bg:#f3f5f3; --card:#ffffff; --line:#dde5e0; --ink:#22302d; --ink-2:#5f7269;
+  --accent:#2f6655; --accent-soft:#e7f0ec; --gold:#a8842c; --coral:#b5543c;
+  --blue:#3d6a8f; --mono:'DM Mono','SF Mono',Menlo,monospace;
+  --sans:'DM Sans',-apple-system,'PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;align-items:center;gap:16px;padding:14px 24px;background:var(--card);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+.brand .mark{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:Georgia,serif;font-size:17px}
+header .sub{color:var(--ink-2);font-size:12.5px}
+header .spacer{flex:1}
+.hbtn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 14px;cursor:pointer;font-size:13px;font-family:var(--sans);color:var(--ink)}
+.hbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.layout{flex:1;display:grid;grid-template-columns:240px 300px 1fr;min-height:0}
+/* ---- sidebar ---- */
+aside{border-right:1px solid var(--line);background:var(--card);overflow-y:auto;padding:14px 12px}
+.coll{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--ink)}
+.coll:hover{background:var(--accent-soft)}
+.coll.active{background:var(--accent);color:#fff}
+.coll .dot{width:7px;height:7px;border-radius:50%}
+.coll b{flex:1;font-weight:500}
+.coll small{opacity:.65;font-family:var(--mono)}
+.side-label{font-size:11px;letter-spacing:.12em;color:var(--ink-2);margin:14px 12px 6px}
+/* ---- record list ---- */
+.listpane{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:#fafbfa}
+.searchbar{padding:10px 12px;border-bottom:1px solid var(--line)}
+.searchbar input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-family:var(--sans);font-size:13px;background:#fff}
+#recordList{flex:1;overflow-y:auto;padding:8px}
+.rec{padding:10px 12px;border-radius:8px;cursor:pointer;margin-bottom:4px;border:1px solid transparent}
+.rec:hover{background:var(--card);border-color:var(--line)}
+.rec.sel{background:var(--card);border-color:var(--accent)}
+.rec.capability-pending{border-color:var(--coral);background:#fff5f1}
+.rec.capability-pending:hover{background:#ffe9e3}
+.rec .t{font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec .m{display:flex;gap:6px;align-items:center;color:var(--ink-2);font-size:11.5px;font-family:var(--mono)}
+.badge{font-size:10.5px;padding:1.5px 7px;border-radius:20px;font-family:var(--sans)}
+.badge.approved{background:var(--accent-soft);color:var(--accent)}
+.badge.pending{background:#f5eedb;color:var(--gold)}
+.badge.rejected{background:#f7e4df;color:var(--coral)}
+.badge.capability{background:#ffe4dc;color:var(--coral);font-weight:600}
+.empty{color:var(--ink-2);text-align:center;padding:40px 20px;font-size:13px}
+/* ---- editor ---- */
+main{overflow-y:auto;padding:20px 24px;min-width:0}
+.editor-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.editor-head h2{font-size:19px;font-weight:700}
+.editor-head .meta{color:var(--ink-2);font-size:12px;font-family:var(--mono);margin-top:5px;word-break:break-all}
+.editor-head .actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.card h3{font-size:13px;letter-spacing:.08em;color:var(--ink-2);margin-bottom:12px;font-weight:600}
+.field{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:center;margin-bottom:10px}
+.field label{font-size:12.5px;color:var(--ink-2)}
+.field input,.field select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-family:var(--sans);font-size:13px;width:100%}
+textarea#contentBox{width:100%;min-height:420px;padding:14px;border:1px solid var(--line);border-radius:10px;font-family:var(--mono);font-size:12.5px;line-height:1.65;background:#fbfcfb;resize:vertical;white-space:pre;overflow-x:auto}
+textarea#contentBox:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+.err{color:var(--coral);font-size:12px;margin-top:8px;font-family:var(--mono);white-space:pre-wrap}
+.ok{color:var(--accent);font-size:12px;margin-top:8px}
+.btnrow{display:flex;gap:8px;margin-top:12px;align-items:center}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;font-family:var(--sans)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{color:var(--coral);border-color:#ecd2cb}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+pre.raw{white-space:pre-wrap;background:#f7faf7;border:1px solid var(--line);border-radius:10px;padding:16px;font-family:var(--mono);font-size:12.5px;line-height:1.6;max-height:600px;overflow:auto}
+.hint{font-size:12px;color:var(--ink-2);margin-left:auto}
+/* structured form editor */
+.modetoggle{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:14px;background:#fff}
+.modetoggle button{border:0;background:#fff;padding:7px 16px;cursor:pointer;font-size:13px;font-family:var(--sans);color:var(--ink-2)}
+.modetoggle button.on{background:var(--accent);color:#fff}
+.card.hero{border-color:var(--accent);box-shadow:0 2px 10px rgba(47,102,85,.12)}
+.card.hero h3{color:var(--accent)}
+.subhead{font-size:12px;color:var(--ink-2);font-weight:600;margin:10px 0 6px;letter-spacing:.05em}
+.itemrow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.itemrow input.itext{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-family:var(--sans);font-size:13px}
+.itemrow .x{border:0;background:none;color:var(--ink-2);cursor:pointer;font-size:15px;line-height:1;padding:4px 6px;border-radius:6px}
+.itemrow .x:hover{color:var(--coral);background:#f7e4df}
+.btn.addbtn{border-style:dashed;color:var(--ink-2);padding:6px 12px;font-size:12.5px}
+.tl{border-left:2px solid var(--line);padding-left:14px}
+.tl .turn{margin-bottom:12px}
+.tl .who{font-weight:600;font-size:12px;margin-bottom:2px}
+.tl .who.cust{color:var(--blue)}
+.tl .who.co{color:var(--accent)}
+.tl .sum{font-size:13px;line-height:1.55}
+.tl .dec{font-size:12px;color:var(--accent);margin-top:3px}
+.tl .unres{font-size:12px;color:var(--gold);margin-top:3px}
+/* toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:9}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="mark">g</span> gatherly <span class="sub">知识库管理</span></div>
+  <div class="spacer"></div>
+  <button class="hbtn" id="newBtn">＋ 新建记录</button>
+  <a class="hbtn" style="text-decoration:none;display:inline-block" href="/knowledge/pending" target="_blank">Pending API</a>
+</header>
+
+<div class="layout">
+  <aside id="collections"></aside>
+
+  <section class="listpane">
+    <div class="searchbar"><input id="filterBox" placeholder="筛选当前集合…"></div>
+    <div id="recordList"></div>
+  </section>
+
+  <main id="editorPane"><div class="empty">← 选择一条记录查看和编辑</div></main>
+</div>
+<div id="toast"></div>
+
+<script>
+const COLLECTIONS=[
+  {key:'historical_cases',name:'历史案例',color:'#2f6655'},
+  {key:'capabilities',name:'能力知识',color:'#3d6a8f'},
+  {key:'principles',name:'销售原则',color:'#b5543c'},
+  {key:'sources',name:'原始来源',color:'#5f7269'},
+];
+let state={collection:'historical_cases',records:[],selected:null,counts:{},editMode:'form'};
+const $=s=>document.querySelector(s);
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
+async function api(path,opts){const r=await fetch(path,opts);const d=await r.json();if(!r.ok)throw new Error(d.error||r.status);return d}
+
+/* ---------- sidebar ---------- */
+function renderSidebar(){
+  $('#collections').innerHTML='<div class="side-label">知识集合</div>'+COLLECTIONS.map(c=>`
+    <div class="coll ${state.collection===c.key?'active':''}" data-key="${c.key}">
+      <span class="dot" style="background:${c.color}"></span><b>${c.name}</b><small>${state.counts[c.key]??'–'}</small>
+    </div>`).join('');
+  document.querySelectorAll('.coll').forEach(el=>el.onclick=()=>{state.collection=el.dataset.key;state.selected=null;loadRecords()});
+}
+
+/* ---------- record list ---------- */
+function renderList(){
+  const kw=$('#filterBox').value.trim().toLowerCase();
+  let items=state.records;
+  if(kw)items=items.filter(r=>JSON.stringify(r).toLowerCase().includes(kw));
+  $('#recordList').innerHTML=items.map(r=>{
+    const st=r.review_status||'pending';
+    const title=r.title||(r.content&&r.content.text)||r.id;
+    const tags = Array.isArray(r.tags) ? r.tags : [];
+    const isCapPending = st==='pending' && tags.includes('capability');
+    const capBadge = isCapPending ? '<span class="badge capability">capability · 待审</span>' : '';
+    return `<div class="rec ${state.selected===r.id?'sel':''} ${isCapPending?'capability-pending':''}" data-id="${r.id}">
+      <div class="t">${esc(title)}</div>
+      <div class="m"><span class="badge ${st}">${st}</span><span>${r.id}</span>${capBadge}</div>
+    </div>`;
+  }).join('')||'<div class="empty">此集合暂无记录</div>';
+  document.querySelectorAll('.rec').forEach(el=>el.onclick=()=>openRecord(el.dataset.id));
+}
+function openRecord(id){
+  state.selected=id; renderList();
+  const r=state.records.find(x=>x.id===id);
+  renderEditor(r||null);
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+/* ---------- editor ---------- */
+function currentRecord(){return state.records.find(x=>x.id===state.selected)}
+function renderEditor(r){
+  if(!r){$('#editorPane').innerHTML='<div class="empty">← 选择一条记录查看和编辑</div>';return}
+  if(state.collection==='sources')return renderSource(r);
+  const tags=(r.tags||[]).join(', ');
+  const isCase=state.collection==='historical_cases';
+  $('#editorPane').innerHTML=`
+    <div class="editor-head">
+      <div><h2>${esc(r.title||'未命名记录')}</h2>
+        <div class="meta">${r.id} · created ${esc(r.created_at||'')}</div></div>
+      <div class="actions">
+        <button class="btn" id="approveBtn">✓ 审批通过</button>
+        <button class="btn" id="rejectBtn">✕ 驳回</button>
+        <button class="btn danger" id="delBtn">删除</button>
+      </div>
+    </div>
+    <div class="card"><h3>基本信息</h3>
+      <div class="field"><label>标题</label><input id="titleBox" value="${esc(r.title||'')}"></div>
+      <div class="field"><label>标签</label><input id="tagBox" value="${esc(tags)}" placeholder="逗号分隔"></div>
+      <div class="field"><label>状态</label><select id="statusBox">
+        ${['pending','approved','rejected'].map(s=>`<option ${r.review_status===s?'selected':''}>${s}</option>`).join('')}
+      </select></div>
+    </div>
+    ${isCase?`<div class="modetoggle">
+      <button id="modeForm" class="${state.editMode!=='json'?'on':''}">结构化表单</button>
+      <button id="modeJson" class="${state.editMode==='json'?'on':''}">原始 JSON</button></div>`:''}
+    <div id="contentArea"></div>`;
+  $('#approveBtn').onclick=()=>review(r.id,'approve');
+  $('#rejectBtn').onclick=()=>review(r.id,'reject');
+  $('#delBtn').onclick=async()=>{
+    if(!confirm(`确定删除记录 ${r.id}？此操作不可恢复。`))return;
+    try{await api('/knowledge/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({collection:state.collection,id:r.id})});toast('已删除');state.selected=null;await refresh()}catch(e){toast('删除失败：'+e.message)}};
+  if(isCase){
+    $('#modeForm').onclick=()=>{state.editMode='form';renderEditor(currentRecord())};
+    $('#modeJson').onclick=()=>{state.editMode='json';renderEditor(currentRecord())};
+    state.editMode==='json'?renderJsonArea(r,'内容（JSON 模式 · 含 source_message_ids 等溯源字段）'):renderCaseForm(r);
+  }else renderJsonArea(r);
+}
+
+/* ---------- shared save ---------- */
+async function saveRecord(r,content){
+  const record={...r,title:$('#titleBox').value.trim()||r.title,
+    tags:$('#tagBox').value.split(',').map(s=>s.trim()).filter(Boolean),
+    review_status:$('#statusBox').value,content};
+  try{const saved=await api('/knowledge/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({collection:state.collection,record})});
+    toast('已保存 '+saved.id);await refresh(saved.id)}
+  catch(e){const eb=$('#errBox');if(eb){eb.className='err';eb.textContent='保存失败：'+e.message}else toast('保存失败：'+e.message)}
+}
+function tryParse(){try{const v=JSON.parse($('#contentBox').value);$('#errBox').textContent='';return v}catch(e){$('#errBox').className='err';$('#errBox').textContent='✕ JSON 解析失败：'+e.message;return undefined}}
+
+/* ---------- raw JSON editor ---------- */
+function renderJsonArea(r,label){
+  $('#contentArea').innerHTML=`
+    <div class="card"><h3>${label||'内容（content 字段，JSON）'}</h3>
+      <textarea id="contentBox" spellcheck="false">${esc(JSON.stringify(r.content??{},null,2))}</textarea>
+      <div class="btnrow">
+        <button class="btn primary" id="saveBtn">保存修改</button>
+        <button class="btn" id="fmtBtn">格式化 / 校验</button>
+        <span class="hint">保存后直接写入 data/knowledge/ 下对应 JSON 文件</span>
+      </div>
+      <div class="err" id="errBox"></div>
+    </div>`;
+  $('#fmtBtn').onclick=()=>{const v=tryParse();if(v!==undefined){$('#contentBox').value=JSON.stringify(v,null,2);$('#errBox').className='ok';$('#errBox').textContent='✓ JSON 格式正确'}};
+  $('#saveBtn').onclick=async()=>{const v=tryParse();if(v===undefined)return;await saveRecord(r,v)};
+}
+
+/* ---------- structured case form ---------- */
+const META_KEYS={source_message_ids:1,source_message_id:1,source_lines:1};
+function kvRows(key,obj){
+  const rows=Object.entries(obj||{}).filter(([k])=>!META_KEYS[k]).map(([k,v])=>{
+    const t=typeof v,ot=(v!==null&&t==='object')?'json':t;
+    return `<div class="field"><label>${esc(k)}</label>
+      <input data-kv="${key}" data-k="${esc(k)}" data-origtype="${ot}" value="${esc(ot==='json'?JSON.stringify(v):String(v))}"></div>`;
+  }).join('');
+  return rows||'<div class="empty" style="padding:8px 0">（暂无字段，可添加）</div>';
+}
+function kvCard(title,key,obj,hero){
+  const meta=Object.fromEntries(Object.entries(obj||{}).filter(([k])=>META_KEYS[k]));
+  return `<div class="card ${hero?'hero':''}"><h3>${title}</h3>${kvRows(key,obj)}
+    <input type="hidden" data-kvmeta="${key}" value="${esc(JSON.stringify(meta))}">
+    <div class="btnrow"><button class="btn addbtn" type="button" data-addkv="${key}">＋ 添加字段</button></div></div>`;
+}
+/* 自动探测列表项的文本字段名（应对 LLM 提取结构漂移：commitment/item/insight...；pending 可能是纯字符串或 dict） */
+function listBlock(key,items){
+  const f=(items||[]).find(x=>x!==null&&x!==undefined&&x!=='');
+  const plain=typeof f!=='object';
+  const tk=(f&&typeof f==='object')?Object.keys(f).find(k=>!META_KEYS[k])||'text':'text';
+  const rows=(items||[]).filter(x=>x!==null&&x!==undefined&&x!=='').map(it=>{
+    const isStr=typeof it==='string';
+    const text=isStr?it:(it[tk]??'');
+    const extra=isStr?'':JSON.stringify(Object.fromEntries(Object.entries(it).filter(([k])=>k!==tk)));
+    return `<div class="itemrow" data-itemrow="${key}"${plain?' data-plain="1"':''} data-tk="${esc(tk)}"${extra?` data-extra="${esc(extra)}"`:''}>
+      <input class="itext" value="${esc(String(text))}" placeholder="${esc(tk)}">
+      <button class="x" type="button" data-rm title="删除此项">✕</button></div>`;
+  }).join('')||'<div class="empty" style="padding:8px 0">（暂无）</div>';
+  return rows+`
+  <button class="btn addbtn" type="button" data-additem="${key}"${plain?' data-plain="1"':''} data-tk="${esc(tk)}">＋ 添加</button>`;
+}
+function timelineCard(r){
+  const tl=(r.extraction&&r.extraction.timeline)||[];
+  if(!tl.length)return '';
+  return `<div class="card"><h3>沟通过程（只读 · 来自原始邮件）</h3><div class="tl">
+    ${tl.map(t=>`<div class="turn">
+      <div class="who ${t.speaker==='customer'?'cust':'co'}">第${t.turn}轮 · ${t.speaker==='customer'?'客户':'我方'}</div>
+      <div class="sum">${esc(t.summary||'')}</div>
+      ${(t.decisions||[]).map(d=>`<div class="dec">✓ ${esc(d)}</div>`).join('')}
+      ${(t.unresolved_items||[]).map(u=>`<div class="unres">? ${esc(u)}</div>`).join('')}
+    </div>`).join('')}
+  </div></div>`;
+}
+function renderCaseForm(r){
+  const c=r.content||{},cm=c.commitments||{};
+  $('#contentArea').innerHTML=`
+    ${kvCard('客户信息','customer',c.customer)}
+    ${kvCard('初始需求','initial_requirement',c.initial_requirement)}
+    ${kvCard('最终方案','final_solution',c.final_solution,true)}
+    ${kvCard('商业状态','commercial_state',c.commercial_state)}
+    ${kvCard('运营状态','operational_state',c.operational_state)}
+    <div class="card"><h3>结果（outcome）</h3>
+      <div class="field"><label>结果</label><input id="outcomeBox" value="${esc(c.outcome===null||c.outcome===undefined?'':String(c.outcome))}" placeholder="如：活动顺利完成，客户复购"></div>
+    </div>
+    <div class="card"><h3>需求变更</h3>${listBlock('reqch',c.requirement_changes)}</div>
+    <div class="card"><h3>承诺与待办</h3>
+      <div class="subhead">我方承诺</div>${listBlock('cmco',cm.company)}
+      <div class="subhead">客户承诺</div>${listBlock('cmcu',cm.customer)}
+      <div class="subhead">待闭环事项</div>${listBlock('cmpd',cm.pending)}
+    </div>
+    <div class="card"><h3>可复用经验</h3>${listBlock('ins',c.reusable_insights)}</div>
+    ${timelineCard(r)}
+    <div class="card"><div class="btnrow">
+      <button class="btn primary" id="saveBtn">保存修改</button>
+      <span class="hint">保存时 source_message_ids 等溯源字段自动保留 · 写入 data/knowledge/ 对应文件</span>
+    </div><div class="err" id="errBox"></div></div>`;
+  $('#contentArea').addEventListener('click',onContentClick);
+  $('#saveBtn').onclick=async()=>{await saveRecord(r,collectCaseContent(r))};
+}
+function onContentClick(e){
+  const rm=e.target.closest('[data-rm]');
+  if(rm){rm.closest('.itemrow').remove();return}
+  const ai=e.target.closest('[data-additem]');
+  if(ai){
+    const row=document.createElement('div');row.className='itemrow';row.dataset.itemrow=ai.dataset.additem;
+    if(ai.dataset.plain==='1')row.dataset.plain='1';
+    if(ai.dataset.tk)row.dataset.tk=ai.dataset.tk;
+    row.innerHTML=`<input class="itext" placeholder="${esc(ai.dataset.tk||'内容')}"><button class="x" type="button" data-rm title="删除此项">✕</button>`;
+    ai.parentElement.insertBefore(row,ai);row.querySelector('input').focus();return;
+  }
+  const ak=e.target.closest('[data-addkv]');
+  if(ak){
+    const k=prompt('新字段名（英文，例如 venue）：');if(!k)return;
+    const f=document.createElement('div');f.className='field';
+    f.innerHTML=`<label>${esc(k)}</label><input data-kv="${ak.dataset.addkv}" data-k="${esc(k)}" data-origtype="string">`;
+    ak.closest('.card').insertBefore(f,ak.closest('.btnrow'));
+    f.querySelector('input').focus();
+  }
+}
+function coerce(v,t){
+  if(t==='boolean')return v==='true';
+  if(t==='number'){const n=Number(v);return isNaN(n)?v:n}
+  if(t==='json'){try{return JSON.parse(v)}catch(e){return v}}
+  return v;
+}
+function collectKV(key){
+  const out={};
+  document.querySelectorAll(`input[data-kv="${key}"]`).forEach(el=>{
+    const k=el.dataset.k.trim();if(!k)return;
+    out[k]=coerce(el.value,el.dataset.origtype);
+  });
+  const meta=document.querySelector(`input[data-kvmeta="${key}"]`);
+  if(meta){try{Object.assign(out,JSON.parse(meta.value)||{})}catch(e){}}
+  return out;
+}
+function collectItems(key){
+  return [...document.querySelectorAll(`[data-itemrow="${key}"]`)].map(row=>{
+    const t=row.querySelector('.itext').value.trim();
+    if(!t)return null;
+    if(row.dataset.plain==='1')return t;
+    const o={[row.dataset.tk||'text']:t};
+    if(row.dataset.extra)Object.assign(o,JSON.parse(row.dataset.extra));
+    return o;
+  }).filter(Boolean);
+}
+function collectCaseContent(r){
+  const c=JSON.parse(JSON.stringify(r.content||{}));
+  ['customer','initial_requirement','current_requirement','final_solution','commercial_state','operational_state']
+    .forEach(k=>{if(document.querySelector(`input[data-kv="${k}"]`))c[k]=collectKV(k)});
+  const oc=$('#outcomeBox');if(oc!==null)c.outcome=oc.value.trim()||null;
+  c.requirement_changes=collectItems('reqch');
+  c.commitments={company:collectItems('cmco'),customer:collectItems('cmcu'),pending:collectItems('cmpd')};
+  c.reusable_insights=collectItems('ins');
+  return c;
+}
+
+function renderSource(r){
+  $('#editorPane').innerHTML=`
+    <div class="editor-head"><div><h2>原始来源 · ${esc(r.type||'')}</h2>
+      <div class="meta">${r.id} · created ${esc(r.created_at||'')}</div></div></div>
+    <div class="card"><h3>元数据</h3><pre class="raw">${esc(JSON.stringify(r.metadata||{},null,2))}</pre></div>
+    <div class="card"><h3>原始内容（只读）</h3><pre class="raw">${esc(r.raw||'')}</pre></div>`;
+}
+
+/* ---------- review action（保留审计日志） ---------- */
+async function review(id,action){
+  try{await api('/knowledge/review/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,reviewer:'workspace-user'})});toast(action==='approve'?'已审批通过':'已驳回');await refresh(id)}
+  catch(e){toast('操作失败：'+e.message)}
+}
+
+/* ---------- new record ---------- */
+$('#newBtn').onclick=async()=>{
+  if(state.collection==='sources'){toast('原始来源由导入流程创建，不手动新建');return}
+  const record={title:'新记录',tags:[],content:{},review_status:'pending'};
+  try{const saved=await api('/knowledge/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({collection:state.collection,record})});
+    toast('已创建 '+saved.id);await refresh(saved.id)}
+  catch(e){toast('创建失败：'+e.message)}
+};
+
+/* ---------- data loading ---------- */
+async function refresh(selectId){
+  const counts=await api('/knowledge/collections');state.counts=counts;
+  if(selectId)state.selected=selectId;
+  await loadRecords(false);renderSidebar();
+}
+async function loadRecords(rerenderSide=true){
+  const key=state.collection;
+  state.records=await api('/knowledge/records?collection='+encodeURIComponent(key)).catch(()=>[]);
+  if(key==='sources')state.records=await api('/knowledge/sources');
+  if(rerenderSide)renderSidebar();
+  renderList();
+  if(state.selected){const r=state.records.find(x=>x.id===state.selected);renderEditor(r||null)}
+  else renderEditor(null);
+}
+$('#filterBox').oninput=renderList;
+
+loadRecords();
+</script>
+</body>
+</html>

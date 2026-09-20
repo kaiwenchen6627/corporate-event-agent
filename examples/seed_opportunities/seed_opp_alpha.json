@@ -1,0 +1,131 @@
+{
+  "id": "seed_opp_alpha",
+  "created_at": "2026-09-01T00:00:00+00:00",
+  "updated_at": "2026-09-01T00:00:00+00:00",
+  "mode": "discovery",
+  "customer": {},
+  "requirements": {
+    "pax": {
+      "value": 80,
+      "confidence": "high",
+      "source": "customer_message",
+      "explicit": true,
+      "updated_at": "2026-09-10T09:04:08.298005+00:00"
+    },
+    "service": {
+      "value": "matcha workshop",
+      "confidence": "high",
+      "source": "customer_message",
+      "explicit": true,
+      "updated_at": "2026-09-10T09:04:08.298394+00:00"
+    },
+    "event_type": {
+      "value": "workshop",
+      "confidence": "high",
+      "source": "customer_message",
+      "explicit": true,
+      "updated_at": "2026-09-10T09:04:08.298399+00:00"
+    },
+    "venue": {
+      "value": "customer office (KL)",
+      "confidence": "medium",
+      "source": "customer_message",
+      "explicit": true,
+      "updated_at": "2026-09-10T09:04:08.298402+00:00"
+    },
+    "workshop_format": {
+      "value": "hands-on",
+      "confidence": "high",
+      "source": "customer_message",
+      "explicit": true,
+      "updated_at": "2026-09-10T09:04:08.298835+00:00"
+    }
+  },
+  "operational": {},
+  "commercial": {},
+  "commitments": {
+    "company": [],
+    "customer": [],
+    "pending": []
+  },
+  "conversation": [
+    {
+      "id": "msg__opp_alpha_01",
+      "role": "customer",
+      "text": "We are planning a wellness event for around 80 employees at our office in KL on 20 October and would like a matcha workshop.",
+      "at": "2026-09-01T00:00:00+00:00"
+    },
+    {
+      "role": "agent",
+      "text": "Thanks, I’ve noted the event details. What time would work best, and how long should the workshop run?",
+      "at": "2026-09-01T00:00:00+00:00",
+      "action": "ask_customer"
+    },
+    {
+      "id": "msg__opp_alpha_02",
+      "role": "customer",
+      "text": "10am would be ideal, and we are happy with a 2-hour hands-on session.",
+      "at": "2026-09-01T00:00:00+00:00"
+    },
+    {
+      "role": "agent",
+      "text": "Thanks, I’ve noted the event details. What time would work best, and how long should the workshop run?",
+      "at": "2026-09-01T00:00:00+00:00",
+      "action": "ask_customer"
+    }
+  ],
+  "history": [
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "pax",
+      "from": null,
+      "to": 80
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "service",
+      "from": null,
+      "to": "matcha workshop"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "event_type",
+      "from": null,
+      "to": "workshop"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "venue",
+      "from": null,
+      "to": "customer office (KL)"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "agent_action",
+      "action": "ask_customer",
+      "changed": true
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "state_change",
+      "field": "workshop_format",
+      "from": null,
+      "to": "hands-on"
+    },
+    {
+      "at": "2026-09-01T00:00:00+00:00",
+      "type": "agent_action",
+      "action": "ask_customer",
+      "changed": true
+    }
+  ],
+  "decision": null,
+  "reflections": [],
+  "style_lessons": [],
+  "commercial_lessons": [],
+  "capability_lessons": []
+}
