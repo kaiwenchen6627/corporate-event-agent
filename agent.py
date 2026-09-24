@@ -30,7 +30,7 @@ EXAMPLE_KNOWLEDGE = EXAMPLES / "seed_knowledge"
 def load_env_file(path=ROOT / ".env"):
     """Load KEY=VALUE pairs from .env; real environment variables always win."""
     if not path.exists(): return
-    for line in path.read_text().splitlines():
+    for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line: continue
         key, _, value = line.partition("=")
@@ -42,9 +42,9 @@ load_env_file()
 def now(): return datetime.now(timezone.utc).isoformat()
 def load(path, default):
     if not path.exists(): return default
-    return json.loads(path.read_text())
+    return json.loads(path.read_text(encoding="utf-8"))
 def save(path, value):
-    path.parent.mkdir(exist_ok=True); path.write_text(json.dumps(value, indent=2, ensure_ascii=False))
+    path.parent.mkdir(exist_ok=True); path.write_text(json.dumps(value, indent=2, ensure_ascii=False), encoding="utf-8")
 
 class StateUpdater:
     """Pure state boundary: parses facts and records auditable changes."""
@@ -102,9 +102,15 @@ class CorporateEventAgent:
         self._bootstrap_examples_if_empty()
         self.db = self._load_opportunities()
         self.routes = load(ROUTES, {})   # email -> active opportunity_id
-        self.deepseek_key = os.getenv("DEEPSEEK_API_KEY", "")
+        # LLM provider: Anthropic (Claude) when ANTHROPIC_API_KEY is set, else DeepSeek, else regex-only.
+        self.anthropic_key = os.getenv("ANTHROPIC_API_KEY", "")
+        self.anthropic_model = os.getenv("ANTHROPIC_MODEL", "claude-opus-5")
+        self.deepseek_key = "" if self.anthropic_key else os.getenv("DEEPSEEK_API_KEY", "")
+        if self.deepseek_key.startswith("replace_with"): self.deepseek_key = ""   # .env.example placeholder
         self.deepseek_model = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
         self.deepseek_url = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com") + "/chat/completions"
+        self.llm_label = (f"anthropic:{self.anthropic_model}" if self.anthropic_key
+                          else f"deepseek:{self.deepseek_model}" if self.deepseek_key else "")
         self.state_updater = StateUpdater(self)
         self.knowledge_store = JsonKnowledgeStore(STORE / "knowledge")
         self.knowledge_importer = KnowledgeImporter(self.knowledge_store)
@@ -125,8 +131,8 @@ class CorporateEventAgent:
             opps_target.mkdir(parents=True, exist_ok=True)
             n = 0
             for src in sorted(EXAMPLE_OPPS.glob("*.json")):
-                rec = json.loads(src.read_text())
-                (opps_target / src.name).write_text(json.dumps(rec, indent=2, ensure_ascii=False))
+                rec = json.loads(src.read_text(encoding="utf-8"))
+                (opps_target / src.name).write_text(json.dumps(rec, indent=2, ensure_ascii=False), encoding="utf-8")
                 n += 1
             if n: print(f"[agent] bootstrapped {n} example opportunities into {opps_target}")
         # Then knowledge collections
@@ -139,8 +145,8 @@ class CorporateEventAgent:
             target.mkdir(parents=True, exist_ok=True)
             n = 0
             for src in sorted(example_coll.glob("*.json")):
-                rec = json.loads(src.read_text())
-                (target / src.name).write_text(json.dumps(rec, indent=2, ensure_ascii=False))
+                rec = json.loads(src.read_text(encoding="utf-8"))
+                (target / src.name).write_text(json.dumps(rec, indent=2, ensure_ascii=False), encoding="utf-8")
                 n += 1
             if n: print(f"[agent] bootstrapped {n} example records into {coll_name}")
 
@@ -178,11 +184,11 @@ class CorporateEventAgent:
         OPPS.mkdir(parents=True, exist_ok=True)
         db = {}
         for p in sorted(OPPS.glob("*.json")):
-            try: rec = json.loads(p.read_text()); db[rec["id"]] = rec
-            except (json.JSONDecodeError, KeyError): continue
+            try: rec = json.loads(p.read_text(encoding="utf-8")); db[rec["id"]] = rec
+            except (json.JSONDecodeError, KeyError, UnicodeDecodeError): continue   # skip unreadable files, don't crash startup
         if not db and DB.exists():
             for oid, st in load(DB, {}).items():
-                (OPPS / f"{oid}.json").write_text(json.dumps(st, indent=2, ensure_ascii=False)); db[oid] = st
+                (OPPS / f"{oid}.json").write_text(json.dumps(st, indent=2, ensure_ascii=False), encoding="utf-8"); db[oid] = st
             DB.rename(STORE / "opportunities.json.migrated")
             print(f"[agent] migrated {len(db)} opportunities into {OPPS}")
         for st in db.values():
@@ -195,12 +201,12 @@ class CorporateEventAgent:
             for k in ("style_lessons", "commercial_lessons", "capability_lessons"):
                 if k not in st: st[k] = []; patched = True
             if patched:
-                (OPPS / f"{st['id']}.json").write_text(json.dumps(st, indent=2, ensure_ascii=False))
+                (OPPS / f"{st['id']}.json").write_text(json.dumps(st, indent=2, ensure_ascii=False), encoding="utf-8")
         return db
 
     def _save_opp(self, state):
         OPPS.mkdir(exist_ok=True)
-        (OPPS / f"{state['id']}.json").write_text(json.dumps(state, indent=2, ensure_ascii=False))
+        (OPPS / f"{state['id']}.json").write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding="utf-8")
 
     def persist(self, state=None):
         """Write one opportunity's file; without an argument, all of them."""
@@ -247,7 +253,8 @@ class CorporateEventAgent:
         return {"triggered": bool(impacts), "changes": changes, "impacts": sorted(set(impacts)), "human_review_required": bool(impacts), "reason": "existing state or commitment may be affected"}
 
     def _llm(self, system, user, json_mode=False):
-        """Call DeepSeek only when configured; workflow remains usable without it."""
+        """Call the configured LLM (Anthropic or DeepSeek); workflow remains usable without one."""
+        if self.anthropic_key: return self._llm_anthropic(system, user, json_mode)
         if not self.deepseek_key: return None
         payload = {"model": self.deepseek_model, "temperature": 0.2,
                    "messages": [{"role":"system","content":system},{"role":"user","content":user}]}
@@ -260,6 +267,22 @@ class CorporateEventAgent:
                 return json.loads(response.read()) ["choices"][0]["message"]["content"]
         except (HTTPError, URLError, TimeoutError, KeyError, json.JSONDecodeError):
             return None
+
+    def _llm_anthropic(self, system, user, json_mode=False):
+        """Claude via the official anthropic SDK. Same contract as the DeepSeek path:
+        returns the text (a bare JSON string when json_mode) or None on any failure."""
+        import anthropic
+        if json_mode: system += "\nRespond with a single JSON object only — no prose, no markdown fences."
+        try:
+            client = anthropic.Anthropic(api_key=self.anthropic_key, timeout=60.0)
+            response = client.messages.create(model=self.anthropic_model, max_tokens=4096, system=system,
+                                              messages=[{"role": "user", "content": user}])
+            text = "".join(b.text for b in response.content if b.type == "text").strip()
+        except anthropic.APIError as e:
+            print(f"[agent] anthropic call failed: {e}"); return None
+        if json_mode:   # tolerate ```json fences even though we asked for none
+            text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
+        return text or None
 
     def _llm_interpretation(self, text, state, gaps):
         """LLM PRIMARY extraction: reads the message first and drives state updates.
@@ -799,8 +822,8 @@ def main():
     if a.cmd=="serve":
         print(f"Agent listening on http://{a.host}:{a.port}"
               + ("  [HTTP Basic auth enabled]" if Handler.AUTH else "  [no auth — local only]"))
-        print("  LLM: " + (f"enabled ({agent.deepseek_model})" if agent.deepseek_key
-                           else "DISABLED — no DEEPSEEK_API_KEY, falling back to regex-only paths"))
+        print("  LLM: " + (f"enabled ({agent.llm_label})" if agent.llm_label
+                           else "DISABLED — no ANTHROPIC_API_KEY / DEEPSEEK_API_KEY, falling back to regex-only paths"))
         ThreadingHTTPServer((a.host,a.port),Handler).serve_forever()
     elif a.cmd=="message": print(json.dumps(agent.message(a.text,a.opportunity_id,a.from_email,a.new_opportunity),ensure_ascii=False,indent=2))
     elif a.cmd=="close": print(json.dumps(agent.close(a.id,a.outcome,a.note),ensure_ascii=False,indent=2))

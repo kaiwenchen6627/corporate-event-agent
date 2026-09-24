@@ -53,7 +53,7 @@ class JsonKnowledgeStore(KnowledgeStore):
         for c in COLLECTIONS: (self.root / c).mkdir(exist_ok=True)
         (self.root / "sources").mkdir(exist_ok=True)
         self.reviews = self.root / "reviews.json"
-        if not self.reviews.exists(): self.reviews.write_text("[]")
+        if not self.reviews.exists(): self.reviews.write_text("[]", encoding="utf-8")
         self._tfidf_cache = {}  # collection -> (vec, matrix, records, texts_lower) or None when empty
         self._migrate_legacy()
 
@@ -63,13 +63,13 @@ class JsonKnowledgeStore(KnowledgeStore):
         for c in COLLECTIONS:
             legacy = self.root / (c + ".json")
             if legacy.exists():
-                for record in json.loads(legacy.read_text()):
-                    if "id" in record: self._record_path(c, record["id"]).write_text(json.dumps(record, indent=2, ensure_ascii=False))
+                for record in json.loads(legacy.read_text(encoding="utf-8")):
+                    if "id" in record: self._record_path(c, record["id"]).write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
                 legacy_dir.mkdir(exist_ok=True); legacy.rename(legacy_dir / legacy.name); moved = True
         legacy_sources = self.root / "sources.json"
         if legacy_sources.exists():
-            for source in json.loads(legacy_sources.read_text()):
-                if "id" in source: self._source_path(source["id"]).write_text(json.dumps(source, indent=2, ensure_ascii=False))
+            for source in json.loads(legacy_sources.read_text(encoding="utf-8")):
+                if "id" in source: self._source_path(source["id"]).write_text(json.dumps(source, indent=2, ensure_ascii=False), encoding="utf-8")
             legacy_dir.mkdir(exist_ok=True); legacy_sources.rename(legacy_dir / legacy_sources.name); moved = True
         if moved: print(f"[knowledge_store] migrated legacy flat files into per-record layout (originals kept in {legacy_dir})")
 
@@ -77,14 +77,14 @@ class JsonKnowledgeStore(KnowledgeStore):
     def _record_path(self, collection, record_id): return self.root / collection / (record_id + ".json")
     def _source_path(self, source_id): return self.root / "sources" / (source_id + ".json")
     def _records(self, collection):
-        return [json.loads(p.read_text()) for p in sorted((self.root / collection).glob("*.json"))]
+        return [json.loads(p.read_text(encoding="utf-8")) for p in sorted((self.root / collection).glob("*.json"))]
     def _sources(self):
-        return [json.loads(p.read_text()) for p in sorted((self.root / "sources").glob("*.json"))]
+        return [json.loads(p.read_text(encoding="utf-8")) for p in sorted((self.root / "sources").glob("*.json"))]
 
     # ---------- sources ----------
     def add_source(self, source_type, raw, metadata=None):
         source = {"id": "source_" + uuid.uuid4().hex[:10], "type": source_type, "raw": raw, "metadata": metadata or {}, "created_at": now()}
-        self._source_path(source["id"]).write_text(json.dumps(source, indent=2, ensure_ascii=False))
+        self._source_path(source["id"]).write_text(json.dumps(source, indent=2, ensure_ascii=False), encoding="utf-8")
         return source
 
     # ---------- records ----------
@@ -93,12 +93,12 @@ class JsonKnowledgeStore(KnowledgeStore):
         record = {**record, "id": record.get("id") or collection + "_" + uuid.uuid4().hex[:8],
                   "collection": collection, "review_status": record.get("review_status", "pending"),
                   "created_at": record.get("created_at", now())}
-        self._record_path(collection, record["id"]).write_text(json.dumps(record, indent=2, ensure_ascii=False))
+        self._record_path(collection, record["id"]).write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
         return record
 
     def get(self, collection, record_id):
         path = self._record_path(collection, record_id)
-        return json.loads(path.read_text()) if path.exists() else None
+        return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
 
     def _build_tfidf(self, collection):
         """Lazy-build / rebuild TF-IDF index for one collection.
@@ -193,7 +193,7 @@ class JsonKnowledgeStore(KnowledgeStore):
         record.setdefault("collection", collection)
         record.setdefault("review_status", "pending")
         record.setdefault("created_at", now())
-        self._record_path(collection, rid).write_text(json.dumps(record, indent=2, ensure_ascii=False))
+        self._record_path(collection, rid).write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
         self._tfidf_cache.pop(collection, None)
         return record
 
@@ -211,10 +211,10 @@ class JsonKnowledgeStore(KnowledgeStore):
                     elif action == "approve": r.update({"review_status": "approved", "approved_by": reviewer, "approved_at": now()})
                     elif action == "reject": r.update({"review_status": "rejected", "rejected_by": reviewer, "rejected_at": now(), "rejection_reason": reason})
                     else: raise ValueError("action must be approve, edit or reject")
-                    self._record_path(c, record_id).write_text(json.dumps(r, indent=2, ensure_ascii=False))
+                    self._record_path(c, record_id).write_text(json.dumps(r, indent=2, ensure_ascii=False), encoding="utf-8")
                     self._tfidf_cache.pop(c, None)
-                    logs = json.loads(self.reviews.read_text())
+                    logs = json.loads(self.reviews.read_text(encoding="utf-8"))
                     logs.append({"record_id": record_id, "action": action, "reviewer": reviewer, "at": now()})
-                    self.reviews.write_text(json.dumps(logs, indent=2, ensure_ascii=False))
+                    self.reviews.write_text(json.dumps(logs, indent=2, ensure_ascii=False), encoding="utf-8")
                     return r
         raise KeyError(record_id)
