@@ -17,6 +17,16 @@ from typing import Any
 from infrastructure.knowledge_store import JsonKnowledgeStore
 from ingestion.importer import KnowledgeImporter
 
+def validate_decision(decision):
+    """Validate the small decision contract before approval/proposal generation."""
+    if not isinstance(decision, dict): raise ValueError("decision must be an object")
+    for key in ("id", "name", "price", "scope"):
+        if key not in decision or decision[key] in (None, "", []):
+            raise ValueError(f"decision missing {key}")
+    if not isinstance(decision["scope"], list): raise ValueError("decision scope must be a list")
+    if not isinstance(decision["price"], (int, float)): raise ValueError("decision price must be numeric")
+    return decision
+
 ROOT = Path(__file__).parent
 STORE = ROOT / "data"
 DB = STORE / "opportunities.json"          # legacy single-file store (migrated on first run)
@@ -397,12 +407,13 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
         def empty(v): return v is None or v == "" or v == [] or v == {}
         if not isinstance(interp, dict): return []
         applied = []
+        source_message_id = next((m.get("id") for m in reversed(state.get("conversation", [])) if m.get("role") == "customer"), None)
         req = state["requirements"]
         for key, value in (interp.get("requirement_updates") or {}).items():
             if empty(value): continue
             existing = req.get(key)
             if existing and existing.get("value") == value: continue  # no-op
-            req[key] = {"value": value, "confidence": "llm", "source": "llm_interpretation", "explicit": False, "updated_at": now()}
+            req[key] = {"value": value, "confidence": "llm", "source": "llm_interpretation", "source_message_id": source_message_id, "explicit": True, "updated_at": now()}
             state["history"].append({"at": now(), "type": "state_change", "field": key,
                                      "from": existing.get("value") if existing else None, "to": value,
                                      "source": "llm_interpretation"})
@@ -489,7 +500,8 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
         applied = []
         def put(key, value, confidence="medium"):
             if key in req: return  # LLM layer already decided this field
-            req[key] = {"value": value, "confidence": confidence, "source": "regex_fallback", "explicit": True, "updated_at": now()}
+            source_message_id = next((m.get("id") for m in reversed(state.get("conversation", [])) if m.get("role") == "customer"), None)
+            req[key] = {"value": value, "confidence": confidence, "source": "regex_fallback", "source_message_id": source_message_id, "explicit": True, "updated_at": now()}
             state["history"].append({"at": now(), "type": "state_change", "field": key, "from": None, "to": value, "source": "regex_fallback"})
             applied.append(key)
         company = re.search(r"(?:from|at|for) ([A-Z][\w &.-]{2,40})", text)
@@ -733,7 +745,7 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
         with self._lock_for(oid):
             state = self.db[oid]; solution = state.get("solution") or self._solution(state)
             option = next(x for x in solution["options"] if x["id"] == option_id); edits = edits or {}
-            approved = {**option, **edits, "approved_at": now()}; state["decision"] = approved; state["mode"] = "collaboration"; state["updated_at"] = now()
+            approved = validate_decision({**option, **edits, "approved_at": now()}); state["decision"] = approved; state["mode"] = "collaboration"; state["updated_at"] = now()
             # Human approval is the ONLY writer of binding commercial terms.
             commercial = state.setdefault("commercial", {})
             approved_terms = commercial.setdefault("approved_terms", {})

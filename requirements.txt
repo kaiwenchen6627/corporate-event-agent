@@ -11,3 +11,6 @@ numpy>=1.24
 
 # Claude via the official SDK (used by agent._llm_anthropic; later swapped to the Bedrock client)
 anthropic>=1.8
+
+# Development/test dependency
+pytest>=8.0

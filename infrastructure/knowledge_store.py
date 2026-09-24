@@ -108,6 +108,7 @@ class JsonKnowledgeStore(KnowledgeStore):
                   "collection": collection, "review_status": record.get("review_status", "pending"),
                   "created_at": record.get("created_at", now())}
         _atomic_write(self._record_path(collection, record["id"]), json.dumps(record, indent=2, ensure_ascii=False))
+        self._tfidf_cache.pop(collection, None)   # a new record can shift every score
         return record
 
     def get(self, collection, record_id):
@@ -168,9 +169,18 @@ class JsonKnowledgeStore(KnowledgeStore):
                 tfidf_scores = [0.0] * len(records)
                 texts_lower = [json.dumps(r, ensure_ascii=False).lower() for r in records]
             else:
-                vec, matrix, cached_records, texts_lower = cached
+                vec, matrix, cached_records, cached_texts_lower = cached
                 q_vec = vec.transform([q_lower])
-                tfidf_scores = cosine_similarity(q_vec, matrix).flatten()
+                all_scores = cosine_similarity(q_vec, matrix).flatten()
+                # `records` may be a tag-filtered subset of cached_records. Never
+                # index cached scores by the subset position: that makes record B
+                # inherit record A's score and attribution.
+                cached_index = {r["id"]: i for i, r in enumerate(cached_records)}
+                # .get() with 0.0 fallback: a record that missed cache invalidation
+                # (hand-edited file, future write path) degrades to keyword-only
+                # scoring instead of crashing the search with a KeyError.
+                tfidf_scores = [float(all_scores[cached_index[r["id"]]]) if r["id"] in cached_index else 0.0 for r in records]
+                texts_lower = [json.dumps(r, ensure_ascii=False).lower() for r in records]
             # 3) Score per record
             for i, r in enumerate(records):
                 kw_score = sum(texts_lower[i].count(t) for t in terms) if terms else 0
