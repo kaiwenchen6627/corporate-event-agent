@@ -69,7 +69,7 @@ with these top-level sections:
 |---|---|---|
 | `requirements`    | pax, service, event_date, workshop_format … | extracted by regex + LLM, merged into prior state |
 | `operational`     | facilitator count, AV needs, dietary etc.    | extracted when present |
-| `commercial`      | price, GST, payment terms                   | only ever updated from human approval |
+| `commercial`      | `customer_claims` / `discussed_terms` / `approved_terms` | claims extracted from customer text; `approved_terms` only ever written by human approval (`POST /opportunities/:id/commercial/approve`, or option approval) |
 | `commitments`     | confirmed vs pending promises to the client  | tracked through approval flow |
 | `conversation`    | chronological customer / agent messages    | appended on every turn |
 | `retrieved_evidence` | slice of historical cases + capabilities + principles used as context for the most recent LLM call | refreshed each turn |
@@ -141,9 +141,15 @@ curl -X POST http://localhost:8080/messages \
   -H 'content-type: application/json' \
   -d '{"text":"We are planning a wellness event for 80 employees at our KL office on 20 October and would like a matcha workshop."}'
 
-# Choose a solution option
+# Choose a solution option (optionally edit scope/price; the proposal
+# follows the EDITED decision, and approved price lands in commercial.approved_terms)
 curl -X POST http://localhost:8080/opportunities/opp_xxxxxxxx/approve \
   -H 'content-type: application/json' -d '{"option_id":"B"}'
+
+# Promote a customer-claimed commercial term into an agreed term (or set one
+# directly); reject drops the claim as not agreed
+curl -X POST http://localhost:8080/opportunities/opp_xxxxxxxx/commercial/approve \
+  -H 'content-type: application/json' -d '{"key":"payment_terms","value":"50% deposit"}'
 
 # Capture human edit + free-text note
 curl -X POST http://localhost:8080/opportunities/opp_xxxxxxxx/reflect \
@@ -273,8 +279,10 @@ Never commit any API key. `.env` is gitignored — keep real keys there.
   regex extraction, retrieval, and solution functions are isolated so an
   LLM provider can replace only those components later without changing
   the workflow or state model.
-* The `commercial` state section is **read-only** outside of human
-  approval — the agent never rewrites pricing on its own.
+* The `commercial.approved_terms` section is **read-only** outside of human
+  approval — the agent never rewrites pricing on its own. Customer-asserted
+  money facts land in `commercial.customer_claims` (claims, not agreements)
+  and are promoted only through `POST /opportunities/:id/commercial/approve`.
 * Approved principles are what the second LLM call actually sees; pending
   records show up in the review UI, not in prompts.
 

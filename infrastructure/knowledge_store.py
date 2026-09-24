@@ -1,4 +1,4 @@
-import json, re, uuid
+import json, os, re, threading, uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -24,6 +24,20 @@ except ImportError:  # pragma: no cover - depends on the runtime environment
 
 COLLECTIONS = ("historical_cases", "capabilities", "principles")
 def now(): return datetime.now(timezone.utc).isoformat()
+
+# Process-wide IO lock: ThreadingHTTPServer workers must not interleave
+# read-modify-write cycles on knowledge files (lost update), and a crash
+# must never leave a half-written record behind.
+_IO_LOCK = threading.RLock()
+
+def _atomic_write(path, text):
+    """Write via tmp file + os.replace so readers see either the old or the
+    new complete file — never a truncated JSON document."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with _IO_LOCK:
+        tmp = path.with_name(path.name + ".tmp")
+        tmp.write_text(text, encoding="utf-8")
+        os.replace(tmp, path)
 
 # Collections that should be pre-filtered by `tags` before scoring. Other
 # collections (historical_cases, capabilities) are tag-agnostic — their
@@ -53,7 +67,7 @@ class JsonKnowledgeStore(KnowledgeStore):
         for c in COLLECTIONS: (self.root / c).mkdir(exist_ok=True)
         (self.root / "sources").mkdir(exist_ok=True)
         self.reviews = self.root / "reviews.json"
-        if not self.reviews.exists(): self.reviews.write_text("[]", encoding="utf-8")
+        if not self.reviews.exists(): _atomic_write(self.reviews, "[]")
         self._tfidf_cache = {}  # collection -> (vec, matrix, records, texts_lower) or None when empty
         self._migrate_legacy()
 
@@ -64,12 +78,12 @@ class JsonKnowledgeStore(KnowledgeStore):
             legacy = self.root / (c + ".json")
             if legacy.exists():
                 for record in json.loads(legacy.read_text(encoding="utf-8")):
-                    if "id" in record: self._record_path(c, record["id"]).write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
+                    if "id" in record: _atomic_write(self._record_path(c, record["id"]), json.dumps(record, indent=2, ensure_ascii=False))
                 legacy_dir.mkdir(exist_ok=True); legacy.rename(legacy_dir / legacy.name); moved = True
         legacy_sources = self.root / "sources.json"
         if legacy_sources.exists():
             for source in json.loads(legacy_sources.read_text(encoding="utf-8")):
-                if "id" in source: self._source_path(source["id"]).write_text(json.dumps(source, indent=2, ensure_ascii=False), encoding="utf-8")
+                if "id" in source: _atomic_write(self._source_path(source["id"]), json.dumps(source, indent=2, ensure_ascii=False))
             legacy_dir.mkdir(exist_ok=True); legacy_sources.rename(legacy_dir / legacy_sources.name); moved = True
         if moved: print(f"[knowledge_store] migrated legacy flat files into per-record layout (originals kept in {legacy_dir})")
 
@@ -84,7 +98,7 @@ class JsonKnowledgeStore(KnowledgeStore):
     # ---------- sources ----------
     def add_source(self, source_type, raw, metadata=None):
         source = {"id": "source_" + uuid.uuid4().hex[:10], "type": source_type, "raw": raw, "metadata": metadata or {}, "created_at": now()}
-        self._source_path(source["id"]).write_text(json.dumps(source, indent=2, ensure_ascii=False), encoding="utf-8")
+        _atomic_write(self._source_path(source["id"]), json.dumps(source, indent=2, ensure_ascii=False))
         return source
 
     # ---------- records ----------
@@ -93,7 +107,7 @@ class JsonKnowledgeStore(KnowledgeStore):
         record = {**record, "id": record.get("id") or collection + "_" + uuid.uuid4().hex[:8],
                   "collection": collection, "review_status": record.get("review_status", "pending"),
                   "created_at": record.get("created_at", now())}
-        self._record_path(collection, record["id"]).write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
+        _atomic_write(self._record_path(collection, record["id"]), json.dumps(record, indent=2, ensure_ascii=False))
         return record
 
     def get(self, collection, record_id):
@@ -184,18 +198,20 @@ class JsonKnowledgeStore(KnowledgeStore):
         return self._sources()
 
     def save_record(self, collection, record):
-        """Create or fully replace a record by its id."""
+        """Create or fully replace a record by its id. Holds the IO lock for
+        the whole read-modify-write cycle so concurrent saves cannot interleave."""
         if collection not in COLLECTIONS: raise ValueError("unknown knowledge collection")
-        rid = record.get("id")
-        if not rid: rid = record["id"] = collection + "_" + uuid.uuid4().hex[:8]
-        existing = self.get(collection, rid)
-        if existing and not record.get("created_at"): record["created_at"] = existing.get("created_at")
-        record.setdefault("collection", collection)
-        record.setdefault("review_status", "pending")
-        record.setdefault("created_at", now())
-        self._record_path(collection, rid).write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
-        self._tfidf_cache.pop(collection, None)
-        return record
+        with _IO_LOCK:
+            rid = record.get("id")
+            if not rid: rid = record["id"] = collection + "_" + uuid.uuid4().hex[:8]
+            existing = self.get(collection, rid)
+            if existing and not record.get("created_at"): record["created_at"] = existing.get("created_at")
+            record.setdefault("collection", collection)
+            record.setdefault("review_status", "pending")
+            record.setdefault("created_at", now())
+            _atomic_write(self._record_path(collection, rid), json.dumps(record, indent=2, ensure_ascii=False))
+            self._tfidf_cache.pop(collection, None)
+            return record
 
     def delete_record(self, collection, record_id):
         if collection not in COLLECTIONS: raise ValueError("unknown knowledge collection")
@@ -204,17 +220,21 @@ class JsonKnowledgeStore(KnowledgeStore):
         path.unlink(); self._tfidf_cache.pop(collection, None); return {"deleted": record_id}
 
     def review(self, record_id, action, reviewer, patch=None, reason=None):
-        for c in COLLECTIONS:
-            for r in self._records(c):
-                if r["id"] == record_id:
-                    if action == "edit": r["content"] = {**r.get("content", {}), **(patch or {})}
-                    elif action == "approve": r.update({"review_status": "approved", "approved_by": reviewer, "approved_at": now()})
-                    elif action == "reject": r.update({"review_status": "rejected", "rejected_by": reviewer, "rejected_at": now(), "rejection_reason": reason})
-                    else: raise ValueError("action must be approve, edit or reject")
-                    self._record_path(c, record_id).write_text(json.dumps(r, indent=2, ensure_ascii=False), encoding="utf-8")
-                    self._tfidf_cache.pop(c, None)
-                    logs = json.loads(self.reviews.read_text(encoding="utf-8"))
-                    logs.append({"record_id": record_id, "action": action, "reviewer": reviewer, "at": now()})
-                    self.reviews.write_text(json.dumps(logs, indent=2, ensure_ascii=False), encoding="utf-8")
-                    return r
-        raise KeyError(record_id)
+        """Approve/reject/edit one record. Holds the IO lock for the whole
+        scan-modify-write cycle; two concurrent reviews (e.g. two humans, or
+        review + save from the browser) cannot interleave."""
+        with _IO_LOCK:
+            for c in COLLECTIONS:
+                for r in self._records(c):
+                    if r["id"] == record_id:
+                        if action == "edit": r["content"] = {**r.get("content", {}), **(patch or {})}
+                        elif action == "approve": r.update({"review_status": "approved", "approved_by": reviewer, "approved_at": now()})
+                        elif action == "reject": r.update({"review_status": "rejected", "rejected_by": reviewer, "rejected_at": now(), "rejection_reason": reason})
+                        else: raise ValueError("action must be approve, edit or reject")
+                        _atomic_write(self._record_path(c, record_id), json.dumps(r, indent=2, ensure_ascii=False))
+                        self._tfidf_cache.pop(c, None)
+                        logs = json.loads(self.reviews.read_text(encoding="utf-8"))
+                        logs.append({"record_id": record_id, "action": action, "reviewer": reviewer, "at": now()})
+                        _atomic_write(self.reviews, json.dumps(logs, indent=2, ensure_ascii=False))
+                        return r
+            raise KeyError(record_id)
