@@ -1,0 +1,13 @@
+{
+  "name": "Service area: Singapore only",
+  "text": "Company policy: we only host events located in Singapore. 公司政策：只承接位于新加坡的活动。If a client requests an event in any other country or overseas location (Malaysia, Indonesia, Thailand, Vietnam, China, Hong Kong, Japan, Korea, or anywhere outside Singapore), we must politely decline: explain that our services are limited to events within Singapore, and we cannot accept the engagement. 若客户邀请去新加坡以外的国家办活动，须礼貌婉拒，说明我们仅能承接新加坡本地活动，不能接单。",
+  "notes": "Hard constraint. Applies to all event types and sizes. Decline politely, offer no alternative venue outside Singapore.",
+  "tags": [
+    "location"
+  ],
+  "id": "cap_singapore_service_area",
+  "review_status": "approved",
+  "origin": "manual_policy",
+  "collection": "capabilities",
+  "created_at": "2026-09-25T01:10:00+00:00"
+}
