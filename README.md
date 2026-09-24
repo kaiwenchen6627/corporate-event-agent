@@ -245,19 +245,27 @@ expected — it proves the process is alive).
 Environment variables (read by `agent.py` on startup, with `.env` as
 fallback):
 
-| Variable            | Default                  | Notes |
+| Variable             | Default                  | Notes |
 |---|---|---|
-| `DEEPSEEK_API_KEY`  | *(required for LLM)*     | Without it the agent falls back to regex-only paths |
-| `DEEPSEEK_MODEL`    | `deepseek-chat`          | Any OpenAI-compatible model name |
-| `DEEPSEEK_BASE_URL` | `https://api.deepseek.com` | Override for self-hosted or proxies |
-| `HOST`              | `127.0.0.1`              | Bind address. Default is local-only; use `0.0.0.0` in containers |
-| `PORT`              | `8080`                   | Bind port; PaaS providers usually inject this |
-| `AGENT_AUTH`        | *(empty = no auth)*      | `user:pass` enables HTTP Basic auth on every route |
+| `LLM_GATEWAY_URL`    | *(empty)*                | Company OpenAI-compatible gateway, e.g. an AWS-backed Claude proxy |
+| `LLM_GATEWAY_API_KEY`| *(empty)*                | When set, takes precedence over all other providers |
+| `LLM_MODEL`          | *(empty)*                | Model name as issued by the gateway, e.g. `global.anthropic.claude-sonnet-4-5-20250929-v1:0` |
+| `ANTHROPIC_API_KEY`  | *(empty)*                | Claude direct via the official SDK (requires `pip install anthropic`) |
+| `ANTHROPIC_MODEL`    | `claude-opus-5`          | Any Anthropic model name |
+| `DEEPSEEK_API_KEY`   | *(empty)*                | DeepSeek direct |
+| `DEEPSEEK_MODEL`     | `deepseek-chat`          | Any OpenAI-compatible model name |
+| `DEEPSEEK_BASE_URL`  | `https://api.deepseek.com` | Override for self-hosted or proxies |
+| `HOST`               | `127.0.0.1`              | Bind address. Default is local-only; use `0.0.0.0` in containers |
+| `PORT`               | `8080`                   | Bind port; PaaS providers usually inject this |
+| `AGENT_AUTH`         | *(empty = no auth)*      | `user:pass` enables HTTP Basic auth on every route |
+
+Provider precedence: `LLM_GATEWAY_API_KEY` → `ANTHROPIC_API_KEY` → `DEEPSEEK_API_KEY`
+→ regex-only. The gateway speaks the OpenAI `/v1/chat/completions` protocol
+(Bearer auth), so the Anthropic SDK is not needed for it.
 
 `--host` / `--port` flags override the corresponding environment variables.
 
-Never commit `DEEPSEEK_API_KEY`. The supported defaults are
-`deepseek-chat` and `https://api.deepseek.com`.
+Never commit any API key. `.env` is gitignored — keep real keys there.
 
 ## Design notes
 

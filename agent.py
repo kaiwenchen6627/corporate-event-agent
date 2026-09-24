@@ -102,14 +102,21 @@ class CorporateEventAgent:
         self._bootstrap_examples_if_empty()
         self.db = self._load_opportunities()
         self.routes = load(ROUTES, {})   # email -> active opportunity_id
-        # LLM provider: Anthropic (Claude) when ANTHROPIC_API_KEY is set, else DeepSeek, else regex-only.
-        self.anthropic_key = os.getenv("ANTHROPIC_API_KEY", "")
+        # LLM provider precedence: company gateway (OpenAI-compatible, e.g. AWS-backed
+        # Claude proxy) → Anthropic direct → DeepSeek → regex-only.
+        self.gateway_key = os.getenv("LLM_GATEWAY_API_KEY", "")
+        if self.gateway_key.startswith("replace_with"): self.gateway_key = ""   # .env.example placeholder
+        gateway_base = os.getenv("LLM_GATEWAY_URL", "").rstrip("/")
+        self.gateway_url = gateway_base + "/v1/chat/completions" if gateway_base else ""
+        self.gateway_model = os.getenv("LLM_MODEL", "")
+        self.anthropic_key = "" if self.gateway_key else os.getenv("ANTHROPIC_API_KEY", "")
         self.anthropic_model = os.getenv("ANTHROPIC_MODEL", "claude-opus-5")
-        self.deepseek_key = "" if self.anthropic_key else os.getenv("DEEPSEEK_API_KEY", "")
+        self.deepseek_key = "" if (self.gateway_key or self.anthropic_key) else os.getenv("DEEPSEEK_API_KEY", "")
         if self.deepseek_key.startswith("replace_with"): self.deepseek_key = ""   # .env.example placeholder
         self.deepseek_model = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
         self.deepseek_url = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com") + "/chat/completions"
-        self.llm_label = (f"anthropic:{self.anthropic_model}" if self.anthropic_key
+        self.llm_label = (f"gateway:{self.gateway_model}@{gateway_base}" if self.gateway_key
+                          else f"anthropic:{self.anthropic_model}" if self.anthropic_key
                           else f"deepseek:{self.deepseek_model}" if self.deepseek_key else "")
         self.state_updater = StateUpdater(self)
         self.knowledge_store = JsonKnowledgeStore(STORE / "knowledge")
@@ -253,20 +260,36 @@ class CorporateEventAgent:
         return {"triggered": bool(impacts), "changes": changes, "impacts": sorted(set(impacts)), "human_review_required": bool(impacts), "reason": "existing state or commitment may be affected"}
 
     def _llm(self, system, user, json_mode=False):
-        """Call the configured LLM (Anthropic or DeepSeek); workflow remains usable without one."""
+        """Call the configured LLM (gateway / Anthropic / DeepSeek); workflow remains usable without one."""
+        if self.gateway_key:
+            return self._llm_openai(self.gateway_url, self.gateway_key, self.gateway_model,
+                                    system, user, json_mode, response_format=False)
         if self.anthropic_key: return self._llm_anthropic(system, user, json_mode)
         if not self.deepseek_key: return None
-        payload = {"model": self.deepseek_model, "temperature": 0.2,
+        return self._llm_openai(self.deepseek_url, self.deepseek_key, self.deepseek_model,
+                                system, user, json_mode, response_format=True)
+
+    def _llm_openai(self, url, key, model, system, user, json_mode, response_format):
+        """OpenAI-compatible /chat/completions call (gateway or DeepSeek). Returns the
+        text, or None on any failure. response_format=False for gateways whose upstream
+        (e.g. Bedrock Claude) may reject the parameter — JSON is enforced via the prompt
+        instead, and ```json fences are tolerated in the reply."""
+        if json_mode and not response_format:
+            system += "\nRespond with a single JSON object only — no prose, no markdown fences."
+        payload = {"model": model, "temperature": 0.2,
                    "messages": [{"role":"system","content":system},{"role":"user","content":user}]}
-        if json_mode: payload["response_format"] = {"type":"json_object"}
-        req = Request(self.deepseek_url, data=json.dumps(payload).encode(), headers={
-            "Authorization": "Bearer " + self.deepseek_key,
+        if json_mode and response_format: payload["response_format"] = {"type":"json_object"}
+        req = Request(url, data=json.dumps(payload).encode(), headers={
+            "Authorization": "Bearer " + key,
             "Content-Type": "application/json"}, method="POST")
         try:
-            with urlopen(req, timeout=45) as response:
-                return json.loads(response.read()) ["choices"][0]["message"]["content"]
-        except (HTTPError, URLError, TimeoutError, KeyError, json.JSONDecodeError):
-            return None
+            with urlopen(req, timeout=60) as response:
+                text = json.loads(response.read()) ["choices"][0]["message"]["content"]
+        except (HTTPError, URLError, TimeoutError, KeyError, json.JSONDecodeError) as e:
+            print(f"[agent] LLM call failed ({url}): {e}"); return None
+        if json_mode and not response_format:   # tolerate ```json fences even though we asked for none
+            text = re.sub(r"^```(?:json)?\s*|\s*```$", "", (text or "").strip())
+        return text or None
 
     def _llm_anthropic(self, system, user, json_mode=False):
         """Claude via the official anthropic SDK. Same contract as the DeepSeek path:
@@ -823,7 +846,7 @@ def main():
         print(f"Agent listening on http://{a.host}:{a.port}"
               + ("  [HTTP Basic auth enabled]" if Handler.AUTH else "  [no auth — local only]"))
         print("  LLM: " + (f"enabled ({agent.llm_label})" if agent.llm_label
-                           else "DISABLED — no ANTHROPIC_API_KEY / DEEPSEEK_API_KEY, falling back to regex-only paths"))
+                           else "DISABLED — no LLM_GATEWAY_API_KEY / ANTHROPIC_API_KEY / DEEPSEEK_API_KEY, falling back to regex-only paths"))
         ThreadingHTTPServer((a.host,a.port),Handler).serve_forever()
     elif a.cmd=="message": print(json.dumps(agent.message(a.text,a.opportunity_id,a.from_email,a.new_opportunity),ensure_ascii=False,indent=2))
     elif a.cmd=="close": print(json.dumps(agent.close(a.id,a.outcome,a.note),ensure_ascii=False,indent=2))
