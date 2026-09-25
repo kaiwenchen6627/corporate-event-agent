@@ -27,6 +27,14 @@ def validate_decision(decision):
     if not isinstance(decision["price"], (int, float)): raise ValueError("decision price must be numeric")
     return decision
 
+def validate_execution_trace(trace):
+    """Keep traces small, stable, and safe to inspect in the review UI."""
+    if not isinstance(trace, dict): raise ValueError("execution trace must be an object")
+    for key in ("at", "message_id", "stages"):
+        if key not in trace: raise ValueError(f"execution trace missing {key}")
+    if not isinstance(trace["stages"], dict): raise ValueError("execution trace stages must be an object")
+    return trace
+
 ROOT = Path(__file__).parent
 STORE = ROOT / "data"
 DB = STORE / "opportunities.json"          # legacy single-file store (migrated on first run)
@@ -637,9 +645,27 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
     def _process_message(self, state, text, routed_via):
         before = json.loads(json.dumps(state["requirements"]))
         history_start = len(state["history"])
-        state["conversation"].append({"id": uuid.uuid4().hex[:8], "role":"customer", "text":text, "at":now()})
+        msg_id = uuid.uuid4().hex[:8]
+        state["conversation"].append({"id": msg_id, "role":"customer", "text":text, "at":now()})
         pre_gaps = self._gaps(state)
+
+        # Execution trace: records what each stage did so decisions are auditable
+        # without reading the full history. Written to state["execution_traces"].
+        trace = {
+            "at": now(),
+            "message_id": msg_id,
+            "routed_via": routed_via,
+            "stages": {},
+        }
+
         interp = self._llm_interpretation(text, state, pre_gaps)     # 1) LLM primary extraction
+        trace["stages"]["llm_extraction"] = {
+            "success": interp is not None,
+            "llm_provider": self.llm_label or "none",
+            "fields_extracted": list((interp or {}).get("requirement_updates", {}).keys()),
+            "same_event_confidence": ((interp or {}).get("same_event") or {}).get("confidence"),
+        }
+
         # same-event guard: follow-up mail must still be about THIS event
         same_event = interp.get("same_event") if isinstance(interp, dict) else None
         if not isinstance(same_event, dict): same_event = {"confidence": "high", "reason": "not assessed"}
@@ -652,6 +678,8 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
             reply = "Thank you for your message — I have received it and will confirm the details with our team before getting back to you shortly."
             state["conversation"].append({"role": "agent", "text": reply, "at": now(), "action": "human_review_same_event"})
             state["updated_at"] = now(); action = "human_review_same_event"
+            trace["stages"]["routing"] = {"next_action": action, "sufficient": False, "gaps_missing": pre_gaps["missing"], "reason": "same_event_uncertain"}
+            state.setdefault("execution_traces", []).append(validate_execution_trace(trace))
             self.persist(state)
             return {"opportunity": state, "action": action, "reply": reply, "gaps": pre_gaps,
                     "llm_filled": [], "regex_filled": [], "routed_via": routed_via, "same_event": same_event}
@@ -659,8 +687,25 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
             state["history"].append({"at": now(), "type": "same_event_check", "confidence": "medium", "reason": same_event.get("reason", "")})
         llm_filled = self._merge_interpretation(state, interp)
         regex_filled = self.state_updater.apply(state, text)        # 2) regex fallback: only fills what the LLM left empty
+
+        # Warn when LLM extraction failed and regex had to carry the load
+        if not llm_filled and regex_filled:
+            print(f"[agent] WARNING opp={state['id']} msg={msg_id}: LLM extraction returned nothing; "
+                  f"regex fallback filled: {regex_filled}")
+        trace["stages"]["regex_fallback"] = {
+            "fields_filled": regex_filled,
+            "was_primary": not llm_filled and bool(regex_filled),
+        }
+
         gaps = self._gaps(state); state["updated_at"] = now()
         plan = self._plan(state, gaps)                                # deterministic routing, no LLM call
+        trace["stages"]["routing"] = {
+            "next_action": plan["next_action"],
+            "reason": plan["reason"],
+            "gaps_missing": gaps["missing"],
+            "sufficient": gaps["sufficient"],
+        }
+
         # principles tag pre-filter: drop principles whose tags don't overlap with state needs.
         # Only consulted when principles are in retrieval_needed; passes through otherwise.
         need_tags = self._principle_tags_for_state(state) if "sales_principles" in plan.get("retrieval_needed", []) else None
@@ -677,8 +722,19 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
         else:
             state["mode"] = "discovery"; action = "ask_customer"
             reply = self._customer_reply(state, plan["customer_reply_strategy"] + " " + (next_q or gaps["next_question"] or "Could you share a little more about the event format?"))
-        state["conversation"].append({"role":"agent","text":reply,"at":now(),"action":action})
-        state["history"].append({"at":now(),"type":"agent_action","action":action,"changed":before != state["requirements"]})
+        # All outbound replies require human approval before being sent.
+        # Stage the draft in pending_reply instead of writing it straight into
+        # conversation — the human calls /reply/send to confirm (with optional
+        # edits), which is the ONLY path that promotes it into conversation.
+        state["pending_reply"] = {
+            "draft": reply,
+            "action": action,
+            "staged_at": now(),
+            "trigger_message_id": msg_id,
+        }
+        state["history"].append({"at":now(),"type":"agent_action","action":action,"changed":before != state["requirements"],
+                                  "note":"reply staged in pending_reply, awaiting human send approval"})
+        state.setdefault("execution_traces", []).append(validate_execution_trace(trace))
         self.persist(state); return {"opportunity":state,"action":action,"reply":reply,"gaps":gaps,"llm_filled":llm_filled,"regex_filled":regex_filled,"routed_via":routed_via,"same_event":same_event}
 
     def _customer_reply(self, state, strategy):
@@ -740,6 +796,29 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
                                      "note": ("promoted from customer claim" if claim is not None else "set directly by human")})
             self.persist(state)
             return {"ok": True, "action": "approve", "key": key, "value": value, "commercial": commercial}
+
+    def send_reply(self, oid, override_text=None):
+        """Human gate for all outbound replies (discovery questions AND solution drafts).
+
+        Promotes the staged pending_reply into conversation so it is 'sent'.
+        The human may pass override_text to edit the draft before sending.
+        Returns an error if there is nothing pending."""
+        with self._lock_for(oid):
+            state = self.db.get(oid)
+            if not state: raise ValueError(f"unknown opportunity {oid}")
+            pending = state.get("pending_reply")
+            if not pending: return {"error": "no pending reply to send"}
+            text = (override_text.strip() if isinstance(override_text, str) and override_text.strip()
+                    else pending["draft"])
+            action = pending.get("action", "send_reply")
+            state["conversation"].append({"role": "agent", "text": text, "at": now(), "action": action,
+                                          "approved_by": "human", "trigger_message_id": pending.get("trigger_message_id")})
+            state["history"].append({"at": now(), "type": "reply_sent", "action": action,
+                                     "edited": text != pending["draft"]})
+            state.pop("pending_reply", None)
+            state["updated_at"] = now()
+            self.persist(state)
+            return {"ok": True, "sent": text, "action": action, "edited": text != pending["draft"]}
 
     def approve(self, oid, option_id="B", edits=None):
         with self._lock_for(oid):
@@ -1006,6 +1085,7 @@ class Handler(BaseHTTPRequestHandler):
             if self.path=="/knowledge/delete": return self.send_json(self.agent.knowledge_store.delete_record(body["collection"], body["id"]))
             if len(parts)==3 and parts[0]=="knowledge" and parts[1]=="review": return self.send_json(self.agent.knowledge_store.review(parts[2],body["action"],body.get("reviewer","workspace-user"),body.get("patch"),body.get("reason")))
             if len(parts)==3 and parts[0]=="opportunities" and parts[2]=="approve": return self.send_json(self.agent.approve(parts[1],body.get("option_id","B"),body.get("edits")))
+            if len(parts)==3 and parts[0]=="opportunities" and parts[2]=="reply": return self.send_json(self.agent.send_reply(parts[1],body.get("text")))
             if len(parts)==3 and parts[0]=="opportunities" and parts[2]=="close": return self.send_json(self.agent.close(parts[1],body["outcome"],body.get("note","")))
             if len(parts)==3 and parts[0]=="opportunities" and parts[2]=="reflect": return self.send_json(self.agent.reflect(parts[1],body["human_output"],body.get("note","")))
             if len(parts)==4 and parts[0]=="opportunities" and parts[2]=="commitments" and parts[3] in ("approve","reject"):

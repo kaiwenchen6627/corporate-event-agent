@@ -176,10 +176,19 @@ class JsonKnowledgeStore(KnowledgeStore):
                 # index cached scores by the subset position: that makes record B
                 # inherit record A's score and attribution.
                 cached_index = {r["id"]: i for i, r in enumerate(cached_records)}
-                # .get() with 0.0 fallback: a record that missed cache invalidation
-                # (hand-edited file, future write path) degrades to keyword-only
-                # scoring instead of crashing the search with a KeyError.
-                tfidf_scores = [float(all_scores[cached_index[r["id"]]]) if r["id"] in cached_index else 0.0 for r in records]
+                # A hand-edited/deleted record can make a stale cache miss an id.
+                # Rebuild once instead of silently assigning a wrong score.
+                if any(r["id"] not in cached_index for r in records):
+                    cached = self._build_tfidf(c)
+                    if cached is None:
+                        tfidf_scores = [0.0] * len(records)
+                    else:
+                        vec, matrix, cached_records, _ = cached
+                        q_vec = vec.transform([q_lower]); all_scores = cosine_similarity(q_vec, matrix).flatten()
+                        cached_index = {r["id"]: i for i, r in enumerate(cached_records)}
+                        tfidf_scores = [float(all_scores[cached_index[r["id"]]]) for r in records]
+                else:
+                    tfidf_scores = [float(all_scores[cached_index[r["id"]]]) for r in records]
                 texts_lower = [json.dumps(r, ensure_ascii=False).lower() for r in records]
             # 3) Score per record
             for i, r in enumerate(records):
