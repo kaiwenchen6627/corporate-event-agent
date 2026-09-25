@@ -1,8 +1,0 @@
-<!doctype html><meta charset="utf-8"><title>Knowledge Review</title>
-<style>body{font:14px system-ui;max-width:900px;margin:40px auto;background:#f5f7f5;color:#21302d}article{background:white;border:1px solid #dbe4df;border-radius:8px;padding:18px;margin:12px 0}button{padding:8px 12px;margin-right:8px;border:0;border-radius:5px;cursor:pointer}.approve{background:#2f6655;color:#fff}.reject{background:#f2d9d4}.source{white-space:pre-wrap;background:#f0f4f1;padding:10px}</style>
-<h1>Knowledge Review</h1><p>Pending records require human approval before they enter retrievable knowledge.</p><main id="list">Loading…</main>
-<script>
-async function load(){let xs=await fetch('/knowledge/pending').then(r=>r.json());document.querySelector('#list').innerHTML=xs.map(x=>`<article><b>${x.title||x.id}</b><p>${x.collection} · ${x.id}</p><div class="source">${JSON.stringify(x.content,null,2)}</div><button class="approve" onclick="review('${x.id}','approve')">Approve</button><button onclick="edit('${x.id}')">Edit</button><button class="reject" onclick="review('${x.id}','reject')">Reject</button></article>`).join('')||'<p>No pending records.</p>'}
-async function review(id,action){await fetch('/knowledge/review/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,reviewer:'workspace-user',reason:action==='reject'?'Rejected in review UI':null})});load()}
-async function edit(id){let text=prompt('Replace/merge JSON content (optional)');if(!text)return;await fetch('/knowledge/review/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'edit',reviewer:'workspace-user',patch:JSON.parse(text)})});load()}load();
-</script>
