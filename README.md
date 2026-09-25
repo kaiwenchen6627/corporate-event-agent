@@ -3,8 +3,9 @@
 A runnable, bounded agent for **corporate event lead handling**. It keeps an
 **Event Opportunity** as the primary object, performs incremental state
 updates and gap analysis, retrieves evidence across three collections, drafts
-multi-option solutions, supports human approval, and stores human
-feedback as approved principles. When `DEEPSEEK_API_KEY` is configured,
+multi-option solutions, supports human approval, and stages outbound replies
+for human send approval. Human feedback becomes pending principles that require
+Knowledge Review before retrieval. When `DEEPSEEK_API_KEY` is configured,
 DeepSeek handles message interpretation and customer-facing generation
 through its OpenAI-compatible API.
 
@@ -29,6 +30,9 @@ python3 agent.py demo
 
 # 4. Or start the HTTP service
 python3 agent.py serve --port 8080
+
+# 5. Run the test suite
+pytest -q
 ```
 
 Without `DEEPSEEK_API_KEY` the service still starts — extraction falls back to
@@ -39,7 +43,7 @@ If `scikit-learn` is missing, the service also keeps running: retrieval drops to
 the keyword layer only (no TF-IDF cosine), prints a one-line warning, and every
 route stays up. Install `requirements.txt` for full hybrid ranking.
 
-The service exposes a tiny HTTP API and three review UIs:
+The service exposes a tiny HTTP API, two review UIs, and one standalone landing page:
 
 | URL | Purpose |
 |---|---|
@@ -74,6 +78,8 @@ with these top-level sections:
 | `conversation`    | chronological customer / agent messages    | appended on every turn |
 | `retrieved_evidence` | slice of historical cases + capabilities + principles used as context for the most recent LLM call | refreshed each turn |
 | `decision`        | the chosen option (`A` / `B` / `C`)         | set on `POST /opportunities/:id/approve` |
+| `pending_reply`   | AI-generated customer reply awaiting human send approval | set on every inbound message; promoted by `POST /opportunities/:id/reply` |
+| `execution_traces`| compact per-message extraction, routing, fallback, and evidence trace | appended on every inbound message |
 | `reflections`     | history of (human_output, note, AI bucket summary) | appended on `POST /opportunities/:id/reflect` |
 | `style_lessons` / `commercial_lessons` / `capability_lessons` | structured per-domain lessons pulled out of human edits | appended on every reflection |
 | `history`         | event log (state changes, agent actions)    | appended on every turn |
@@ -85,11 +91,14 @@ with these top-level sections:
    against the projected prior state and the gap list. It produces a
    *merged* `requirements` update and a `next_question` if anything is
    still missing.
-2. **Call 2 — drafting.** With the updated state and the retrieved
-   evidence (historical cases ranked by TF-IDF + keyword count, principles
-   pre-filtered by tag), the agent drafts three solution options
-   with names, prices, scope, and references; it returns one of them as
-   the outbound customer reply.
+2. **Planning and solution.** The deterministic bounded planner uses the
+   updated state to choose the next action and retrieval domains. When the
+   requirements are sufficient, the workflow generates three solution options
+   with names, prices, scope, and references.
+3. **Call 2 — drafting.** The LLM drafts customer-facing language from the
+   projected state, selected evidence, and strategy. The draft is staged in
+   `pending_reply`; it is not added to conversation or treated as sent until
+   a human calls the reply endpoint.
 
 ### Reflection loop
 
@@ -101,7 +110,7 @@ Human edits feed back as:
 2. Promote each lesson into the matching lesson list on the
    opportunity state.
 3. Record the same lesson into the `principles` knowledge collection as a
-   `pending` record, tagged so that the next retrieval can target it.
+   `pending` record, tagged so that a reviewer can approve it before retrieval.
 
 Tag inference:
 
@@ -155,6 +164,10 @@ curl -X POST http://localhost:8080/opportunities/opp_xxxxxxxx/commercial/approve
 curl -X POST http://localhost:8080/opportunities/opp_xxxxxxxx/reflect \
   -H 'content-type: application/json' -d '{"human_output":"...","note":"Adjust tone here only"}'
 
+# Human-review and send the staged customer reply; optional text edits the draft
+curl -X POST http://localhost:8080/opportunities/opp_xxxxxxxx/reply \
+  -H 'content-type: application/json' -d '{"text":"Could you share the expected headcount?"}'
+
 # Search the knowledge store (GET, query string)
 curl 'http://localhost:8080/knowledge/search?q=matcha+workshop+pricing'
 
@@ -165,7 +178,7 @@ curl -X POST http://localhost:8080/knowledge/import \
 ```
 
 With `AGENT_AUTH` set, add `-u user:pass` to every request. The full list of
-routes is at the bottom of `agent.py` — `Handler.do_GET` and `Handler.do_POST`.
+routes is at the bottom of `agent.py` — `Handler._route_get` and `Handler.do_POST`.
 
 ## Project layout
 
@@ -183,7 +196,8 @@ routes is at the bottom of `agent.py` — `Handler.do_GET` and `Handler.do_POST`
 │   ├── seed_knowledge/       # historical_cases + capabilities + principles
 │   └── legacy_knowledge.json # flat legacy seed used by the inline importer
 ├── data/                     # runtime state (gitignored, auto-bootstrapped from examples/)
-├── requirements.txt          # scikit-learn + numpy
+├── tests/                    # unit, retrieval regression, and golden-path tests
+├── requirements.txt          # scikit-learn + numpy + pytest
 ├── Dockerfile                # python:3.12-slim, non-root, healthchecked
 ├── docker-compose.yml        # single-service deploy with a persistent data volume
 ├── .dockerignore
@@ -283,8 +297,8 @@ Never commit any API key. `.env` is gitignored — keep real keys there.
   approval — the agent never rewrites pricing on its own. Customer-asserted
   money facts land in `commercial.customer_claims` (claims, not agreements)
   and are promoted only through `POST /opportunities/:id/commercial/approve`.
-* Approved principles are what the second LLM call actually sees; pending
-  records show up in the review UI, not in prompts.
+* Approved principles are what the customer-drafting LLM call actually sees;
+  pending records show up in the review UI, not in prompts.
 
 ## License
 
