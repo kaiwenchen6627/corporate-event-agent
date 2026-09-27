@@ -239,6 +239,14 @@ class CorporateEventAgent:
             print(f"[agent] migrated {len(db)} opportunities into {OPPS}")
         for st in db.values():
             patched = False
+            # Repair a known legacy regex false-positive where the date
+            # pattern captured a stop-word such as "our" from "on our ...".
+            # It must not count as a confirmed event date.
+            date_field = (st.get("requirements") or {}).get("event_date")
+            if isinstance(date_field, dict) and str(date_field.get("value", "")).strip().lower() in {"our", "your", "the", "a", "an"}:
+                st["requirements"].pop("event_date", None)
+                st.setdefault("history", []).append({"at": now(), "type": "state_repair", "field": "event_date", "from": date_field.get("value"), "to": None, "source": "invalid_regex_fallback"})
+                patched = True
             if "reflection" in st and "reflections" not in st:
                 legacy = st.pop("reflection")
                 if legacy: st["reflections"] = [legacy]
@@ -293,7 +301,10 @@ class CorporateEventAgent:
         missing = gaps["missing"]
         return {"matters_now": ["resolve the highest-value missing requirement"],
                 "missing_information": missing,
-                "retrieval_needed": ["capabilities"] if "service" in missing else [],
+                # Style principles apply to every outbound draft, including
+                # discovery/clarification replies. Capability and commercial
+                # evidence remain conditional on the state gaps.
+                "retrieval_needed": (["capabilities"] if "service" in missing else []) + ["sales_principles"],
                 "next_action": "ask_customer",
                 "reason": "missing material fields: " + ", ".join(missing),
                 "customer_reply_strategy": "Thank the customer, confirm what is already known, and ask only the highest-value question."}
@@ -518,7 +529,7 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
             state["customer"] = {"company": name, "source": "regex_fallback"}
         pax = re.search(r"(?:around|about|for|of)\s*(\d+)\s*(?:employees|people|pax|guests|participants)?", lower)
         if pax: put("pax", int(pax.group(1)), "high")
-        date = re.search(r"(?:\bon\b|date[: ]+)\s*((?:\d{1,2}\s+)?[A-Za-z]+(?:\s+\d{4})?|\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?)", text, re.I)
+        date = re.search(r"(?:\bon\b|date[: ]+)\s*((?:\d{1,2}\s+)?(?:January|February|March|April|May|June|July|August|September|October|November|December)(?:\s+\d{4})?|\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?)", text, re.I)
         if date: put("event_date", date.group(1), "high")
         time = re.search(r"(?:at|around|^|,\s*)(\d{1,2}(?::\d{2})?\s*(?:am|pm))", lower)
         if time: put("event_time", time.group(1), "high")
@@ -532,9 +543,13 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
 
     def _gaps(self, state):
         req = state["requirements"]
-        material = ["event_type", "pax", "event_date", "venue", "service", "event_time", "event_duration_hours"]
+        material = ["pax", "event_date", "venue", "service", "event_time", "event_duration_hours"]
         missing = [x for x in material if x not in req]
-        sufficient = not [x for x in ["event_type", "pax", "event_date", "venue", "service", "event_duration_hours"] if x not in req]
+        # A price is only appropriate once the event is sufficiently defined
+        # for a workable proposal. Time is material for staffing, scheduling,
+        # venue access and commercial feasibility, so do not enter solution
+        # mode or generate a priced draft while it is still missing.
+        sufficient = not [x for x in ["pax", "event_date", "venue", "service", "event_time", "event_duration_hours"] if x not in req]
         return {"missing": missing, "sufficient": sufficient, "next_question": ("What time would work best, and how long should the workshop run?" if "event_time" in missing or "event_duration_hours" in missing else None)}
 
     def _retrieve(self, state, tags=None):
@@ -797,28 +812,45 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
             self.persist(state)
             return {"ok": True, "action": "approve", "key": key, "value": value, "commercial": commercial}
 
-    def send_reply(self, oid, override_text=None):
+    def send_reply(self, oid, override_text=None, feedback_note=""):
         """Human gate for all outbound replies (discovery questions AND solution drafts).
 
         Promotes the staged pending_reply into conversation so it is 'sent'.
         The human may pass override_text to edit the draft before sending.
         Returns an error if there is nothing pending."""
+        edited = False
+        should_reflect = False
         with self._lock_for(oid):
             state = self.db.get(oid)
             if not state: raise ValueError(f"unknown opportunity {oid}")
             pending = state.get("pending_reply")
             if not pending: return {"error": "no pending reply to send"}
+            original_draft = pending["draft"]
             text = (override_text.strip() if isinstance(override_text, str) and override_text.strip()
-                    else pending["draft"])
+                    else original_draft)
+            edited = text != original_draft
             action = pending.get("action", "send_reply")
             state["conversation"].append({"role": "agent", "text": text, "at": now(), "action": action,
                                           "approved_by": "human", "trigger_message_id": pending.get("trigger_message_id")})
             state["history"].append({"at": now(), "type": "reply_sent", "action": action,
-                                     "edited": text != pending["draft"]})
+                                     "edited": edited})
+            if edited or (isinstance(feedback_note, str) and feedback_note.strip()):
+                state["last_ai_draft"] = original_draft
+                should_reflect = True
             state.pop("pending_reply", None)
             state["updated_at"] = now()
             self.persist(state)
-            return {"ok": True, "sent": text, "action": action, "edited": text != pending["draft"]}
+        reflection = None
+        if should_reflect:
+            try:
+                # Approval of an edited reply is the reflection trigger. Any
+                # resulting principles remain pending for Knowledge Review.
+                reflection = self.reflect(oid, text, feedback_note or "Automatically captured from an edited approved reply")
+            except Exception as e:
+                # Do not undo a human-approved reply if reflection is unavailable.
+                reflection = {"error": str(e)}
+        return {"ok": True, "sent": text, "action": action, "edited": edited,
+                "reflection": reflection}
 
     def approve(self, oid, option_id="B", edits=None):
         with self._lock_for(oid):
@@ -844,7 +876,9 @@ Leave a key empty rather than guessing. Do not invent prices, commitments, dates
         'no silent fall-back to the old keyword path' decision."""
         if not human_output or not human_output.strip():
             raise ValueError("human_output is required for AI reflection summary")
-        ai = (state.get("proposal") or {}).get("body", "")
+        # Preserve the exact pre-edit draft when reflection is triggered from
+        # approval of a human-edited reply.
+        ai = state.get("last_ai_draft") or (state.get("proposal") or {}).get("body", "")
         if not ai:
             tail = (state.get("conversation") or [])
             ai = next((m.get("text", "") for m in reversed(tail) if m.get("role") == "agent"), "")
@@ -1085,7 +1119,7 @@ class Handler(BaseHTTPRequestHandler):
             if self.path=="/knowledge/delete": return self.send_json(self.agent.knowledge_store.delete_record(body["collection"], body["id"]))
             if len(parts)==3 and parts[0]=="knowledge" and parts[1]=="review": return self.send_json(self.agent.knowledge_store.review(parts[2],body["action"],body.get("reviewer","workspace-user"),body.get("patch"),body.get("reason")))
             if len(parts)==3 and parts[0]=="opportunities" and parts[2]=="approve": return self.send_json(self.agent.approve(parts[1],body.get("option_id","B"),body.get("edits")))
-            if len(parts)==3 and parts[0]=="opportunities" and parts[2]=="reply": return self.send_json(self.agent.send_reply(parts[1],body.get("text")))
+            if len(parts)==3 and parts[0]=="opportunities" and parts[2]=="reply": return self.send_json(self.agent.send_reply(parts[1],body.get("text"),body.get("note", "")))
             if len(parts)==3 and parts[0]=="opportunities" and parts[2]=="close": return self.send_json(self.agent.close(parts[1],body["outcome"],body.get("note","")))
             if len(parts)==3 and parts[0]=="opportunities" and parts[2]=="reflect": return self.send_json(self.agent.reflect(parts[1],body["human_output"],body.get("note","")))
             if len(parts)==4 and parts[0]=="opportunities" and parts[2]=="commitments" and parts[3] in ("approve","reject"):

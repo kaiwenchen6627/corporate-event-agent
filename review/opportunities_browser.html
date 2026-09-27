@@ -14,6 +14,7 @@
   aside header { padding:14px 16px; border-bottom:1px solid var(--line); }
   aside header h1 { font-size:15px; }
   aside header .sub { font-size:11px; color:var(--muted); margin-top:3px; }
+  .new-opportunity { margin-top:12px; width:100%; }
   #list { overflow-y:auto; flex:1; }
   .section-title { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;
                    letter-spacing:.04em; padding:12px 16px 6px; }
@@ -61,6 +62,12 @@
                font-size:12.5px; margin-top:10px; }
   .case-note a { color:var(--blue); font-weight:600; }
   .decision-box { background:#f0fdf4; border:1px solid var(--green); border-radius:8px; padding:10px 14px; font-size:12.5px; margin-top:10px; }
+  .reply-draft { background:#fffaf0; border:1px solid #f1c46a; }
+  .reply-draft textarea { width:100%; min-height:160px; padding:10px; border:1px solid var(--line); border-radius:7px; font:12.5px/1.55 -apple-system,'PingFang SC','Segoe UI',sans-serif; resize:vertical; box-sizing:border-box; }
+  .reply-draft .feedback-note { min-height:58px; margin-top:8px; }
+  .learning-result { background:#eff6ff; border:1px solid #93c5fd; border-radius:8px; padding:10px 14px; font-size:12.5px; margin-top:10px; }
+  .inbound textarea { width:100%; min-height:130px; padding:10px; border:1px solid var(--line); border-radius:7px; font:12.5px/1.55 -apple-system,'PingFang SC','Segoe UI',sans-serif; resize:vertical; }
+  .inbound .row { display:flex; gap:10px; align-items:center; margin-top:8px; flex-wrap:wrap; }
   .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:none; align-items:center; justify-content:center; z-index:100; }
   .modal-backdrop.show { display:flex; }
   .modal { background:var(--card); border-radius:12px; padding:20px; max-width:640px; width:90%; max-height:80vh; overflow:auto; box-shadow:0 12px 40px rgba(0,0,0,0.2); }
@@ -79,6 +86,7 @@
   <header>
     <h1>机会管理</h1>
     <div class="sub">结案 → 蒸馏成案例 → <a href="/knowledge/review" target="_blank">知识库审批</a></div>
+    <button class="primary new-opportunity" onclick="openNewOpp()">＋ 新建商机</button>
   </header>
   <div id="list"></div>
 </aside>
@@ -96,6 +104,19 @@
     <div class="modal-actions">
       <button onclick="closeReflect()">取消</button>
       <button class="primary" onclick="submitReflect()">提交并让 AI 总结</button>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" id="newOppModal" onclick="if(event.target===this)closeNewOpp()">
+  <div class="modal">
+    <h3>新建商机</h3>
+    <label>客户邮箱（可选）</label>
+    <input id="newOppEmail" type="email" placeholder="customer@example.com" style="width:100%;padding:9px;border:1px solid var(--line);border-radius:6px;font-size:12px;box-sizing:border-box;">
+    <label>客户第一封邮件</label>
+    <textarea id="newOppText" placeholder="把客户的新询价邮件粘贴到这里……" style="min-height:180px"></textarea>
+    <div class="modal-actions">
+      <button onclick="closeNewOpp()">取消</button>
+      <button class="primary" onclick="submitNewOpp()">创建并处理</button>
     </div>
   </div>
 </div>
@@ -186,6 +207,8 @@ function renderDetail(o){
       <span class="hint">${esc(o.id)}</span></h2>
     <div class="hint" style="margin-top:4px">${esc(cust.contact_person||'')}${cust.role?' · '+esc(cust.role):''}${cust.contact_email?' · '+esc(cust.contact_email):''}</div>
     ${decisionHtml}
+    ${o.pending_reply ? `<div class="panel reply-draft"><h3>AI 回复草稿（待审核）</h3><textarea id="pendingReplyText">${esc(o.pending_reply.draft||'')}</textarea><textarea id="replyFeedbackNote" class="feedback-note" placeholder="本次反馈的要点（可选）：例如语气更简洁、不要说 delighted、先确认价格再问问题……"></textarea><div class="row"><button class="primary" onclick="sendPendingReply()">确认并加入对话</button><span class="hint">确认时会保存你的修改，并自动归纳为待审核原则。</span></div></div>` : ''}
+    ${!o.closed ? `<div class="panel inbound"><h3>粘贴客户新邮件</h3><textarea id="incomingEmail" placeholder="把客户最新一封邮件粘贴到这里……"></textarea><div class="row"><button class="primary" onclick="submitIncoming()">处理这封邮件</button><span class="hint">Agent 会把它作为本机会话的新一轮消息，更新需求、缺口和回复草稿。</span></div></div>` : ''}
     <div class="panel"><h3>结案操作</h3>${actionsHtml}</div>
     <div class="panel"><h3>需求</h3><div class="kv-grid">${reqCards}</div></div>
     <div class="panel"><h3>对话时间线（${(o.conversation||[]).length} 条）</h3>${conv}</div>`;
@@ -202,6 +225,70 @@ async function approveOpp(){
     await api(`/opportunities/${current}/approve`, {option_id: $('#optSel').value});
     flash('方案已批准（mode → collaboration）'); await select(current);
   }catch(e){ flash('失败：'+e.message); }
+}
+
+async function submitIncoming(){
+  const box = $('#incomingEmail');
+  const text = (box && box.value || '').trim();
+  if(!text){ flash('请先粘贴客户邮件'); return; }
+  const btn = box.parentElement.querySelector('button');
+  btn.disabled = true; btn.textContent = 'Agent 处理中…';
+  try{
+    const r = await api('/messages', {text, opportunity_id: current});
+    flash(r.action === 'human_review_same_event' ? '邮件已收到，等待确认是否属于本机会' : '邮件已处理，状态和草稿已更新');
+    await select(current);
+  }catch(e){ flash('处理失败：'+e.message); }
+  finally{ btn.disabled = false; btn.textContent = '处理这封邮件'; }
+}
+
+async function sendPendingReply(){
+  const box = $('#pendingReplyText');
+  const text = (box && box.value || '').trim();
+  if(!text){ flash('回复内容不能为空'); return; }
+  const btn = box.parentElement.querySelector('button');
+  btn.disabled = true; btn.textContent = '确认中…';
+  try{
+    const note = ($('#replyFeedbackNote') && $('#replyFeedbackNote').value || '').trim();
+    const r = await api(`/opportunities/${current}/reply`, {text, note});
+    if(r.reflection && !r.reflection.error){
+      const principles = (r.reflection.principles || []).map(p=>`<li>${esc(p.text||'')}</li>`).join('');
+      if(principles){
+        const panel = document.createElement('div');
+        panel.className = 'learning-result';
+        panel.innerHTML = `<b>本次已记录到 principles（待知识审核）</b><ul>${principles}</ul><a href="/knowledge/review" target="_blank">打开知识库审核</a>`;
+        $('#detail').prepend(panel);
+      }
+      flash('回复已确认，修改和反馈已归纳为待审核原则');
+    } else flash('回复已确认并加入对话时间线');
+    await select(current);
+  }catch(e){ flash('确认失败：'+e.message); }
+  finally{ btn.disabled = false; btn.textContent = '确认并加入对话'; }
+}
+
+function openNewOpp(){
+  $('#newOppEmail').value = '';
+  $('#newOppText').value = '';
+  $('#newOppModal').classList.add('show');
+  setTimeout(()=>$('#newOppText').focus(), 0);
+}
+
+function closeNewOpp(){ $('#newOppModal').classList.remove('show'); }
+
+async function submitNewOpp(){
+  const text = ($('#newOppText').value || '').trim();
+  const from_email = ($('#newOppEmail').value || '').trim();
+  if(!text){ flash('请先粘贴客户第一封邮件'); return; }
+  const btn = document.querySelector('#newOppModal button.primary');
+  btn.disabled = true; btn.textContent = '创建中…';
+  try{
+    const r = await api('/messages', {text, from_email, new_opportunity:true});
+    const oid = r.opportunity && r.opportunity.id;
+    closeNewOpp();
+    await refresh();
+    if(oid) await select(oid);
+    flash('新商机已创建，Agent 已完成首轮处理');
+  }catch(e){ flash('创建失败：'+e.message); }
+  finally{ btn.disabled = false; btn.textContent = '创建并处理'; }
 }
 
 async function closeOpp(outcome){
