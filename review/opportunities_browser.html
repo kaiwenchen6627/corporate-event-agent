@@ -40,6 +40,9 @@
   .kv .src { font-size:10px; color:var(--muted); margin-top:4px; }
   .panel { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin-bottom:18px; }
   .panel h3 { font-size:13px; margin-bottom:10px; color:var(--muted); }
+  .revision-result { margin-top:14px; padding:12px 14px; border:1px solid #2da44e; border-radius:8px; background:#f0fff4; }
+  .revision-result h4 { font-size:12px; margin-bottom:8px; color:var(--green); }
+  .revision-result .revision-text { font-size:12.5px; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
   .msg { display:flex; gap:10px; padding:9px 0; border-bottom:1px solid #eaeef2; }
   .msg:last-child { border-bottom:none; }
   .msg .who { font-size:10px; font-weight:700; min-width:44px; padding-top:2px; }
@@ -135,13 +138,13 @@ const I18N={
  zh:{pageTitle:'机会管理 — Corporate Event Agent',pageHeading:'机会管理',pageSub:'结案 → 蒸馏成案例 → ',knowledgeApproval:'知识库',knowledge:'知识库',newOpportunityButton:'＋ 新建商机',emptyDetail:'← 选择一个机会',
   reflectTitle:'提交反馈（AI 自动总结为通用原则）',aiDraftReadonly:'AI 原稿（只读）',humanRevision:'人工改后的版本',humanRevisionPlaceholder:'把你想发给客户的版本粘贴在这里……',feedbackNotes:'本次反馈的要点（可选）',feedbackNotesPlaceholder:'这次主要改了语气 / 报价 / 服务范围 / 客户类型……',cancel:'取消',submitReflection:'提交并让 AI 总结',newOpportunity:'新建商机',customerEmail:'客户邮箱（可选）',firstEmail:'客户第一封邮件',firstEmailPlaceholder:'把客户的新询价邮件粘贴到这里……',createAndProcess:'创建并处理',
   stageDiscovery:'洽谈中',stageSolution:'方案期',stageCollaboration:'已批方案',stageClosed:'已完结',won:'成交',lost:'丢单',people:'人',noRequirements:'（尚无需求信息）',activeOpportunities:'活跃机会',closedOpportunities:'已完结',none:'无',empty:'（空）',noConversation:'（无对话）',customer:'客户',team:'Agent',approvePlan:'批准方案',insufficient:'信息未齐 / 无方案 —— 仍可直接结案',submitFeedback:'💡 提交反馈',closeWon:'✓ 成交结案',closeLost:'✗ 丢单结案',closeHint:'结案会把本机会直接存为历史案例（AI 起草 insights，其余字段来自 state）',
-  closedAs:'已结案',distilledCase:'已存入案例库：',approvedPlan:'已批方案：',scope:'范围：',unknownError:'未知错误',aiError:'⚠️ 本次处理发生 AI 错误',fallbackWarning:'以下结果可能使用了 fallback，请确认后再发送。',replyDraft:'AI 回复草稿（待审核）',feedbackOptionalExample:'本次反馈的要点（可选）：例如语气更简洁、不要说 delighted、先确认价格再问问题……',confirmAddConversation:'确认并加入对话',confirmHint:'确认时会保存你的修改，并自动归纳为可立即使用的邮件原则。',pasteNewEmail:'粘贴客户新邮件',latestEmailPlaceholder:'把客户最新一封邮件粘贴到这里……',processEmail:'处理这封邮件',processHint:'Agent 会把它作为本机会话的新一轮消息，更新需求、缺口和回复草稿。',closingActions:'结案操作',requirements:'需求',conversationTimeline:'对话时间线',turns:'条',
+  closedAs:'已结案',distilledCase:'已存入案例库：',approvedPlan:'已批方案：',scope:'范围：',unknownError:'未知错误',aiError:'⚠️ 本次处理发生 AI 错误',fallbackWarning:'以下结果可能使用了 fallback，请确认后再发送。',replyDraft:'AI 回复草稿（待审核）',feedbackOptionalExample:'本次反馈的要点（可选）：例如语气更简洁、不要说 delighted、先确认价格再问问题……',confirmAddConversation:'确认并加入对话',reviseReply:'按反馈调整草稿',revisingReply:'AI 正在调整草稿…',revisedReplyTitle:'AI 调整后的邮件（请检查下方版本）',reviseReplyDone:'AI 已生成调整版本，请检查绿色区域后再确认',reviseReplyFailed:'AI 调整草稿失败：',confirmHint:'确认时会保存最终版本，并继续原有的反馈总结流程。',pasteNewEmail:'粘贴客户新邮件',latestEmailPlaceholder:'把客户最新一封邮件粘贴到这里……',processEmail:'处理这封邮件',processHint:'Agent 会把它作为本机会话的新一轮消息，更新需求、缺口和回复草稿。',closingActions:'结案操作',requirements:'需求',conversationTimeline:'对话时间线',turns:'条',
   planApproved:'方案已批准（mode → collaboration）',failed:'失败：',pasteEmailFirst:'请先粘贴客户邮件',agentProcessing:'Agent 处理中…',llmFailed:'⚠️ AI 调用失败，系统已提示并可能使用 fallback',sameEvent:'邮件已收到，等待确认是否属于本机会',emailProcessed:'邮件已处理，状态和草稿已更新',processingFailed:'处理失败：',replyRequired:'回复内容不能为空',confirming:'确认中…',feedbackSavedToPrinciples:'本次已直接记录到 principles',viewKnowledge:'查看知识库',replyConfirmedFeedback:'回复已确认，修改和反馈已归纳为邮件原则',replyConfirmedReflectionFailed:'⚠️ 回复已确认；邮件反馈已保存，但 Reflection 失败：',replyConfirmed:'回复已确认并加入对话时间线',confirmFailed:'确认失败：',pasteFirstEmail:'请先粘贴客户第一封邮件',creating:'创建中…',newOpportunityCreated:'新商机已创建，Agent 已完成首轮处理',createFailed:'创建失败：',lostReason:'丢单原因（将写入 outcome.note，也是一条高价值教训）：',wonNote:'成交备注（可选）：',lostReasonRequired:'丢单需要填原因',confirmClose:'确认结案（{result}）？将直接写入历史案例。',alreadyClosed:'该机会已完结过',caseSaved:'已结案，案例 {id} 已写入案例库（insights {n} 条）',selectOpportunity:'请先选择一个机会',noDraft:'本机会尚无 AI 草稿可反馈（需先走完至少一轮回复）',readDraftFailed:'读取草稿失败：',humanVersionRequired:'请填写人工改后的版本',summarizing:'AI 总结中…',reflectionDone:'已总结 {n} 条，{m} 条新原则已写入知识库',submitAndSummarize:'提交并让 AI 总结'},
  en:{pageTitle:'Opportunities — Corporate Event Agent',pageHeading:'Opportunities',pageSub:'Close → Save as a case → ',knowledgeApproval:'Knowledge Base',knowledge:'Knowledge Base',newOpportunityButton:'＋ New opportunity',emptyDetail:'← Select an opportunity',
   reflectTitle:'Submit feedback (AI will distill reusable principles)',aiDraftReadonly:'AI draft (read-only)',humanRevision:'Your edited version',humanRevisionPlaceholder:'Paste the version you would send to the customer…',feedbackNotes:'Feedback notes (optional)',feedbackNotesPlaceholder:'What changed—tone, pricing, service scope, customer type…',cancel:'Cancel',submitReflection:'Submit for AI reflection',newOpportunity:'New opportunity',customerEmail:'Customer email (optional)',firstEmail:'Customer’s first email',firstEmailPlaceholder:'Paste the customer’s initial inquiry here…',createAndProcess:'Create and process',
   stageDiscovery:'Discovery',stageSolution:'Solution',stageCollaboration:'Plan approved',stageClosed:'Closed',won:'Won',lost:'Lost',people:' people',noRequirements:'(No requirement details yet)',activeOpportunities:'Active opportunities',closedOpportunities:'Closed',none:'None',empty:'(Empty)',noConversation:'(No conversation)',customer:'Customer',team:'Agent',approvePlan:'Approve plan',insufficient:'Not enough information / no options — you can still close this opportunity',submitFeedback:'💡 Submit feedback',closeWon:'✓ Mark as won',closeLost:'✗ Mark as lost',closeHint:'Closing saves this opportunity directly as a historical case (AI drafts insights; other fields come from state)',
-  closedAs:'Closed as',distilledCase:'Saved to case library: ',approvedPlan:'Approved plan: ',scope:'Scope: ',unknownError:'Unknown error',aiError:'⚠️ An AI error occurred during this run',fallbackWarning:'Some results may use fallback logic. Please review before sending.',replyDraft:'AI reply draft (awaiting review)',feedbackOptionalExample:'Optional feedback: e.g. use a more concise tone, avoid “delighted”, confirm price before asking a question…',confirmAddConversation:'Confirm and add to conversation',confirmHint:'Your edits are saved, and reusable email principles are recorded for immediate use.',pasteNewEmail:'Paste a new customer email',latestEmailPlaceholder:'Paste the customer’s latest email here…',processEmail:'Process email',processHint:'The Agent adds it as the next message, updates requirements and gaps, and drafts a reply.',closingActions:'Close opportunity',requirements:'Requirements',conversationTimeline:'Conversation timeline',turns:'messages',
-  planApproved:'Plan approved (mode → collaboration)',failed:'Failed: ',pasteEmailFirst:'Paste the customer email first',agentProcessing:'Agent is processing…',llmFailed:'⚠️ AI call failed; the system may have used fallback logic',sameEvent:'Email received; confirm whether it belongs to this opportunity',emailProcessed:'Email processed; state and draft updated',processingFailed:'Processing failed: ',replyRequired:'Reply cannot be empty',confirming:'Confirming…',feedbackSavedToPrinciples:'Recorded in principles',viewKnowledge:'View Knowledge Base',replyConfirmedFeedback:'Reply confirmed; edits were saved as reusable email principles',replyConfirmedReflectionFailed:'⚠️ Reply confirmed; email feedback was saved, but reflection failed: ',replyConfirmed:'Reply confirmed and added to the conversation',confirmFailed:'Confirmation failed: ',pasteFirstEmail:'Paste the customer’s first email first',creating:'Creating…',newOpportunityCreated:'Opportunity created; the Agent completed its first pass',createFailed:'Creation failed: ',lostReason:'Reason for loss (saved in outcome.note as a useful lesson):',wonNote:'Won note (optional):',lostReasonRequired:'Please provide a reason for marking this as lost',confirmClose:'Close this opportunity as {result}? It will be saved directly to historical cases.',alreadyClosed:'This opportunity is already closed',caseSaved:'Closed and saved case {id} to the case library ({n} insights)',selectOpportunity:'Select an opportunity first',noDraft:'There is no AI draft to give feedback on yet (process at least one reply first)',readDraftFailed:'Could not load draft: ',humanVersionRequired:'Enter your edited version',summarizing:'AI is reflecting…',reflectionDone:'Summarized {n} lesson(s); added {m} new principle(s) to the Knowledge Base',submitAndSummarize:'Submit for AI reflection'}
+  closedAs:'Closed as',distilledCase:'Saved to case library: ',approvedPlan:'Approved plan: ',scope:'Scope: ',unknownError:'Unknown error',aiError:'⚠️ An AI error occurred during this run',fallbackWarning:'Some results may use fallback logic. Please review before sending.',replyDraft:'AI reply draft (awaiting review)',feedbackOptionalExample:'Optional feedback: e.g. use a more concise tone, avoid “delighted”, confirm price before asking a question…',confirmAddConversation:'Confirm and add to conversation',reviseReply:'Revise draft with feedback',revisingReply:'AI is revising the draft…',revisedReplyTitle:'AI revised email (review before confirming)',reviseReplyDone:'AI generated a revised version; review the green panel before confirming',reviseReplyFailed:'AI draft revision failed: ',confirmHint:'The final version is saved, then the existing feedback reflection flow runs.',pasteNewEmail:'Paste a new customer email',latestEmailPlaceholder:'Paste the customer’s latest email here…',processEmail:'Process email',processHint:'The Agent adds it as the next message, updates requirements and gaps, and drafts a reply.',closingActions:'Close opportunity',requirements:'Requirements',conversationTimeline:'Conversation timeline',turns:'messages',
+  planApproved:'Plan approved (mode → collaboration)',failed:'Failed: ',pasteEmailFirst:'Paste the customer email first',agentProcessing:'Agent is processing…',llmFailed:'⚠️ AI call failed; the system may have used fallback logic',sameEvent:'Email received; confirm whether it belongs to this opportunity',emailProcessed:'Email processed; state and draft updated',processingFailed:'Processing failed: ',replyRequired:'Reply cannot be empty',confirming:'Confirming…',feedbackSavedToPrinciples:'Recorded in principles',viewKnowledge:'View Knowledge Base',replyConfirmedFeedback:'Reply confirmed; edits were saved as reusable email principles',replyConfirmedReflectionFailed:'⚠️ Reply confirmed; email feedback was saved, but reflection failed: ',replyConfirmed:'Reply confirmed and added to the conversation',confirmFailed:'Confirmation failed: ',pasteFirstEmail:'Paste the customer’s first email first',creating:'Creating…',newOpportunityCreated:'Opportunity created; the Agent completed its first pass',createFailed:'Create failed: ',lostReason:'Reason for loss (saved in outcome.note as a useful lesson):',wonNote:'Won note (optional):',lostReasonRequired:'Please provide a reason for marking this as lost',confirmClose:'Close this opportunity as {result}? It will be saved directly to historical cases.',alreadyClosed:'This opportunity is already closed',caseSaved:'Closed and saved case {id} to the case library ({n} insights)',selectOpportunity:'Select an opportunity first',noDraft:'There is no AI draft to give feedback on yet (process at least one reply first)',readDraftFailed:'Could not load draft: ',humanVersionRequired:'Enter your edited version',summarizing:'AI is reflecting…',reflectionDone:'Summarized {n} lesson(s); added {m} new principle(s) to the Knowledge Base',submitAndSummarize:'Submit for AI reflection'}
 };
 let lang=localStorage.getItem('gatherly_language')||'zh';if(!['zh','en'].includes(lang))lang='zh';
 const t=(key,vars={})=>((I18N[lang]||I18N.zh)[key]||I18N.zh[key]||key).replace(/\{(\w+)\}/g,(_,k)=>vars[k]??'');
@@ -234,7 +237,7 @@ function renderDetail(o){
     <div class="hint" style="margin-top:4px">${esc(cust.contact_person||'')}${cust.role?' · '+esc(cust.role):''}${cust.contact_email?' · '+esc(cust.contact_email):''}</div>
     ${warningHtml}
     ${decisionHtml}
-    ${o.pending_reply ? `<div class="panel reply-draft"><h3>${t('replyDraft')}</h3><textarea id="pendingReplyText">${esc(o.pending_reply.draft||'')}</textarea><textarea id="replyFeedbackNote" class="feedback-note" placeholder="${t('feedbackOptionalExample')}"></textarea><div class="row"><button class="primary" onclick="sendPendingReply()">${t('confirmAddConversation')}</button><span class="hint">${t('confirmHint')}</span></div></div>` : ''}
+    ${o.pending_reply ? `<div class="panel reply-draft"><h3>${t('replyDraft')}</h3><textarea id="pendingReplyText">${esc(o.pending_reply.draft||'')}</textarea><textarea id="replyFeedbackNote" class="feedback-note" placeholder="${t('feedbackOptionalExample')}"></textarea><div class="row"><button onclick="revisePendingReply()">${t('reviseReply')}</button><button class="primary" onclick="sendPendingReply()">${t('confirmAddConversation')}</button><span class="hint">${t('confirmHint')}</span></div><div id="revisedReplyResult" class="revision-result" hidden><h4>${t('revisedReplyTitle')}</h4><div id="revisedReplyText" class="revision-text"></div></div></div>` : ''}
     ${!o.closed ? `<div class="panel inbound"><h3>${t('pasteNewEmail')}</h3><textarea id="incomingEmail" placeholder="${t('latestEmailPlaceholder')}"></textarea><div class="row"><button class="primary" onclick="submitIncoming()">${t('processEmail')}</button><span class="hint">${t('processHint')}</span></div></div>` : ''}
     <div class="panel"><h3>${t('closingActions')}</h3>${actionsHtml}</div>
     <div class="panel"><h3>${t('requirements')}</h3><div class="kv-grid">${reqCards}</div></div>
@@ -250,8 +253,9 @@ async function select(oid){
 
 async function approveOpp(){
   try{
-    await api(`/opportunities/${current}/approve`, {option_id: $('#optSel').value});
-    flash(t('planApproved')); await select(current);
+    const r = await api(`/opportunities/${current}/approve`, {option_id: $('#optSel').value});
+    flash(t('planApproved'));
+    await select(current);
   }catch(e){ flash(t('failed')+e.message); }
 }
 
@@ -274,7 +278,7 @@ async function sendPendingReply(){
   const box = $('#pendingReplyText');
   const text = (box && box.value || '').trim();
   if(!text){ flash(t('replyRequired')); return; }
-  const btn = box.parentElement.querySelector('button');
+  const btn = box.closest('.reply-draft').querySelector('button[onclick="sendPendingReply()"]');
   btn.disabled = true; btn.textContent = t('confirming');
   try{
     const note = ($('#replyFeedbackNote') && $('#replyFeedbackNote').value || '').trim();
@@ -293,6 +297,24 @@ async function sendPendingReply(){
     await select(current);
   }catch(e){ flash(t('confirmFailed')+e.message); }
   finally{ btn.disabled = false; btn.textContent = t('confirmAddConversation'); }
+}
+
+async function revisePendingReply(){
+  const box = $('#pendingReplyText');
+  const text = (box && box.value || '').trim();
+  if(!text){ flash(t('replyRequired')); return; }
+  const note = ($('#replyFeedbackNote') && $('#replyFeedbackNote').value || '').trim();
+  const btn = box.closest('.reply-draft').querySelector('button[onclick="revisePendingReply()"]');
+  btn.disabled = true; btn.textContent = t('revisingReply');
+  try{
+    const r = await api(`/opportunities/${current}/reply/revise`, {text, note});
+    box.value = r.draft || '';
+    const output = $('#revisedReplyText');
+    const resultPanel = $('#revisedReplyResult');
+    if(output && resultPanel){ output.textContent = r.draft || ''; resultPanel.hidden = false; }
+    flash(t('reviseReplyDone'));
+  }catch(e){ flash(t('reviseReplyFailed')+e.message); }
+  finally{ btn.disabled = false; btn.textContent = t('reviseReply'); }
 }
 
 function openNewOpp(){
