@@ -2,7 +2,7 @@ import json
 from infrastructure.knowledge_store import JsonKnowledgeStore, _HAS_SKLEARN
 
 def record(rid, tags, text):
-    return {"id": rid, "tags": tags, "text": text, "review_status": "approved", "source_ids": ["src_"+rid]}
+    return {"id": rid, "tags": tags, "text": text, "source_ids": ["src_"+rid]}
 
 def test_tag_filtered_tfidf_uses_the_record_own_score(tmp_path):
     store = JsonKnowledgeStore(tmp_path / "knowledge")
@@ -16,11 +16,13 @@ def test_tag_filtered_tfidf_uses_the_record_own_score(tmp_path):
     if _HAS_SKLEARN:
         assert filtered[0]["tfidf_score"] > 0
 
-def test_pending_and_rejected_are_not_retrievable(tmp_path):
+def test_knowledge_records_have_no_review_gate_or_review_metadata(tmp_path):
     store = JsonKnowledgeStore(tmp_path / "knowledge")
-    pending = store.add("principles", {"id":"pending", "text":"hidden", "review_status":"pending"})
-    rejected = store.add("principles", {"id":"rejected", "text":"hidden", "review_status":"rejected"})
-    assert store.search(["principles"], "hidden") == []
+    store.add("principles", {"id":"pending", "text":"hidden", "review_status":"pending"})
+    store.add("principles", {"id":"rejected", "text":"hidden", "review_status":"rejected"})
+    hits = store.search(["principles"], "hidden")
+    assert {h["record_id"] for h in hits} == {"pending", "rejected"}
+    assert all("review_status" not in h["record"] for h in hits)
 
 def test_add_after_cache_build_does_not_crash_or_misalign(tmp_path):
     """Regression: add() must invalidate the TF-IDF cache. Before the fix,

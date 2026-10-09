@@ -22,7 +22,7 @@ except ImportError:  # pragma: no cover - depends on the runtime environment
                   "running on the keyword layer only. "
                   "Install with: pip install -r requirements.txt")
 
-COLLECTIONS = ("historical_cases", "capabilities", "principles")
+COLLECTIONS = ("historical_cases", "capabilities", "principles", "feedback")
 def now(): return datetime.now(timezone.utc).isoformat()
 
 # Process-wide IO lock: ThreadingHTTPServer workers must not interleave
@@ -48,9 +48,8 @@ class KnowledgeStore:
     """Stable interface; JSON keyword search can later be replaced by hybrid/vector RAG."""
     def add(self, collection, record): raise NotImplementedError
     def get(self, collection, record_id): raise NotImplementedError
-    def search(self, collections, query, limit=10): raise NotImplementedError
-    def list_pending(self): raise NotImplementedError
-    def review(self, record_id, action, reviewer, patch=None, reason=None): raise NotImplementedError
+    def search(self, collections, query, limit=10, tags=None, topics=None): raise NotImplementedError
+    def save_source(self, source): raise NotImplementedError
 
 class JsonKnowledgeStore(KnowledgeStore):
     """Directory-per-collection, file-per-record storage.
@@ -58,7 +57,6 @@ class JsonKnowledgeStore(KnowledgeStore):
     Layout:
         root/<collection>/<record_id>.json   one record per file
         root/sources/<source_id>.json       one raw source per file
-        root/reviews.json                   append-only review log
     Legacy flat files (root/<collection>.json, root/sources.json) are migrated
     into the directory layout on first load, then moved to root/_legacy/.
     """
@@ -66,10 +64,27 @@ class JsonKnowledgeStore(KnowledgeStore):
         self.root = Path(root); self.root.mkdir(parents=True, exist_ok=True)
         for c in COLLECTIONS: (self.root / c).mkdir(exist_ok=True)
         (self.root / "sources").mkdir(exist_ok=True)
-        self.reviews = self.root / "reviews.json"
-        if not self.reviews.exists(): _atomic_write(self.reviews, "[]")
         self._tfidf_cache = {}  # collection -> (vec, matrix, records, texts_lower) or None when empty
         self._migrate_legacy()
+        self._remove_knowledge_review_metadata()
+
+    @staticmethod
+    def _without_review_metadata(record):
+        # Knowledge records are directly editable and immediately searchable;
+        # opportunity/commitment approval remains a separate business workflow.
+        return {k: v for k, v in record.items() if k not in {
+            "review_status", "approved_by", "approved_at", "rejected_by",
+            "rejected_at", "rejection_reason",
+        }}
+
+    def _remove_knowledge_review_metadata(self):
+        """Clean up records created by the old knowledge review UI."""
+        for collection in COLLECTIONS:
+            for record in self._records(collection):
+                clean = self._without_review_metadata(record)
+                if clean != record:
+                    _atomic_write(self._record_path(collection, record["id"]),
+                                  json.dumps(clean, indent=2, ensure_ascii=False))
 
     # ---------- migration ----------
     def _migrate_legacy(self):
@@ -101,12 +116,17 @@ class JsonKnowledgeStore(KnowledgeStore):
         _atomic_write(self._source_path(source["id"]), json.dumps(source, indent=2, ensure_ascii=False))
         return source
 
+    def save_source(self, source):
+        if not source.get("id"): raise ValueError("source id is required")
+        _atomic_write(self._source_path(source["id"]), json.dumps(source, indent=2, ensure_ascii=False))
+        return source
+
     # ---------- records ----------
     def add(self, collection, record):
         if collection not in COLLECTIONS: raise ValueError("unknown knowledge collection")
+        record = self._without_review_metadata(record)
         record = {**record, "id": record.get("id") or collection + "_" + uuid.uuid4().hex[:8],
-                  "collection": collection, "review_status": record.get("review_status", "pending"),
-                  "created_at": record.get("created_at", now())}
+                  "collection": collection, "created_at": record.get("created_at", now())}
         _atomic_write(self._record_path(collection, record["id"]), json.dumps(record, indent=2, ensure_ascii=False))
         self._tfidf_cache.pop(collection, None)   # a new record can shift every score
         return record
@@ -117,13 +137,13 @@ class JsonKnowledgeStore(KnowledgeStore):
 
     def _build_tfidf(self, collection):
         """Lazy-build / rebuild TF-IDF index for one collection.
-        Returns (vec, matrix, records, texts_lower) or None when no approved records
+        Returns (vec, matrix, records, texts_lower) or None when the collection is empty
         or when scikit-learn is unavailable (keyword-only mode)."""
         if not _HAS_SKLEARN:
             _warn_once()
             self._tfidf_cache[collection] = None
             return None
-        records = [r for r in self._records(collection) if r.get("review_status") == "approved"]
+        records = self._records(collection)
         if not records:
             self._tfidf_cache[collection] = None
             return None
@@ -136,11 +156,12 @@ class JsonKnowledgeStore(KnowledgeStore):
         self._tfidf_cache[collection] = (vec, matrix, records, texts_lower)
         return self._tfidf_cache[collection]
 
-    def search(self, collections, query, limit=10, tags=None):
+    def search(self, collections, query, limit=10, tags=None, topics=None):
         """Hybrid search:
           - Tag pre-filter: any collection in TAG_FILTER_COLLECTIONS drops records whose
             tags are non-empty AND have no overlap with `tags`. Records without a tags
             field always pass (back-compat with legacy seed records).
+          - Optional precise-topic filter: matches a record's primary or related topic.
           - Token-frequency layer (exact match) — fast, deterministic, strong on IDs/numbers.
           - TF-IDF cosine layer (char_wb n-grams) — semantic tolerance for Chinese and
             English variants of the same concept.
@@ -153,18 +174,24 @@ class JsonKnowledgeStore(KnowledgeStore):
         hits = []
         for c in collections:
             # 1) Tag pre-filter
-            records = [r for r in self._records(c) if r.get("review_status") == "approved"]
+            records = self._records(c)
             if c in TAG_FILTER_COLLECTIONS and tags:
                 tagset = set(tags)
                 records = [r for r in records
                            if not r.get("tags") or set(r["tags"]) & tagset]
+            if topics:
+                topicset = set(topics)
+                records = [r for r in records
+                           if not r.get("primary_topic")
+                           or r.get("primary_topic") in topicset
+                           or topicset.intersection(r.get("related_topics") or [])]
             if not records: continue
             # 2) TF-IDF layer (cached)
             cached = self._tfidf_cache.get(c)
             if cached is None and c not in self._tfidf_cache:
                 cached = self._build_tfidf(c)
             if cached is None:
-                # No TF-IDF available (no approved records, or scikit-learn missing).
+                # No TF-IDF available (empty collection, or scikit-learn missing).
                 # Plain list rather than np.zeros so this path needs no numpy either.
                 tfidf_scores = [0.0] * len(records)
                 texts_lower = [json.dumps(r, ensure_ascii=False).lower() for r in records]
@@ -202,12 +229,6 @@ class JsonKnowledgeStore(KnowledgeStore):
                                  "source_ids": r.get("source_ids", []), "record": r})
         return sorted(hits, key=lambda x: x["score"], reverse=True)[:limit]
 
-    def list_pending(self):
-        out = []
-        for c in COLLECTIONS:
-            out += [x for x in self._records(c) if x.get("review_status") == "pending"]
-        return out
-
     # ---------- full-record management (for the knowledge browser UI) ----------
     def list_records(self, collection):
         if collection not in COLLECTIONS: raise ValueError("unknown knowledge collection")
@@ -226,8 +247,8 @@ class JsonKnowledgeStore(KnowledgeStore):
             existing = self.get(collection, rid)
             if existing and not record.get("created_at"): record["created_at"] = existing.get("created_at")
             record.setdefault("collection", collection)
-            record.setdefault("review_status", "pending")
             record.setdefault("created_at", now())
+            record = self._without_review_metadata(record)
             _atomic_write(self._record_path(collection, rid), json.dumps(record, indent=2, ensure_ascii=False))
             self._tfidf_cache.pop(collection, None)
             return record
@@ -237,23 +258,3 @@ class JsonKnowledgeStore(KnowledgeStore):
         path = self._record_path(collection, record_id)
         if not path.exists(): raise KeyError(record_id)
         path.unlink(); self._tfidf_cache.pop(collection, None); return {"deleted": record_id}
-
-    def review(self, record_id, action, reviewer, patch=None, reason=None):
-        """Approve/reject/edit one record. Holds the IO lock for the whole
-        scan-modify-write cycle; two concurrent reviews (e.g. two humans, or
-        review + save from the browser) cannot interleave."""
-        with _IO_LOCK:
-            for c in COLLECTIONS:
-                for r in self._records(c):
-                    if r["id"] == record_id:
-                        if action == "edit": r["content"] = {**r.get("content", {}), **(patch or {})}
-                        elif action == "approve": r.update({"review_status": "approved", "approved_by": reviewer, "approved_at": now()})
-                        elif action == "reject": r.update({"review_status": "rejected", "rejected_by": reviewer, "rejected_at": now(), "rejection_reason": reason})
-                        else: raise ValueError("action must be approve, edit or reject")
-                        _atomic_write(self._record_path(c, record_id), json.dumps(r, indent=2, ensure_ascii=False))
-                        self._tfidf_cache.pop(c, None)
-                        logs = json.loads(self.reviews.read_text(encoding="utf-8"))
-                        logs.append({"record_id": record_id, "action": action, "reviewer": reviewer, "at": now()})
-                        _atomic_write(self.reviews, json.dumps(logs, indent=2, ensure_ascii=False))
-                        return r
-            raise KeyError(record_id)

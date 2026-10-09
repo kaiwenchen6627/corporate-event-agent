@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>知识库管理 · Gatherly</title>
+<title>Gatherly · Knowledge Base</title>
 <style>
 :root{
   --bg:#f3f5f3; --card:#ffffff; --line:#dde5e0; --ink:#22302d; --ink-2:#5f7269;
@@ -38,15 +38,10 @@ aside{border-right:1px solid var(--line);background:var(--card);overflow-y:auto;
 .rec{padding:10px 12px;border-radius:8px;cursor:pointer;margin-bottom:4px;border:1px solid transparent}
 .rec:hover{background:var(--card);border-color:var(--line)}
 .rec.sel{background:var(--card);border-color:var(--accent)}
-.rec.capability-pending{border-color:var(--coral);background:#fff5f1}
-.rec.capability-pending:hover{background:#ffe9e3}
 .rec .t{font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rec .m{display:flex;gap:6px;align-items:center;color:var(--ink-2);font-size:11.5px;font-family:var(--mono)}
 .badge{font-size:10.5px;padding:1.5px 7px;border-radius:20px;font-family:var(--sans)}
-.badge.approved{background:var(--accent-soft);color:var(--accent)}
-.badge.pending{background:#f5eedb;color:var(--gold)}
-.badge.rejected{background:#f7e4df;color:var(--coral)}
-.badge.capability{background:#ffe4dc;color:var(--coral);font-weight:600}
+.facet-chip{display:inline-block;background:#eef2f0;color:#40574d;border-radius:14px;padding:2px 8px;font-size:11px;margin:3px 4px 0 0}
 .empty{color:var(--ink-2);text-align:center;padding:40px 20px;font-size:13px}
 /* ---- editor ---- */
 main{overflow-y:auto;padding:20px 24px;min-width:0}
@@ -97,42 +92,65 @@ pre.raw{white-space:pre-wrap;background:#f7faf7;border:1px solid var(--line);bor
 </head>
 <body>
 <header>
-  <div class="brand"><span class="mark">g</span> gatherly <span class="sub">知识库管理</span></div>
+  <div class="brand"><span class="mark">g</span> gatherly <span class="sub" id="pageSubtitle"></span></div>
   <div class="spacer"></div>
-  <button class="hbtn" id="newBtn">＋ 新建记录</button>
-  <a class="hbtn" style="text-decoration:none;display:inline-block" href="/knowledge/pending" target="_blank">Pending API</a>
+  <a class="hbtn" id="oppNav" style="text-decoration:none;display:inline-block" href="/opportunities/review"></a>
+  <button class="hbtn" id="langToggle" type="button">EN</button>
+  <button class="hbtn" id="newBtn"></button>
 </header>
 
 <div class="layout">
   <aside id="collections"></aside>
 
   <section class="listpane">
-    <div class="searchbar"><input id="filterBox" placeholder="筛选当前集合…"></div>
+    <div class="searchbar"><input id="filterBox" data-i18n-placeholder="filterCollection"></div>
     <div id="recordList"></div>
   </section>
 
-  <main id="editorPane"><div class="empty">← 选择一条记录查看和编辑</div></main>
+  <main id="editorPane"><div class="empty" id="emptyEditor"></div></main>
 </div>
 <div id="toast"></div>
 
 <script>
 const COLLECTIONS=[
-  {key:'historical_cases',name:'历史案例',color:'#2f6655'},
-  {key:'capabilities',name:'能力知识',color:'#3d6a8f'},
-  {key:'principles',name:'销售原则',color:'#b5543c'},
-  {key:'sources',name:'原始来源',color:'#5f7269'},
+  {key:'historical_cases',label:'historicalCases',color:'#2f6655'},
+  {key:'capabilities',label:'capabilities',color:'#3d6a8f'},
+  {key:'principles',label:'salesPrinciples',color:'#b5543c'},
+  {key:'feedback',label:'emailFeedback',color:'#8b5cf6'},
+  {key:'sources',label:'rawSources',color:'#5f7269'},
 ];
 let state={collection:'historical_cases',records:[],selected:null,counts:{},editMode:'form'};
 const $=s=>document.querySelector(s);
+const I18N={
+  zh:{pageTitle:'知识库管理 · Gatherly',pageSubtitle:'知识库管理',opportunities:'机会管理',newRecord:'＋ 新建记录',filterCollection:'筛选当前集合…',
+    historicalCases:'历史案例',capabilities:'能力知识',salesPrinciples:'销售原则',emailFeedback:'邮件反馈',rawSources:'原始来源',collections:'知识集合',
+    chooseRecord:'← 选择一条记录查看和编辑',emptyCollection:'此集合暂无记录',unnamed:'未命名记录',delete:'删除',basicInfo:'基本信息',title:'标题',tags:'标签',tagPlaceholder:'逗号分隔',topic:'主题分类',stages:'适用阶段',scope:'适用边界',
+    structuredForm:'结构化表单',rawJson:'原始 JSON',confirmDelete:'确定删除记录 {id}？此操作不可恢复。',deleted:'已删除',deleteFailed:'删除失败：',
+    jsonCaseLabel:'内容（JSON 模式 · 含 source_message_ids 等溯源字段）',saved:'已保存 ',saveFailed:'保存失败：',invalidJson:'✕ JSON 解析失败：',jsonValid:'✓ JSON 格式正确',content:'内容',saveChanges:'保存修改',textHint:'只显示和编辑这条知识的文本内容',fullRecordJson:'内容（完整记录，JSON）',contentJson:'内容（content 字段，JSON）',formatValidate:'格式化 / 校验',fileHint:'保存后直接写入 data/knowledge/ 下对应 JSON 文件',
+    noFields:'（暂无字段，可添加）',addField:'＋ 添加字段',empty:'（暂无）',add:'＋ 添加',deleteItem:'删除此项',conversation:'沟通过程（只读 · 来自原始邮件）',turn:'第{n}轮',customer:'客户',company:'我方',customerInfo:'客户信息',initialReq:'初始需求',finalSolution:'最终方案',commercialState:'商业状态',operationalState:'运营状态',outcome:'结果（outcome）',result:'结果',outcomePlaceholder:'如：活动顺利完成，客户复购',requirementChanges:'需求变更',commitmentsTodos:'承诺与待办',ourCommitments:'我方承诺',customerCommitments:'客户承诺',pendingItems:'待闭环事项',reusableLessons:'可复用经验',traceHint:'保存时 source_message_ids 等溯源字段自动保留 · 写入 data/knowledge/ 对应文件',newFieldPrompt:'新字段名（英文，例如 venue）：',
+    rawSource:'原始来源 · ',metadata:'元数据',rawReadonly:'原始内容（只读）',sourceCreateHint:'原始来源由导入流程创建，不手动新建',newRecordTitle:'新记录',created:'已创建 ',createFailed:'创建失败：',noSources:'原始来源由导入流程创建，不手动新建'},
+  en:{pageTitle:'Knowledge Base · Gatherly',pageSubtitle:'Knowledge Base',opportunities:'Opportunities',newRecord:'＋ New record',filterCollection:'Filter this collection…',
+    historicalCases:'Historical Cases',capabilities:'Capabilities',salesPrinciples:'Sales Principles',emailFeedback:'Email Feedback',rawSources:'Raw Sources',collections:'Collections',
+    chooseRecord:'← Select a record to view and edit',emptyCollection:'No records in this collection',unnamed:'Untitled record',delete:'Delete',basicInfo:'BASIC INFORMATION',title:'Title',tags:'Tags',tagPlaceholder:'Comma-separated',topic:'Topic',stages:'Sales stages',scope:'Applicability',
+    structuredForm:'Structured form',rawJson:'Raw JSON',confirmDelete:'Delete record {id}? This cannot be undone.',deleted:'Deleted',deleteFailed:'Delete failed: ',
+    jsonCaseLabel:'Content (JSON mode · includes source_message_ids and other provenance)',saved:'Saved ',saveFailed:'Save failed: ',invalidJson:'✕ Invalid JSON: ',jsonValid:'✓ Valid JSON',content:'CONTENT',saveChanges:'Save changes',textHint:'View and edit the text of this knowledge record',fullRecordJson:'Content (full record, JSON)',contentJson:'Content (content field, JSON)',formatValidate:'Format / validate',fileHint:'Saves directly to the corresponding JSON file under data/knowledge/',
+    noFields:'(No fields yet; you can add one)',addField:'＋ Add field',empty:'(None)',add:'＋ Add',deleteItem:'Delete this item',conversation:'Conversation (read-only · from original email)',turn:'Turn {n}',customer:'Customer',company:'Our team',customerInfo:'Customer information',initialReq:'Initial requirements',finalSolution:'Final solution',commercialState:'Commercial state',operationalState:'Operational state',outcome:'Outcome',result:'Outcome',outcomePlaceholder:'e.g. Event completed successfully; customer returned',requirementChanges:'Requirement changes',commitmentsTodos:'Commitments and follow-ups',ourCommitments:'Our commitments',customerCommitments:'Customer commitments',pendingItems:'Open follow-ups',reusableLessons:'Reusable lessons',traceHint:'Provenance fields such as source_message_ids are preserved when saved · Stored under data/knowledge/',newFieldPrompt:'New field name (English, e.g. venue):',
+    rawSource:'Raw source · ',metadata:'METADATA',rawReadonly:'Original content (read-only)',sourceCreateHint:'Raw sources are created through the import flow',newRecordTitle:'New record',created:'Created ',createFailed:'Create failed: ',noSources:'Raw sources are created through the import flow'},
+};
+let lang=localStorage.getItem('gatherly_language')||'zh';if(!['zh','en'].includes(lang))lang='zh';
+function t(key,vars={}){let s=(I18N[lang]||I18N.zh)[key]??I18N.zh[key]??key;return s.replace(/\{(\w+)\}/g,(_,k)=>vars[k]??'')}
+function setLanguage(next){lang=next;localStorage.setItem('gatherly_language',lang);document.documentElement.lang=lang==='zh'?'zh-CN':'en';document.title=t('pageTitle');$('#pageSubtitle').textContent=t('pageSubtitle');$('#oppNav').textContent=t('opportunities');$('#newBtn').textContent=t('newRecord');$('#langToggle').textContent=lang==='zh'?'EN':'中文';$('#filterBox').placeholder=t('filterCollection');$('#emptyEditor').textContent=t('chooseRecord');renderSidebar();renderList();if(state.selected)renderEditor(currentRecord())}
+$('#langToggle').onclick=()=>setLanguage(lang==='zh'?'en':'zh');
+window.addEventListener('storage',e=>{if(e.key==='gatherly_language'&&e.newValue&&e.newValue!==lang)setLanguage(e.newValue)});
 
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
 async function api(path,opts){const r=await fetch(path,opts);const d=await r.json();if(!r.ok)throw new Error(d.error||r.status);return d}
 
 /* ---------- sidebar ---------- */
 function renderSidebar(){
-  $('#collections').innerHTML='<div class="side-label">知识集合</div>'+COLLECTIONS.map(c=>`
+  $('#collections').innerHTML='<div class="side-label">'+t('collections')+'</div>'+COLLECTIONS.map(c=>`
     <div class="coll ${state.collection===c.key?'active':''}" data-key="${c.key}">
-      <span class="dot" style="background:${c.color}"></span><b>${c.name}</b><small>${state.counts[c.key]??'–'}</small>
+      <span class="dot" style="background:${c.color}"></span><b>${t(c.label)}</b><small>${state.counts[c.key]??'–'}</small>
     </div>`).join('');
   document.querySelectorAll('.coll').forEach(el=>el.onclick=()=>{state.collection=el.dataset.key;state.selected=null;loadRecords()});
 }
@@ -143,16 +161,13 @@ function renderList(){
   let items=state.records;
   if(kw)items=items.filter(r=>JSON.stringify(r).toLowerCase().includes(kw));
   $('#recordList').innerHTML=items.map(r=>{
-    const st=r.review_status||'pending';
-    const title=r.title||(r.content&&r.content.text)||r.id;
-    const tags = Array.isArray(r.tags) ? r.tags : [];
-    const isCapPending = st==='pending' && tags.includes('capability');
-    const capBadge = isCapPending ? '<span class="badge capability">capability · 待审</span>' : '';
-    return `<div class="rec ${state.selected===r.id?'sel':''} ${isCapPending?'capability-pending':''}" data-id="${r.id}">
+    const title=r.title||r.name||(r.content&&r.content.text)||r.id;
+    return `<div class="rec ${state.selected===r.id?'sel':''}" data-id="${r.id}">
       <div class="t">${esc(title)}</div>
-      <div class="m"><span class="badge ${st}">${st}</span><span>${r.id}</span>${capBadge}</div>
+      <div class="m"><span>${r.id}</span></div>
+      ${r.topic_label?`<div><span class="facet-chip">${esc(r.topic_label)}</span></div>`:''}
     </div>`;
-  }).join('')||'<div class="empty">此集合暂无记录</div>';
+  }).join('')||`<div class="empty">${t('emptyCollection')}</div>`;
   document.querySelectorAll('.rec').forEach(el=>el.onclick=()=>openRecord(el.dataset.id));
 }
 function openRecord(id){
@@ -165,67 +180,99 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 /* ---------- editor ---------- */
 function currentRecord(){return state.records.find(x=>x.id===state.selected)}
 function renderEditor(r){
-  if(!r){$('#editorPane').innerHTML='<div class="empty">← 选择一条记录查看和编辑</div>';return}
+  if(!r){$('#editorPane').innerHTML=`<div class="empty">${t('chooseRecord')}</div>`;return}
   if(state.collection==='sources')return renderSource(r);
   const tags=(r.tags||[]).join(', ');
   const isCase=state.collection==='historical_cases';
+  const isTextRecord=state.collection==='capabilities' || state.collection==='principles';
   $('#editorPane').innerHTML=`
     <div class="editor-head">
-      <div><h2>${esc(r.title||'未命名记录')}</h2>
+      <div><h2>${esc(r.title||r.name||t('unnamed'))}</h2>
         <div class="meta">${r.id} · created ${esc(r.created_at||'')}</div></div>
-      <div class="actions">
-        <button class="btn" id="approveBtn">✓ 审批通过</button>
-        <button class="btn" id="rejectBtn">✕ 驳回</button>
-        <button class="btn danger" id="delBtn">删除</button>
-      </div>
+      <div class="actions"><button class="btn danger" id="delBtn">${t('delete')}</button></div>
     </div>
-    <div class="card"><h3>基本信息</h3>
-      <div class="field"><label>标题</label><input id="titleBox" value="${esc(r.title||'')}"></div>
-      <div class="field"><label>标签</label><input id="tagBox" value="${esc(tags)}" placeholder="逗号分隔"></div>
-      <div class="field"><label>状态</label><select id="statusBox">
-        ${['pending','approved','rejected'].map(s=>`<option ${r.review_status===s?'selected':''}>${s}</option>`).join('')}
-      </select></div>
+    <div class="card"><h3>${t('basicInfo')}</h3>
+      <div class="field"><label>${t('title')}</label><input id="titleBox" value="${esc(r.title||'')}"></div>
+      <div class="field"><label>${t('tags')}</label><input id="tagBox" value="${esc(tags)}" placeholder="${t('tagPlaceholder')}"></div>
+      ${r.primary_topic?`<div class="field"><label>${t('topic')}</label><div><span class="facet-chip">${esc(r.topic_label||r.primary_topic)}</span><span class="facet-chip">${esc(r.primary_topic)}</span></div></div>`:''}
+      ${Array.isArray(r.sales_stages)?`<div class="field"><label>${t('stages')}</label><div>${r.sales_stages.map(x=>`<span class="facet-chip">${esc(x)}</span>`).join('')}</div></div>`:''}
+      ${r.applicability?`<div class="field"><label>${t('scope')}</label><div><span class="facet-chip">${esc(r.applicability)}</span><span class="facet-chip">${esc(r.activation_status||'')}</span></div></div>`:''}
     </div>
     ${isCase?`<div class="modetoggle">
-      <button id="modeForm" class="${state.editMode!=='json'?'on':''}">结构化表单</button>
-      <button id="modeJson" class="${state.editMode==='json'?'on':''}">原始 JSON</button></div>`:''}
+      <button id="modeForm" class="${state.editMode!=='json'?'on':''}">${t('structuredForm')}</button>
+      <button id="modeJson" class="${state.editMode==='json'?'on':''}">${t('rawJson')}</button></div>`:''}
     <div id="contentArea"></div>`;
-  $('#approveBtn').onclick=()=>review(r.id,'approve');
-  $('#rejectBtn').onclick=()=>review(r.id,'reject');
   $('#delBtn').onclick=async()=>{
-    if(!confirm(`确定删除记录 ${r.id}？此操作不可恢复。`))return;
-    try{await api('/knowledge/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({collection:state.collection,id:r.id})});toast('已删除');state.selected=null;await refresh()}catch(e){toast('删除失败：'+e.message)}};
+    if(!confirm(t('confirmDelete',{id:r.id})))return;
+    try{await api('/knowledge/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({collection:state.collection,id:r.id})});toast(t('deleted'));state.selected=null;await refresh()}catch(e){toast(t('deleteFailed')+e.message)}};
   if(isCase){
     $('#modeForm').onclick=()=>{state.editMode='form';renderEditor(currentRecord())};
     $('#modeJson').onclick=()=>{state.editMode='json';renderEditor(currentRecord())};
-    state.editMode==='json'?renderJsonArea(r,'内容（JSON 模式 · 含 source_message_ids 等溯源字段）'):renderCaseForm(r);
-  }else renderJsonArea(r);
+    state.editMode==='json'?renderJsonArea(r,t('jsonCaseLabel')):renderCaseForm(r);
+  }else if(isTextRecord) renderTextArea(r);
+  else renderJsonArea(r);
 }
 
 /* ---------- shared save ---------- */
 async function saveRecord(r,content){
-  const record={...r,title:$('#titleBox').value.trim()||r.title,
-    tags:$('#tagBox').value.split(',').map(s=>s.trim()).filter(Boolean),
-    review_status:$('#statusBox').value,content};
+  const flatRecord = state.collection==='principles' || state.collection==='feedback';
+  const record=flatRecord ? {...r,...content} : {...r,content};
+  record.title=$('#titleBox').value.trim()||r.title;
+  record.tags=$('#tagBox').value.split(',').map(s=>s.trim()).filter(Boolean);
+  // Identity and storage metadata are controlled by the store, not the JSON editor.
+  for(const k of ['id','collection','created_at']) record[k]=r[k];
+  if(flatRecord) delete record.content;
   try{const saved=await api('/knowledge/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({collection:state.collection,record})});
-    toast('已保存 '+saved.id);await refresh(saved.id)}
-  catch(e){const eb=$('#errBox');if(eb){eb.className='err';eb.textContent='保存失败：'+e.message}else toast('保存失败：'+e.message)}
+    toast(t('saved')+saved.id);await refresh(saved.id)}
+  catch(e){const eb=$('#errBox');if(eb){eb.className='err';eb.textContent=t('saveFailed')+e.message}else toast(t('saveFailed')+e.message)}
 }
-function tryParse(){try{const v=JSON.parse($('#contentBox').value);$('#errBox').textContent='';return v}catch(e){$('#errBox').className='err';$('#errBox').textContent='✕ JSON 解析失败：'+e.message;return undefined}}
+function tryParse(){try{const v=JSON.parse($('#contentBox').value);$('#errBox').textContent='';return v}catch(e){$('#errBox').className='err';$('#errBox').textContent=t('invalidJson')+e.message;return undefined}}
+
+async function saveTextRecord(r,text){
+  const record={...r,
+    title:$('#titleBox').value.trim()||r.title,
+    tags:$('#tagBox').value.split(',').map(s=>s.trim()).filter(Boolean)};
+  // Capabilities imported from older seed data use notes; newer records and
+  // principles use text. Preserve the existing field so editing never moves
+  // the sentence into an unrelated JSON content object.
+  const field = Object.prototype.hasOwnProperty.call(r,'text') ? 'text' : 'notes';
+  record[field]=text.trim();
+  delete record.content;
+  try{
+    const saved=await api('/knowledge/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({collection:state.collection,record})});
+    toast(t('saved')+saved.id); await refresh(saved.id);
+  }catch(e){toast(t('saveFailed')+e.message)}
+}
+
+function renderTextArea(r){
+  const field = Object.prototype.hasOwnProperty.call(r,'text') ? 'text' : 'notes';
+  const value = r[field] || '';
+  $('#contentArea').innerHTML=`
+    <div class="card"><h3>${t('content')}</h3>
+      <textarea id="textContentBox" style="width:100%;min-height:180px;padding:14px;border:1px solid var(--line);border-radius:10px;font-family:var(--sans);font-size:14px;line-height:1.65;resize:vertical">${esc(value)}</textarea>
+      <div class="btnrow">
+        <button class="btn primary" id="saveTextBtn">${t('saveChanges')}</button>
+        <span class="hint">${t('textHint')}</span>
+      </div>
+    </div>`;
+  $('#saveTextBtn').onclick=async()=>saveTextRecord(r,$('#textContentBox').value);
+}
 
 /* ---------- raw JSON editor ---------- */
 function renderJsonArea(r,label){
+  const flatRecord = state.collection==='principles' || state.collection==='feedback';
+  const value = flatRecord ? r : (r.content??{});
   $('#contentArea').innerHTML=`
-    <div class="card"><h3>${label||'内容（content 字段，JSON）'}</h3>
-      <textarea id="contentBox" spellcheck="false">${esc(JSON.stringify(r.content??{},null,2))}</textarea>
+    <div class="card"><h3>${label||(flatRecord?t('fullRecordJson'):t('contentJson'))}</h3>
+      <textarea id="contentBox" spellcheck="false">${esc(JSON.stringify(value,null,2))}</textarea>
       <div class="btnrow">
-        <button class="btn primary" id="saveBtn">保存修改</button>
-        <button class="btn" id="fmtBtn">格式化 / 校验</button>
-        <span class="hint">保存后直接写入 data/knowledge/ 下对应 JSON 文件</span>
+        <button class="btn primary" id="saveBtn">${t('saveChanges')}</button>
+        <button class="btn" id="fmtBtn">${t('formatValidate')}</button>
+        <span class="hint">${t('fileHint')}</span>
       </div>
       <div class="err" id="errBox"></div>
     </div>`;
-  $('#fmtBtn').onclick=()=>{const v=tryParse();if(v!==undefined){$('#contentBox').value=JSON.stringify(v,null,2);$('#errBox').className='ok';$('#errBox').textContent='✓ JSON 格式正确'}};
+  $('#fmtBtn').onclick=()=>{const v=tryParse();if(v!==undefined){$('#contentBox').value=JSON.stringify(v,null,2);$('#errBox').className='ok';$('#errBox').textContent=t('jsonValid')}};
   $('#saveBtn').onclick=async()=>{const v=tryParse();if(v===undefined)return;await saveRecord(r,v)};
 }
 
@@ -237,13 +284,13 @@ function kvRows(key,obj){
     return `<div class="field"><label>${esc(k)}</label>
       <input data-kv="${key}" data-k="${esc(k)}" data-origtype="${ot}" value="${esc(ot==='json'?JSON.stringify(v):String(v))}"></div>`;
   }).join('');
-  return rows||'<div class="empty" style="padding:8px 0">（暂无字段，可添加）</div>';
+  return rows||`<div class="empty" style="padding:8px 0">${t('noFields')}</div>`;
 }
 function kvCard(title,key,obj,hero){
   const meta=Object.fromEntries(Object.entries(obj||{}).filter(([k])=>META_KEYS[k]));
   return `<div class="card ${hero?'hero':''}"><h3>${title}</h3>${kvRows(key,obj)}
     <input type="hidden" data-kvmeta="${key}" value="${esc(JSON.stringify(meta))}">
-    <div class="btnrow"><button class="btn addbtn" type="button" data-addkv="${key}">＋ 添加字段</button></div></div>`;
+    <div class="btnrow"><button class="btn addbtn" type="button" data-addkv="${key}">${t('addField')}</button></div></div>`;
 }
 /* 自动探测列表项的文本字段名（应对 LLM 提取结构漂移：commitment/item/insight...；pending 可能是纯字符串或 dict） */
 function listBlock(key,items){
@@ -256,17 +303,17 @@ function listBlock(key,items){
     const extra=isStr?'':JSON.stringify(Object.fromEntries(Object.entries(it).filter(([k])=>k!==tk)));
     return `<div class="itemrow" data-itemrow="${key}"${plain?' data-plain="1"':''} data-tk="${esc(tk)}"${extra?` data-extra="${esc(extra)}"`:''}>
       <input class="itext" value="${esc(String(text))}" placeholder="${esc(tk)}">
-      <button class="x" type="button" data-rm title="删除此项">✕</button></div>`;
-  }).join('')||'<div class="empty" style="padding:8px 0">（暂无）</div>';
+      <button class="x" type="button" data-rm title="${t('deleteItem')}">✕</button></div>`;
+  }).join('')||`<div class="empty" style="padding:8px 0">${t('empty')}</div>`;
   return rows+`
-  <button class="btn addbtn" type="button" data-additem="${key}"${plain?' data-plain="1"':''} data-tk="${esc(tk)}">＋ 添加</button>`;
+  <button class="btn addbtn" type="button" data-additem="${key}"${plain?' data-plain="1"':''} data-tk="${esc(tk)}">${t('add')}</button>`;
 }
 function timelineCard(r){
   const tl=(r.extraction&&r.extraction.timeline)||[];
   if(!tl.length)return '';
-  return `<div class="card"><h3>沟通过程（只读 · 来自原始邮件）</h3><div class="tl">
+  return `<div class="card"><h3>${t('conversation')}</h3><div class="tl">
     ${tl.map(t=>`<div class="turn">
-      <div class="who ${t.speaker==='customer'?'cust':'co'}">第${t.turn}轮 · ${t.speaker==='customer'?'客户':'我方'}</div>
+      <div class="who ${t.speaker==='customer'?'cust':'co'}">${I18N[lang].turn.replace('{n}',t.turn)} · ${t.speaker==='customer'?I18N[lang].customer:I18N[lang].company}</div>
       <div class="sum">${esc(t.summary||'')}</div>
       ${(t.decisions||[]).map(d=>`<div class="dec">✓ ${esc(d)}</div>`).join('')}
       ${(t.unresolved_items||[]).map(u=>`<div class="unres">? ${esc(u)}</div>`).join('')}
@@ -276,25 +323,25 @@ function timelineCard(r){
 function renderCaseForm(r){
   const c=r.content||{},cm=c.commitments||{};
   $('#contentArea').innerHTML=`
-    ${kvCard('客户信息','customer',c.customer)}
-    ${kvCard('初始需求','initial_requirement',c.initial_requirement)}
-    ${kvCard('最终方案','final_solution',c.final_solution,true)}
-    ${kvCard('商业状态','commercial_state',c.commercial_state)}
-    ${kvCard('运营状态','operational_state',c.operational_state)}
-    <div class="card"><h3>结果（outcome）</h3>
-      <div class="field"><label>结果</label><input id="outcomeBox" value="${esc(c.outcome===null||c.outcome===undefined?'':String(c.outcome))}" placeholder="如：活动顺利完成，客户复购"></div>
+    ${kvCard(t('customerInfo'),'customer',c.customer)}
+    ${kvCard(t('initialReq'),'initial_requirement',c.initial_requirement)}
+    ${kvCard(t('finalSolution'),'final_solution',c.final_solution,true)}
+    ${kvCard(t('commercialState'),'commercial_state',c.commercial_state)}
+    ${kvCard(t('operationalState'),'operational_state',c.operational_state)}
+    <div class="card"><h3>${t('outcome')}</h3>
+      <div class="field"><label>${t('result')}</label><input id="outcomeBox" value="${esc(c.outcome===null||c.outcome===undefined?'':String(c.outcome))}" placeholder="${t('outcomePlaceholder')}"></div>
     </div>
-    <div class="card"><h3>需求变更</h3>${listBlock('reqch',c.requirement_changes)}</div>
-    <div class="card"><h3>承诺与待办</h3>
-      <div class="subhead">我方承诺</div>${listBlock('cmco',cm.company)}
-      <div class="subhead">客户承诺</div>${listBlock('cmcu',cm.customer)}
-      <div class="subhead">待闭环事项</div>${listBlock('cmpd',cm.pending)}
+    <div class="card"><h3>${t('requirementChanges')}</h3>${listBlock('reqch',c.requirement_changes)}</div>
+    <div class="card"><h3>${t('commitmentsTodos')}</h3>
+      <div class="subhead">${t('ourCommitments')}</div>${listBlock('cmco',cm.company)}
+      <div class="subhead">${t('customerCommitments')}</div>${listBlock('cmcu',cm.customer)}
+      <div class="subhead">${t('pendingItems')}</div>${listBlock('cmpd',cm.pending)}
     </div>
-    <div class="card"><h3>可复用经验</h3>${listBlock('ins',c.reusable_insights)}</div>
+    <div class="card"><h3>${t('reusableLessons')}</h3>${listBlock('ins',c.reusable_insights)}</div>
     ${timelineCard(r)}
     <div class="card"><div class="btnrow">
-      <button class="btn primary" id="saveBtn">保存修改</button>
-      <span class="hint">保存时 source_message_ids 等溯源字段自动保留 · 写入 data/knowledge/ 对应文件</span>
+      <button class="btn primary" id="saveBtn">${t('saveChanges')}</button>
+      <span class="hint">${t('traceHint')}</span>
     </div><div class="err" id="errBox"></div></div>`;
   $('#contentArea').addEventListener('click',onContentClick);
   $('#saveBtn').onclick=async()=>{await saveRecord(r,collectCaseContent(r))};
@@ -307,12 +354,12 @@ function onContentClick(e){
     const row=document.createElement('div');row.className='itemrow';row.dataset.itemrow=ai.dataset.additem;
     if(ai.dataset.plain==='1')row.dataset.plain='1';
     if(ai.dataset.tk)row.dataset.tk=ai.dataset.tk;
-    row.innerHTML=`<input class="itext" placeholder="${esc(ai.dataset.tk||'内容')}"><button class="x" type="button" data-rm title="删除此项">✕</button>`;
+    row.innerHTML=`<input class="itext" placeholder="${esc(ai.dataset.tk||t('content'))}"><button class="x" type="button" data-rm title="${t('deleteItem')}">✕</button>`;
     ai.parentElement.insertBefore(row,ai);row.querySelector('input').focus();return;
   }
   const ak=e.target.closest('[data-addkv]');
   if(ak){
-    const k=prompt('新字段名（英文，例如 venue）：');if(!k)return;
+    const k=prompt(t('newFieldPrompt'));if(!k)return;
     const f=document.createElement('div');f.className='field';
     f.innerHTML=`<label>${esc(k)}</label><input data-kv="${ak.dataset.addkv}" data-k="${esc(k)}" data-origtype="string">`;
     ak.closest('.card').insertBefore(f,ak.closest('.btnrow'));
@@ -358,25 +405,19 @@ function collectCaseContent(r){
 
 function renderSource(r){
   $('#editorPane').innerHTML=`
-    <div class="editor-head"><div><h2>原始来源 · ${esc(r.type||'')}</h2>
+    <div class="editor-head"><div><h2>${t('rawSource')}${esc(r.type||'')}</h2>
       <div class="meta">${r.id} · created ${esc(r.created_at||'')}</div></div></div>
-    <div class="card"><h3>元数据</h3><pre class="raw">${esc(JSON.stringify(r.metadata||{},null,2))}</pre></div>
-    <div class="card"><h3>原始内容（只读）</h3><pre class="raw">${esc(r.raw||'')}</pre></div>`;
-}
-
-/* ---------- review action（保留审计日志） ---------- */
-async function review(id,action){
-  try{await api('/knowledge/review/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,reviewer:'workspace-user'})});toast(action==='approve'?'已审批通过':'已驳回');await refresh(id)}
-  catch(e){toast('操作失败：'+e.message)}
+    <div class="card"><h3>${t('metadata')}</h3><pre class="raw">${esc(JSON.stringify(r.metadata||{},null,2))}</pre></div>
+    <div class="card"><h3>${t('rawReadonly')}</h3><pre class="raw">${esc(r.raw||'')}</pre></div>`;
 }
 
 /* ---------- new record ---------- */
 $('#newBtn').onclick=async()=>{
-  if(state.collection==='sources'){toast('原始来源由导入流程创建，不手动新建');return}
-  const record={title:'新记录',tags:[],content:{},review_status:'pending'};
+  if(state.collection==='sources'){toast(t('sourceCreateHint'));return}
+  const record={title:t('newRecordTitle'),tags:[],content:{}};
   try{const saved=await api('/knowledge/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({collection:state.collection,record})});
-    toast('已创建 '+saved.id);await refresh(saved.id)}
-  catch(e){toast('创建失败：'+e.message)}
+    toast(t('created')+saved.id);await refresh(saved.id)}
+  catch(e){toast(t('createFailed')+e.message)}
 };
 
 /* ---------- data loading ---------- */
@@ -396,6 +437,7 @@ async function loadRecords(rerenderSide=true){
 }
 $('#filterBox').oninput=renderList;
 
+setLanguage(lang);
 loadRecords();
 </script>
 </body>

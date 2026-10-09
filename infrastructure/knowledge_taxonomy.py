@@ -1,0 +1,153 @@
+"""Controlled facets for precise, explainable knowledge retrieval.
+
+`tags` remain as legacy routing buckets for backward compatibility. New records
+should use these facets to describe what the knowledge is about, when it applies,
+what kind of evidence it is, and whether it is safe to use as an instruction.
+"""
+
+TAXONOMY_VERSION = "1.0"
+
+SALES_STAGES = (
+    "discovery", "qualification", "solution_design", "quotation",
+    "procurement", "fulfillment", "cross_stage",
+)
+
+APPLICABILITY = (
+    "general_guardrail", "phase_guidance", "case_specific_example",
+    "evaluation_scenario", "pending_policy", "source_only",
+)
+
+ACTIVATION_STATES = (
+    "active_guardrail", "advisory", "authority_check_required",
+    "source_only", "pending_business_confirmation",
+)
+
+# Display label and stage defaults for each controlled topic.
+TOPICS = {
+    "governance.case_generalization": ("历史案例与规则边界", ["cross_stage"]),
+    "governance.numeric_evidence": ("数字证据与单位", ["cross_stage"]),
+    "governance.unknown_information": ("未知信息与来源核验", ["cross_stage"]),
+    "governance.rule_promotion": ("知识升格与适用范围", ["cross_stage"]),
+    "governance.conflict_resolution": ("知识冲突处理", ["cross_stage"]),
+    "governance.retrieval_authority": ("检索证据权威性", ["cross_stage"]),
+    "governance.context_preservation": ("知识上下文保留", ["cross_stage"]),
+    "governance.evaluation_scenario": ("验收情境", ["cross_stage"]),
+    "requirements.fact_provenance": ("需求事实与来源", ["discovery", "qualification"]),
+    "requirements.intent_classification": ("需求、偏好与推断区分", ["discovery", "qualification"]),
+    "requirements.information_sufficiency": ("信息充分性与决策门槛", ["qualification", "solution_design", "quotation"]),
+    "requirements.clarification": ("澄清问题设计", ["discovery", "qualification"]),
+    "requirements.decision_dependency": ("下一步决策与关键证据", ["qualification", "solution_design", "quotation"]),
+    "requirements.event_format": ("活动形式与参与方式", ["discovery", "solution_design"]),
+    "requirements.capacity": ("同时容量与场地布局", ["qualification", "solution_design"]),
+    "requirements.quote_scope": ("可报价范围与待确认项", ["quotation"]),
+    "requirements.priority": ("需求优先级", ["qualification", "solution_design"]),
+    "requirements.change_impact": ("需求变更与影响", ["cross_stage"]),
+    "communication.truthful_status": ("对客事实与状态表达", ["cross_stage"]),
+    "communication.sales_progression": ("销售推进与下一步", ["cross_stage"]),
+    "communication.conditional_language": ("条件式表达", ["solution_design", "quotation"]),
+    "communication.human_authority": ("人工审批与发送权限", ["cross_stage"]),
+    "communication.internal_handoff": ("内部交接与对客边界", ["cross_stage"]),
+    "communication.document_response": ("文件索取与交付沟通", ["procurement", "fulfillment"]),
+    "communication.brand_policy_pending": ("待确认的品牌沟通政策", ["cross_stage"]),
+    "pricing.current_price_validity": ("现行价格与有效性", ["quotation"]),
+    "pricing.human_approval": ("报价人工核准", ["quotation"]),
+    "pricing.scope_decomposition": ("报价范围拆分", ["solution_design", "quotation"]),
+    "pricing.calculation": ("报价计算与币种单位", ["quotation"]),
+    "pricing.exceptions": ("折扣、赠品与商业例外", ["quotation"]),
+    "pricing.fulfillment_feasibility": ("履约成本与可行性", ["quotation", "fulfillment"]),
+    "pricing.retail_boundary": ("零售菜单与活动报价边界", ["quotation"]),
+    "pricing.quote_readiness": ("报价文件与条款检查", ["quotation", "procurement"]),
+    "solution.customer_specificity": ("客户特定方案与泛化边界", ["solution_design"]),
+    "solution.design_sequence": ("方案设计顺序", ["solution_design"]),
+    "solution.venue_constraints": ("场地限制与替代形式", ["solution_design"]),
+    "solution.module_selection": ("方案模块选择与许可条件", ["solution_design"]),
+    "solution.budget_tradeoffs": ("预算取舍与范围调整", ["solution_design", "quotation"]),
+    "solution.comparison": ("方案比较与重新评估", ["solution_design", "quotation"]),
+    "operations.human_handoff": ("方案审批与人工交接", ["solution_design", "quotation"]),
+    "operations.fulfillment_model": ("履约模式与库存", ["fulfillment", "quotation"]),
+    "product.source_boundaries": ("产品信息与声明边界", ["cross_stage"]),
+    "capabilities.service_scope": ("服务能力范围", ["cross_stage"]),
+}
+
+# Compact classifier descriptions. These explain where a knowledge record
+# belongs; they are taxonomy metadata, not business evidence or instructions.
+TOPIC_DEFINITIONS = {
+    "governance.case_generalization": "Keep case-specific facts separate from approved reusable business rules.",
+    "governance.numeric_evidence": "Handle figures with their units, scope, date, source, and verification status.",
+    "governance.unknown_information": "Preserve missing or unverified facts as unknown; do not infer them as established facts.",
+    "governance.rule_promotion": "Review evidence and scope before promoting a lesson into a generally applicable rule.",
+    "governance.conflict_resolution": "Resolve conflicting knowledge using authority, scope, and effective time; escalate unresolved conflicts.",
+    "governance.retrieval_authority": "Check provenance, authority, and validity before using retrieved material to support a claim.",
+    "governance.context_preservation": "Retain the relationships and conditions needed to interpret source knowledge correctly.",
+    "governance.evaluation_scenario": "A test input and expected guardrail behavior, not a customer case or active business policy.",
+    "requirements.fact_provenance": "Capture stated event requirements with their source, unit, and explicit or inferred status.",
+    "requirements.intent_classification": "Distinguish a customer's requirement, preference, target, and an agent inference.",
+    "requirements.information_sufficiency": "Judge whether current facts are enough for the next decision, while identifying material gaps.",
+    "requirements.clarification": "Choose concise questions that resolve a specific decision-blocking information gap.",
+    "requirements.decision_dependency": "Identify what decision is next and which evidence it depends on.",
+    "requirements.event_format": "Understand the desired event format, participant activity, and service interaction.",
+    "requirements.capacity": "Assess simultaneous attendance in relation to venue layout, activity format, and flow.",
+    "requirements.quote_scope": "Determine which confirmed event details and inclusions are needed to define a quoteable scope.",
+    "requirements.priority": "Prioritize requirements by how strongly they affect the next decision or feasible solution.",
+    "requirements.change_impact": "Track a changed requirement and identify downstream effects on commitments, resources, timing, or price.",
+    "communication.truthful_status": "Describe facts and progress accurately; distinguish proposed, pending, completed, and confirmed.",
+    "communication.sales_progression": "Help the customer reach an appropriate next sales decision without unsupported pressure or promises.",
+    "communication.conditional_language": "Express recommendations and prices with the conditions or verification they depend on.",
+    "communication.human_authority": "Keep approval, external sending, and binding commitments within authorized human control.",
+    "communication.internal_handoff": "Separate concise customer-facing content from internal reasoning, risks, and handoff notes.",
+    "communication.document_response": "Respond to requested business documents by matching available files to requested items and gaps.",
+    "communication.brand_policy_pending": "A communication convention or brand detail that is not yet confirmed as a general policy.",
+    "pricing.current_price_validity": "Check whether a price is current, sourced, and applicable to this event before quoting it.",
+    "pricing.human_approval": "Prepare pricing evidence for review; do not treat an unapproved calculation as an authorized quote.",
+    "pricing.scope_decomposition": "Break the proposal into its actual service, product, staffing, setup, and delivery components.",
+    "pricing.calculation": "Calculate amounts only with compatible confirmed quantities, units, currencies, and approved adjustments.",
+    "pricing.exceptions": "Handle discounts, samples, gifts, and other one-off commercial exceptions within their approved scope.",
+    "pricing.fulfillment_feasibility": "Assess whether lead time, stock, testing, storage, and delivery can support the commercial offer.",
+    "pricing.retail_boundary": "Distinguish retail menu references from prices applicable to a corporate event.",
+    "pricing.quote_readiness": "Check quote status, inclusions, exclusions, terms, source, and verification before delivery.",
+    "solution.customer_specificity": "Keep a customer-specific adjustment from silently becoming a default package or general policy.",
+    "solution.design_sequence": "Move from customer outcome and constraints to supported modules, feasibility, and human review.",
+    "solution.venue_constraints": "Adapt the service concept to venue rules, access, space, equipment, and permitted activities.",
+    "solution.module_selection": "Select event modules and activities that fit the customer's goals and confirmed venue permissions.",
+    "solution.budget_tradeoffs": "Compare scope adjustments against the customer's priorities and explain the value or delivery change.",
+    "solution.comparison": "Compare feasible options on scope, dependencies, price status, trade-offs, and recommendation rationale.",
+    "operations.human_handoff": "Present a proposed solution and unresolved checks for human decision; approval states remain distinct.",
+    "operations.fulfillment_model": "Describe inventory, sourcing, stocking, and delivery arrangements without assuming they are operational.",
+    "product.source_boundaries": "Keep product attributes and claims tied to the specific product and supporting source.",
+    "capabilities.service_scope": "Describe what the business can provide, distinguishing verified capability from a proposal or assumption.",
+}
+
+# Existing source scope is preserved verbatim; this map gives it a precise,
+# searchable business topic. Scope is not treated as authority by itself.
+SCOPE_TO_TOPIC = {
+    "knowledge_governance": "governance.case_generalization",
+    "knowledge_governance.numeric_reuse": "governance.numeric_evidence",
+    "knowledge_governance.missing_data": "governance.unknown_information",
+    "knowledge_governance.promotion": "governance.rule_promotion",
+    "knowledge_governance.conflict": "governance.conflict_resolution",
+    "knowledge_governance.rich_context": "governance.context_preservation",
+    "agent.reasoning_boundary": "governance.case_generalization",
+    "agent.retrieval_guard": "governance.retrieval_authority",
+    "agent.requirement_extraction": "requirements.fact_provenance",
+    "agent.information_sufficiency": "requirements.information_sufficiency",
+    "agent.clarification": "requirements.clarification",
+    "communication.clarification": "requirements.clarification",
+    "communication.expectation": "communication.sales_progression",
+    "communication.conditional_language": "communication.conditional_language",
+    "communication.handoff": "communication.internal_handoff",
+    "communication.procurement_documents": "communication.document_response",
+    "agent.outbound_workflow": "communication.human_authority",
+    "agent.truthful_communication": "communication.truthful_status",
+    "agent.solution_limits": "solution.customer_specificity",
+    "agent.solution_sequence": "solution.design_sequence",
+    "agent.constraint_redesign": "solution.venue_constraints",
+    "agent.budget_tradeoff": "solution.budget_tradeoffs",
+    "agent.comparison": "solution.comparison",
+    "agent.pricing_boundary": "pricing.current_price_validity",
+    "agent_project.pricing_review": "pricing.human_approval",
+    "pricing.scope": "pricing.scope_decomposition",
+    "pricing.calculation": "pricing.calculation",
+    "pricing.exceptions": "pricing.exceptions",
+    "pricing.commercial_feasibility": "pricing.fulfillment_feasibility",
+    "corporate_events.retail_price_boundary": "pricing.retail_boundary",
+}

@@ -52,5 +52,5 @@ NORMALIZED TIMELINE:\n{json.dumps(timeline, ensure_ascii=False)}''')
         # Keep extraction metadata light. Full raw source is available through source_ids;
         # the structured case should remain focused enough for retrieval and review.
         compact_timeline = [{k:v for k,v in m.items() if k != "raw_text"} for m in timeline.get("messages", [])]
-        record = {"id":"case_candidate_"+uuid.uuid4().hex[:10], "title":"Imported historical event case", "source_ids":[source["id"]], "tags":["imported","historical_event_case"], "extraction":{"method":"deepseek_two_stage","created_at":now(),"timeline":compact_timeline}, "content":case, "review_status":"pending"}
+        record = {"id":"case_candidate_"+uuid.uuid4().hex[:10], "title":"Imported historical event case", "source_ids":[source["id"]], "tags":["imported","historical_event_case"], "extraction":{"method":"deepseek_two_stage","created_at":now(),"timeline":compact_timeline}, "content":case, "review_status":"approved"}
         return self.store.add("historical_cases", record)
